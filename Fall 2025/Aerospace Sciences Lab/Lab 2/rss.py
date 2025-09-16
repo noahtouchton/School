@@ -24,7 +24,7 @@ def create_dict(data_list):
     return values
 
 
-def RSS(name, value, function, data_list):
+def RSS(name, function, data_list):
     #allow the user to input spaces but remove them here
     function = function.replace(" ", "")
     if "=" not in function:
@@ -44,18 +44,33 @@ def RSS(name, value, function, data_list):
             sym = sp.Symbol(var_name)
         sym_map[var_name] = sym
         subs_map[sym] = d.value
+
+    lhs_sym = sp.Symbol(lhs)
+
     try:
         expr = sp.sympify(rhs, locals=sym_map)
     except Exception as e:
         print(f"Could not parse RHS '{rhs}': {e}")
         return None
+    
+    missing = [s for s in expr.free_symbols if s not in subs_map]
+    if missing:
+        names = ", ".join(sorted([s.name for s in missing]))
+        print(f"Missing values for : {names}")
+        return None
 
-    val = 0.0
+    try:
+        nominal_value = float(expr.subs(subs_map))
+    except Exception as e:
+        print(f"Could not evaluate expression '{rhs_str}': {e}")
+        return None
+
+    rss_sq = 0.0
     for d in data_list:
         sym = d.var if isinstance(d.var, sp.Symbol) else sym_map[str(d.var)]
         dfdxi = sp.diff(expr, sym)
         dfdxi_val = float(dfdxi.subs(subs_map))
-        val = val + (dfdxi_val * d.uncertainty)**2
+        rss_sq = rss_sq + (dfdxi_val * d.uncertainty)**2
 
-    new_data = Data(str(name), lhs, value, math.sqrt(val))
+    new_data = Data(str(name), lhs, nominal_value, math.sqrt(rss_sq))
     return new_data
