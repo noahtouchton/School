@@ -1,0 +1,2 @@
+frequency_hz,num_samples,time_start_s,time_end_s,duration_s,amplitude_set,command_peak_est,angle_peak_est,velocity_peak_est
+0.2,42310,73.753731,95.218551,21.464820000000003,350.0,350.0,1799.721649,1556.556343
