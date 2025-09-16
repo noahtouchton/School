@@ -9,7 +9,10 @@ class Data:
         self.uncertainty = uncertainty
 
     def get_error(self):
-        print(f"{self.value:.3f} ± {self.uncertainty:.3f}")
+        print(f"{self.value:.3e} ± {self.uncertainty:.3e}")
+
+    def get_description(self):
+        print(f"{self.name}, {self.var}: {self.value:.3e} ± {self.uncertainty:.3e}")
 
 
 
