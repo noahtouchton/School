@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 import os
 
 # ----------------------- USER SETTINGS -----------------------
-BASE_DIR = Path(r"C:\Users\noaht\School\Fall 2025\Controls Lab\Lab 2")
+BASE_DIR = Path(r"C:\Users\noaht\School\Fall 2025\Controls Lab\Lab 1")
 FILES = [
     "amp_200.xlsx",
     "amp_250.xlsx",
