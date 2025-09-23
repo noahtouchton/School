@@ -120,3 +120,75 @@ def RSS(name, function, data_list):
         uncertainty = float(uncertainty)
 
     return Data(str(name), lhs_sym, nominal_value, uncertainty)
+
+def drag_per_unit_span_from_pressure(name, deltaP: Data, theta_rad: np.ndarray, R_cyl: Data):
+    """
+    Build D' = ∫ [ΔP(θ) cosθ R] dθ  (trapezoid)
+    Returns Data(name, Dprime, value, uncertainty).
+    Uncertainty sources:
+      - per-tap ΔP uncertainties (independent)
+      - radius uncertainty (optional; via dR)
+    """
+    # Symbols
+    Dprime_sym = sp.Symbol("Dprime")
+
+    # Values
+    dp = np.asarray(deltaP.value, dtype=float)          # Pa
+    sdp = np.asarray(deltaP.uncertainty, dtype=float)   # Pa (broadcastable)
+    Rv  = float(R_cyl.value)                            # m
+    sR  = float(R_cyl.uncertainty)                      # m
+
+    # Trapz weights for linear propagation
+    h = theta_rad[1] - theta_rad[0]               # radians (dimensionless)
+    coeff = np.ones_like(theta_rad)
+    coeff[0]  = 0.5
+    coeff[-1] = 0.5
+
+    # D' nominal
+    integrand = dp * np.cos(theta_rad) * Rv
+    Dprime_val = np.trapz(integrand, theta_rad)  # N/m
+
+    # Linear weights wrt each ΔP_i
+    # D' = Σ_i [ w_i * ΔP_i ], where w_i = h * c_i * R * cosθ_i
+    w = h * coeff * Rv * np.cos(theta_rad)       # units: m
+    # Pressure-driven variance
+    var_Dp = np.sum((w * sdp)**2)                # (N/m)^2 because Pa * m = N/m
+
+    # Radius-driven term (optional): ∂D'/∂R = ∫ ΔP cosθ dθ = D'/R  (linear in R)
+    # If sR==0, this adds nothing.
+    dD_dR = Dprime_val / Rv if Rv != 0.0 else 0.0
+    var_R = (dD_dR * sR)**2
+
+    sDprime = float(np.sqrt(var_Dp + var_R))
+
+    return Data(name, Dprime_sym, float(Dprime_val), sDprime)
+
+
+def cd_from_Dprime(name, Dprime: Data, q: Data, D: Data):
+    """
+    C_D = D' / (q * D)
+    Uncertainty propagation (independent sources):
+      var(C_D) = (∂C/∂D')^2 sD'^2 + (∂C/∂q)^2 s_q^2 + (∂C/∂D)^2 s_D^2
+    ∂C/∂D' = 1/(qD),  ∂C/∂q = -D'/(q^2 D),  ∂C/∂D = -D'/(q D^2)
+    """
+    CD_sym = sp.Symbol("CD")
+
+    Dp  = float(Dprime.value)
+    sDp = float(Dprime.uncertainty)
+
+    qv  = float(q.value)
+    sq  = float(q.uncertainty)
+
+    Dv  = float(D.value)
+    sD  = float(D.uncertainty)
+
+    CD_val = Dp / (qv * Dv)
+
+    dC_dDp = 1.0 / (qv * Dv)
+    dC_dq  = -Dp / (qv**2 * Dv)
+    dC_dD  = -Dp / (qv * Dv**2)
+
+    var_CD = (dC_dDp * sDp)**2 + (dC_dq * sq)**2 + (dC_dD * sD)**2
+    sCD = float(np.sqrt(var_CD))
+
+    return Data(name, CD_sym, float(CD_val), sCD)
