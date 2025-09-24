@@ -50,8 +50,7 @@ rss_uncertainty55 = np.array([
     0.150545674, 0.160012500
 ])
 
-beta_deg = np.arange(0, 361, 10) 
-theta = np.deg2rad(beta_deg)
+
 dp35_pa = inH2O_to_Pa * pcyl_pwall35       # shape (37,)
 dp55_pa = inH2O_to_Pa * pcyl_pwall55
 
@@ -132,11 +131,14 @@ Cp55.print_to_excel()
 
 D_data   = d
 R_cyl    = Data("Radius", "R_cyl", d.value/2, d.uncertainty/2)
-theta    = np.deg2rad(beta_deg)
+theta_deg = np.arange(0, 361, 10) 
+beta = np.deg2rad(theta_deg) - 305 * (np.pi/180)
 
 # --- Build D' (as Data) for both runs using your ΔP arrays (already in Pa with uncertainties) ---
-Dprime35 = drag_per_unit_span_from_pressure("Drag per unit span 35", deltaP35, theta, R_cyl)
-Dprime55 = drag_per_unit_span_from_pressure("Drag per unit span 55", deltaP55, theta, R_cyl)
+theta_unc_rad = np.deg2rad(0.5)
+Dprime35 = drag_per_unit_span_from_pressure("D' 35", deltaP35, beta, R_cyl, theta_unc_rad)
+Dprime55 = drag_per_unit_span_from_pressure("D' 55", deltaP55, beta, R_cyl, theta_unc_rad)
+
 
 # --- Build C_D (as Data) with full propagation using your q35, q55 (already Data via RSS) ---
 CD35 = cd_from_Dprime("Drag coefficient 35", Dprime35, q35, D_data)

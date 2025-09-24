@@ -121,47 +121,41 @@ def RSS(name, function, data_list):
 
     return Data(str(name), lhs_sym, nominal_value, uncertainty)
 
-def drag_per_unit_span_from_pressure(name, deltaP: Data, theta_rad: np.ndarray, R_cyl: Data):
-    """
-    Build D' = ∫ [ΔP(θ) cosθ R] dθ  (trapezoid)
-    Returns Data(name, Dprime, value, uncertainty).
-    Uncertainty sources:
-      - per-tap ΔP uncertainties (independent)
-      - radius uncertainty (optional; via dR)
-    """
-    # Symbols
+def drag_per_unit_span_from_pressure(name, deltaP: Data, theta_rad: np.ndarray, R_cyl: Data,
+                                     theta_unc_rad: np.ndarray | float | None = None):
+    import numpy as np, sympy as sp
     Dprime_sym = sp.Symbol("Dprime")
 
-    # Values
-    dp = np.asarray(deltaP.value, dtype=float)          # Pa
-    sdp = np.asarray(deltaP.uncertainty, dtype=float)   # Pa (broadcastable)
-    Rv  = float(R_cyl.value)                            # m
-    sR  = float(R_cyl.uncertainty)                      # m
+    dp  = np.asarray(deltaP.value, dtype=float)          # Pa
+    sdp = np.asarray(deltaP.uncertainty, dtype=float)    # Pa
+    Rv  = float(R_cyl.value)                             # m
+    sR  = float(R_cyl.uncertainty)                       # m
 
-    # Trapz weights for linear propagation
-    h = theta_rad[1] - theta_rad[0]               # radians (dimensionless)
-    coeff = np.ones_like(theta_rad)
-    coeff[0]  = 0.5
-    coeff[-1] = 0.5
+    h = float(theta_rad[1] - theta_rad[0])               # rad
+    coeff = np.ones_like(theta_rad); coeff[0]=0.5; coeff[-1]=0.5
 
-    # D' nominal
+    # Nominal D'
     integrand = dp * np.cos(theta_rad) * Rv
-    Dprime_val = np.trapz(integrand, theta_rad)  # N/m
+    Dprime_val = np.trapz(integrand, theta_rad)          # N/m
 
-    # Linear weights wrt each ΔP_i
-    # D' = Σ_i [ w_i * ΔP_i ], where w_i = h * c_i * R * cosθ_i
-    w = h * coeff * Rv * np.cos(theta_rad)       # units: m
-    # Pressure-driven variance
-    var_Dp = np.sum((w * sdp)**2)                # (N/m)^2 because Pa * m = N/m
+    # Pressure contribution: w_i = h c_i R cosθ_i
+    w = h * coeff * Rv * np.cos(theta_rad)               # m
+    var_dp = np.sum((w * sdp)**2)                        # (N/m)^2
 
-    # Radius-driven term (optional): ∂D'/∂R = ∫ ΔP cosθ dθ = D'/R  (linear in R)
-    # If sR==0, this adds nothing.
-    dD_dR = Dprime_val / Rv if Rv != 0.0 else 0.0
-    var_R = (dD_dR * sR)**2
+    # Radius contribution: ∂D'/∂R = D'/R
+    var_R = ((Dprime_val / Rv) * sR)**2 if sR > 0 else 0.0
 
-    sDprime = float(np.sqrt(var_Dp + var_R))
+    # Angle contribution (optional): ∂D'/∂θ_i = -h c_i R ΔP_i sinθ_i
+    var_theta = 0.0
+    if theta_unc_rad is not None:
+        sθ = np.asarray(theta_unc_rad, dtype=float)
+        if sθ.size == 1:
+            sθ = np.full_like(theta_rad, float(sθ))
+        var_theta = np.sum((h * coeff * Rv * dp * np.sin(theta_rad) * sθ)**2)
 
+    sDprime = float(np.sqrt(var_dp + var_R + var_theta))
     return Data(name, Dprime_sym, float(Dprime_val), sDprime)
+
 
 
 def cd_from_Dprime(name, Dprime: Data, q: Data, D: Data):
@@ -192,3 +186,27 @@ def cd_from_Dprime(name, Dprime: Data, q: Data, D: Data):
     sCD = float(np.sqrt(var_CD))
 
     return Data(name, CD_sym, float(CD_val), sCD)
+
+def align_theta_for_integration(beta_deg, deltaP_data):
+    """
+    Rotate measured angles so that the tap with max ΔP becomes θ_flow = 0°,
+    and sort to 0..360 for proper trapezoid integration. Reorders uncertainties too.
+    Returns: theta_flow_rad (monotonic 0..2π), aligned Data (ΔP, same shape), beta_stag (deg).
+    """
+    beta_deg = np.asarray(beta_deg, dtype=float)
+    dp  = np.asarray(deltaP_data.value, dtype=float)
+    sdp = np.asarray(deltaP_data.uncertainty, dtype=float)
+
+    i0 = int(np.argmax(dp))                # index of stagnation (max ΔP)
+    beta_stag = beta_deg[i0]               # measured angle of stagnation (deg)
+
+    theta_flow_deg = (beta_deg - beta_stag) % 360.0
+    order = np.argsort(theta_flow_deg)
+
+    theta_flow_rad = np.deg2rad(theta_flow_deg[order])  # 0..2π, monotonic
+    dp_aligned  = dp[order]
+    sdp_aligned = sdp[order]
+
+    deltaP_aligned = Data(deltaP_data.name + " (aligned)", "deltaP",
+                          dp_aligned, sdp_aligned)
+    return theta_flow_rad, deltaP_aligned, float(beta_stag)
