@@ -1,32 +1,44 @@
 #!/usr/bin/env python3
 """
-Analyze Controls Lab data for amplitude=250:
+Controls Lab: Bode + Step with model overlays
 
-1) Bode (voltage -> velocity) from amp_250.xlsx
-   - Segments contiguous frequency blocks
-   - Fits input (volts) and output (velocity) sinusoids at the known block frequency
-   - Computes Gain (linear + dB) and Phase (deg) vs frequency
-   - Saves bode_data.csv and bode_plot.png
+What this does:
+1) Builds Bode (voltage -> velocity) from amp_250.xlsx
+   - Fits sinusoids per frequency block
+   - Outputs bode_data.csv
+   - Plots ONE Bode figure with experimental points and TWO model approximations
+     (first-order K, tau) from:
+       a) Bode-derived estimates
+       b) Step-derived estimates
+     -> saved as results_amp_250/bode_with_models.png
 
-2) Step (square wave) from square.xlsx
-   - Converts command -> volts
-   - Detects step transitions
-   - For each step: computes K = Δω_ss / ΔV and τ via 63.2% crossing
-   - Saves square_step_summary.csv and step_xxx.png per transition
-
-Assumptions
-- Excel header row is line 4 (1-indexed) => pandas header=3
-- Data start on line 5
-- Columns matched by fuzzy names:
-    "Time (s)", "Command Signal", "Filtered Platen Rotation Angle",
-    "Platen Velocity", "Amplitude", "Frequency"
-- Command range is ±1023 mapping to ±V_SUPPLY (set below)
+2) Analyzes steps from square.xlsx
+   - Detects up/down steps
+   - For every UP step, normalizes response to "rad/s per Volt"
+     and overlays ALL up-steps on the SAME plot with the two model step responses
+     -> saved as results_amp_250/up_steps_vs_models.png
 """
 
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+
+# ---- bigger, clearer fonts everywhere ----
+rcParams.update({
+    "figure.dpi": 120,
+    "savefig.dpi": 300,
+    "font.size": 15,        # base size (ticks)
+    "axes.labelsize": 17,   # x/y labels
+    "axes.titlesize": 18,   # titles
+    "xtick.labelsize": 15,
+    "ytick.labelsize": 15,
+    "legend.fontsize": 15   # legend text
+})
+
 
 # ============================ USER CONFIG ============================
 BASE_DIR = Path(r"C:\Users\noaht\School\Fall 2025\Controls Lab\Lab 1")
@@ -37,17 +49,16 @@ RESULTS_DIR = BASE_DIR / "results_amp_250"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 HEADER_ROW = 3               # Excel row 4 is header -> pandas header=3
-V_SUPPLY = 12.0              # H-bridge supply (Volts) — change if you used a different Vmax
+V_SUPPLY = 12.0              # H-bridge supply (Volts)
 FREQ_TOL = 1e-3              # tolerance for frequency block changes (Hz)
 MIN_BLOCK_LEN = 1000         # ignore tiny frequency blocks
 
 # Step detection / plots
-ROLL_MED_WIN = 101           # rolling median window (samples) to smooth command for step detection
-STEP_THRESH_FRAC = 0.3       # threshold fraction of global command swing to detect a step
-PRE_SAMPLES = 300            # samples before step to estimate y0 and V0 plateaus
-POST_SAMPLES = 600           # samples after step to estimate y_inf and V1 plateaus
+ROLL_MED_WIN = 101           # rolling median window (samples)
+STEP_THRESH_FRAC = 0.3       # fraction of global swing to detect a step
+PRE_SAMPLES = 300            # samples before step to estimate y0/V0
+POST_SAMPLES = 600           # samples after step to estimate y_inf/V1
 # ====================================================================
-
 
 # --------------------- Utilities and helpers -------------------------
 def read_excel(path: Path, header_row: int) -> pd.DataFrame:
@@ -80,8 +91,12 @@ def read_excel(path: Path, header_row: int) -> pd.DataFrame:
 
 
 def command_to_volts(cmd: np.ndarray, v_supply: float = V_SUPPLY) -> np.ndarray:
-    # ±1023 -> ±V_SUPPLY
+    # 0..1023 -> 0..V_SUPPLY (per your lab note)
     return (cmd / 1023.0) * v_supply
+
+def vel_degps_to_radps(vel_degps: np.ndarray) -> np.ndarray:
+    # deg/s -> rad/s
+    return vel_degps * (np.pi / 180.0)
 
 
 def find_frequency_blocks(freq: np.ndarray, tol: float, min_len: int):
@@ -109,25 +124,16 @@ def sine_fit_known_freq(t: np.ndarray, y: np.ndarray, f_hz: float):
     y = np.asarray(y, dtype=float)
     w = 2 * np.pi * f_hz
 
-    # Design matrix: [sin(wt), cos(wt), 1]
     S = np.sin(w * t)
     C = np.cos(w * t)
     X = np.column_stack((S, C, np.ones_like(t)))
 
-    # Least-squares
     beta, *_ = np.linalg.lstsq(X, y, rcond=None)
     a, b, c = beta
     A = float(np.hypot(a, b))
-    # A*sin(ωt + φ) = a*sin(ωt) + b*cos(ωt) -> φ = atan2(b, a)
-    phi = float(np.degrees(np.arctan2(b, a)))
+    phi = float(np.degrees(np.arctan2(b, a)))  # deg
     y_fit = (a * S) + (b * C) + c
     return A, phi, c, y_fit
-
-
-def unwrap_phase_deg(delta_deg: float) -> float:
-    """Wrap to (-180, 180]."""
-    d = (delta_deg + 180.0) % 360.0 - 180.0
-    return d
 
 
 # --------------------- Bode from amp_250.xlsx ------------------------
@@ -142,22 +148,22 @@ def build_bode(freq_df: pd.DataFrame, outdir: Path):
         sub = df.iloc[i0:i1+1].reset_index(drop=True)
         t = sub["time"].values
         u_cmd = sub["command"].values
-        v = sub["velocity"].values
+        v_degps = sub["velocity"].values
 
-        u_volt = command_to_volts(u_cmd, V_SUPPLY)
+        u_volt = command_to_volts(u_cmd, V_SUPPLY)          # Volts
+        v = vel_degps_to_radps(v_degps)                     # rad/s
 
         # Fit input and output at f_med
-        Au, phi_u_deg, cu, u_fit = sine_fit_known_freq(t, u_volt, f_med)
-        Ay, phi_y_deg, cy, y_fit = sine_fit_known_freq(t, v,       f_med)
+        Au, phi_u_deg, cu, _ = sine_fit_known_freq(t, u_volt, f_med)
+        Ay, phi_y_deg, cy, _ = sine_fit_known_freq(t, v,      f_med)
 
         if Au <= 1e-9:
             continue  # avoid division by zero
 
         G_lin = Ay / Au                         # rad/s per Volt
-        G_dB = 20.0 * np.log10(G_lin)
-        phase_deg = unwrap_phase_deg(phi_y_deg - phi_u_deg)
-
-        # store metrics
+        G_dB  = 20.0 * np.log10(max(G_lin, 1e-15))
+        phase_deg = (phi_y_deg - phi_u_deg)
+        # unwrap later with numpy unwrap; store raw here
         rows.append({
             "f_hz": f_med,
             "omega_rad_s": 2 * np.pi * f_med,
@@ -169,44 +175,15 @@ def build_bode(freq_df: pd.DataFrame, outdir: Path):
             "N_samples": len(sub)
         })
 
-    bode = pd.DataFrame(rows).sort_values("f_hz").reset_index(drop=True)
+    bode = pd.DataFrame(rows).sort_values("omega_rad_s").reset_index(drop=True)
+
+    # Phase unwrap across frequency (keep in degrees)
+    if len(bode):
+        bode["Phase_deg"] = np.degrees(np.unwrap(np.radians(bode["Phase_deg"].to_numpy())))
+
     csv_path = outdir / "bode_data.csv"
     bode.to_csv(csv_path, index=False)
     print(f"[BODE] Wrote {csv_path}")
-
-    # Plot magnitude and phase
-    fig1 = plt.figure(figsize=(10, 6))
-    ax1 = fig1.add_subplot(2, 1, 1)
-    ax2 = fig1.add_subplot(2, 1, 2)
-
-    # magnitude (dB)
-    ax1.semilogx(bode["f_hz"], bode["Gain_dB"], marker="o", linewidth=1.2)
-    ax1.set_ylabel("Magnitude (dB)")
-    ax1.grid(True, which="both", linewidth=0.4, alpha=0.6)
-
-    # phase (deg)
-    ax2.semilogx(bode["f_hz"], bode["Phase_deg"], marker="o", linewidth=1.2)
-    ax2.set_xlabel("Frequency (Hz)")
-    ax2.set_ylabel("Phase (deg)")
-    ax2.grid(True, which="both", linewidth=0.4, alpha=0.6)
-
-    plt.tight_layout()
-    fig_path = outdir / "bode_plot.png"
-    plt.savefig(fig_path, dpi=200)
-    plt.close(fig1)
-    print(f"[BODE] Saved {fig_path}")
-
-    # Rough readouts: K ~ low-f req linear gain; tau from -3 dB corner
-    if len(bode) >= 3:
-        K_est = float(bode.loc[0:2, "Gain_linear_rad_per_s_per_V"].median())
-        # find closest to -3 dB from low-f plateau
-        plateau_dB = float(20 * np.log10(K_est))
-        corner_target = plateau_dB - 3.0
-        idx = int(np.argmin(np.abs(bode["Gain_dB"].values - corner_target)))
-        f_c = float(bode.loc[idx, "f_hz"])
-        tau_est = 1.0 / (2 * np.pi * f_c)
-        print(f"[BODE] Approx K ~ {K_est:.4g} rad/s/V, tau ~ {tau_est:.4g} s (from -3 dB near {f_c:.3g} Hz)")
-
     return bode
 
 
@@ -223,9 +200,8 @@ def detect_steps(t: np.ndarray, u_volt: np.ndarray):
     thresh = STEP_THRESH_FRAC * max(swing, 1e-6)
     candidates = np.flatnonzero(np.abs(du) > thresh)
 
-    # Keep only leading edges separated by some gap
     steps = []
-    min_gap = max(PRE_SAMPLES + POST_SAMPLES, 100)  # ensure room around the step
+    min_gap = max(PRE_SAMPLES + POST_SAMPLES, 100)
     last = -min_gap
     for idx in candidates:
         if idx - last >= min_gap:
@@ -237,9 +213,9 @@ def detect_steps(t: np.ndarray, u_volt: np.ndarray):
 def analyze_step_at_index(t: np.ndarray, y: np.ndarray, u_volt: np.ndarray, idx: int):
     """
     Compute K and tau for one step centered at idx using:
-      - K = Δω_ss / ΔV (steady states from pre/post plateaus)
-      - tau via 63.2% crossing on the rising/falling segment
-    Returns dict with metrics and optional plot data.
+      - K = Δω_ss / ΔV (plateaus)
+      - tau via 63.2% crossing
+    Also return a normalized segment for plotting (per-Volt, time aligned at t=0).
     """
     n = len(t)
     i0 = max(0, idx - PRE_SAMPLES)
@@ -261,30 +237,25 @@ def analyze_step_at_index(t: np.ndarray, y: np.ndarray, u_volt: np.ndarray, idx:
         return None
 
     K = dω / dV
+    direction = "up" if dV > 0 else "down"
 
-    # 63.2% cross time from the instant of the step
-    # determine target level depending on rise or fall
+    # 63.2% crossing
     target = y0 + 0.632 * dω
     post_t = t[idx:i1+1]
     post_y = y[idx:i1+1]
-
-    # find first crossing of target
     crossing = None
     for k in range(1, len(post_t)):
         y_prev, y_curr = post_y[k-1], post_y[k]
         if (y_prev - target) * (y_curr - target) <= 0:
-            # linear interpolation for better estimate
             t_prev, t_curr = post_t[k-1], post_t[k]
-            if y_curr != y_prev:
-                frac = (target - y_prev) / (y_curr - y_prev)
-            else:
-                frac = 0.0
+            frac = 0.0 if y_curr == y_prev else (target - y_prev) / (y_curr - y_prev)
             crossing = t_prev + frac * (t_curr - t_prev)
             break
+    tau = float(crossing - t[idx]) if crossing is not None else np.nan
 
-    tau = None
-    if crossing is not None:
-        tau = float(crossing - t[idx])  # τ is time from the step edge
+    # Build normalized per-Volt post-step trace for overlay: y_norm = (y - y0)/dV
+    t_post = t[idx:i1+1] - t[idx]
+    y_post_norm = (y[idx:i1+1] - y0) / dV  # units: (rad/s)/V
 
     return {
         "index": idx,
@@ -296,59 +267,32 @@ def analyze_step_at_index(t: np.ndarray, y: np.ndarray, u_volt: np.ndarray, idx:
         "dV": dV,
         "domega": dω,
         "K_rad_per_s_per_V": K,
-        "tau_s": tau
-    }, (t_seg, y_seg, u_seg, target)
-
-
-def plot_step_segment(t_seg, y_seg, u_seg, t_step, target, outpath: Path, title: str):
-    fig = plt.figure(figsize=(10, 5.5))
-    ax1 = fig.add_subplot(2, 1, 1)
-    ax2 = fig.add_subplot(2, 1, 2, sharex=ax1)
-
-    ax1.plot(t_seg, y_seg, linewidth=1.2)
-    ax1.axvline(t_step, linestyle="--", alpha=0.7)
-    ax1.axhline(target, linestyle=":", alpha=0.7)
-    ax1.set_ylabel("Velocity (rad/s)")
-    ax1.set_title(title)
-    ax1.grid(True, linewidth=0.4, alpha=0.6)
-
-    ax2.plot(t_seg, u_seg, linewidth=1.2)
-    ax2.axvline(t_step, linestyle="--", alpha=0.7)
-    ax2.set_ylabel("Command (Volts)")
-    ax2.set_xlabel("Time (s)")
-    ax2.grid(True, linewidth=0.4, alpha=0.6)
-
-    plt.tight_layout()
-    plt.savefig(outpath, dpi=200)
-    plt.close(fig)
+        "tau_s": tau,
+        "direction": direction
+    }, (t_post, y_post_norm)
 
 
 def analyze_square(step_df: pd.DataFrame, outdir: Path):
     df = step_df.dropna(subset=["time", "command", "velocity"]).reset_index(drop=True)
     t = df["time"].values
-    y = df["velocity"].values
-    u_volt = command_to_volts(df["command"].values, V_SUPPLY)
+    y = vel_degps_to_radps(df["velocity"].values)              # rad/s
+    u_volt = command_to_volts(df["command"].values, V_SUPPLY)  # V
 
     step_indices = detect_steps(t, u_volt)
     if not step_indices:
-        raise RuntimeError("No steps detected in square.xlsx. Try adjusting ROLL_MED_WIN/STEP_THRESH_FRAC.")
+        raise RuntimeError("No steps detected in square.xlsx. Adjust ROLL_MED_WIN/STEP_THRESH_FRAC.")
 
     summary = []
-    step_dir = outdir / "square_step_plots"
-    step_dir.mkdir(parents=True, exist_ok=True)
+    up_traces = []  # list of (t_post, y_post_norm) for UP steps only
 
-    for j, idx in enumerate(step_indices, start=1):
+    for idx in step_indices:
         result = analyze_step_at_index(t, y, u_volt, idx)
         if result is None:
             continue
-        metrics, plot_data = result
+        metrics, (t_post, y_post_norm) = result
         summary.append(metrics)
-
-        t_seg, y_seg, u_seg, target = plot_data
-        title = f"Step #{j} @ t={metrics['t_step']:.3f}s  |  K={metrics['K_rad_per_s_per_V']:.4g}, τ={metrics['tau_s'] if metrics['tau_s'] else np.nan:.4g}s"
-        outpath = step_dir / f"step_{j:02d}.png"
-        plot_step_segment(t_seg, y_seg, u_seg, metrics["t_step"], target, outpath, title)
-        print(f"[STEP] Saved {outpath}")
+        if metrics["direction"] == "up":
+            up_traces.append((t_post, y_post_norm))
 
     if not summary:
         raise RuntimeError("Steps found, but none yielded valid metrics (ΔV ~ 0?).")
@@ -358,12 +302,158 @@ def analyze_square(step_df: pd.DataFrame, outdir: Path):
     df_sum.to_csv(csv_path, index=False)
     print(f"[STEP] Wrote {csv_path}")
 
-    # Overall estimates (robust)
+    # Robust overall estimates
     K_med = float(df_sum["K_rad_per_s_per_V"].median())
     tau_med = float(df_sum["tau_s"].dropna().median()) if df_sum["tau_s"].notna().any() else np.nan
     print(f"[STEP] Median K ~ {K_med:.4g} rad/s/V, median τ ~ {tau_med:.4g} s")
 
-    return df_sum
+    return df_sum, up_traces
+
+
+# ---------------------- Model estimation helpers ---------------------
+def estimate_K_tau_from_bode(bode: pd.DataFrame):
+    """Estimate K (low-ω plateau) and τ from -3 dB point in Bode data."""
+    if bode.empty:
+        return np.nan, np.nan
+    b = bode.sort_values("omega_rad_s").reset_index(drop=True)
+    # K ≈ average of first few linear magnitudes
+    n_lo = min(3, len(b))
+    Kdc = float(b.loc[:n_lo-1, "Gain_linear_rad_per_s_per_V"].mean())
+    plateau_dB = float(20*np.log10(max(Kdc, 1e-12)))
+
+    # target -3 dB
+    target = plateau_dB - 3.0
+    mag_db = b["Gain_dB"].to_numpy()
+    w = b["omega_rad_s"].to_numpy()
+
+    # find crossing by log-frequency interpolation
+    wc = np.nan
+    for i in range(len(w) - 1):
+        y1, y2 = mag_db[i], mag_db[i+1]
+        if (y1 - target) * (y2 - target) <= 0:
+            x1, x2 = np.log(w[i]), np.log(w[i+1])
+            m = (y2 - y1) / (x2 - x1)
+            x_star = x1 + (target - y1) / m if m != 0 else x1
+            wc = float(np.exp(x_star))
+            break
+    tau = 1.0 / wc if np.isfinite(wc) else np.nan
+    return Kdc, tau
+
+
+def bode_mag_phase_first_order(K, tau, w):
+    """Magnitude (linear) and phase (deg) of K/(1 + j*w*tau)."""
+    mag = K / np.sqrt(1.0 + (w * tau)**2)
+    phase = -np.degrees(np.arctan(w * tau))
+    return mag, phase
+
+
+# ------------------------------ Plots --------------------------------
+def plot_bode_with_models(bode: pd.DataFrame, K_bode, tau_bode, K_step, tau_step, outdir: Path):
+    """One Bode figure with experimental points + two model approximations."""
+    if bode.empty:
+        return
+    # Frequency grid spanning experimental data
+    w_min = max(1e-2, float(bode["omega_rad_s"].min())/1.5)
+    w_max = float(bode["omega_rad_s"].max())*1.5
+    w = np.logspace(np.log10(w_min), np.log10(w_max), 600)
+
+    # Models
+    mag_b, ph_b = bode_mag_phase_first_order(K_bode, tau_bode, w) if np.isfinite(tau_bode) else (None, None)
+    mag_s, ph_s = bode_mag_phase_first_order(K_step, tau_step, w) if np.isfinite(tau_step) else (None, None)
+
+    # Build figure
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+    # Experimental magnitude (points) in dB
+    ax1.semilogx(bode["omega_rad_s"], bode["Gain_dB"], marker="o", linestyle="none",
+                 label="Experimental (mag, dB)")
+    # Model magnitudes (lines) in dB
+    if mag_b is not None:
+        ax1.semilogx(w, 20*np.log10(np.maximum(mag_b, 1e-15)), label=f"Model (Bode fit): K={K_bode:.3g}, τ={tau_bode:.3g}s")
+    if mag_s is not None:
+        ax1.semilogx(w, 20*np.log10(np.maximum(mag_s, 1e-15)), label=f"Model (Step fit): K={K_step:.3g}, τ={tau_step:.3g}s")
+    ax1.set_ylabel("Magnitude (dB)")
+    ax1.grid(True, which="both", linewidth=0.4, alpha=0.6)
+    ax1.legend(framealpha=0.95, fontsize=15)
+
+    # Experimental phase (points) in deg
+    ax2.semilogx(bode["omega_rad_s"], bode["Phase_deg"], marker="x", linestyle="none",
+                 label="Experimental (phase, deg)")
+    # Model phases (lines) in deg
+    if ph_b is not None:
+        ax2.semilogx(w, ph_b, label="Model (Bode fit)")
+    if ph_s is not None:
+        ax2.semilogx(w, ph_s, label="Model (Step fit)")
+    ax2.set_xlabel("Angular frequency ω (rad/s)")
+    ax2.set_ylabel("Phase (deg)")
+    ax2.grid(True, which="both", linewidth=0.4, alpha=0.6)
+    ax2.legend(framealpha=0.95, fontsize=15)
+
+    plt.tight_layout()
+    out = outdir / "bode_with_models.png"
+    fig.savefig(out, dpi=200)
+    plt.close(fig)
+    print(f"[PLOT] Saved {out}")
+
+
+def plot_up_steps_vs_models(up_traces, K_bode, tau_bode, K_step, tau_step, outdir: Path):
+    """
+    Overlay ALL 'up' steps (normalized per Volt) with BOTH model step responses.
+    x-axis is limited to the data extent (slight padding), so lines end where the blue data end.
+    """
+    if not up_traces:
+        print("[PLOT] No UP steps found to overlay.")
+        return
+
+    # --- time window LIMITED BY DATA (not by model taus) ---
+    t_max_data = max(float(tr[0].max()) for tr in up_traces if tr[0].size)
+    pad = 0.02 * t_max_data  # 2% padding for aesthetics
+    t_end = max(t_max_data + pad, 1e-3)
+    t = np.linspace(0, t_end, 600)
+
+    # Model responses over the same, data-limited time base (1 V step)
+    y_b = K_bode * (1.0 - np.exp(-t / tau_bode)) if np.isfinite(tau_bode) else None
+    y_s = K_step * (1.0 - np.exp(-t / tau_step)) if np.isfinite(tau_step) else None
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    # Blue up-step data: more pronounced + single legend entry
+    first_label_done = False
+    for t_post, y_norm in up_traces:
+        label = "Up-step data (normalized)" if not first_label_done else "_nolegend_"
+        ax.plot(
+            t_post,
+            y_norm,
+            color="C0",
+            linewidth=1.8,
+            alpha=0.75,
+            solid_capstyle="round",
+            zorder=1,
+            label=label
+        )
+        first_label_done = True
+
+    # Models on SAME time axis (data-limited)
+    if y_b is not None:
+        ax.plot(t, y_b, color="C1", linewidth=2.4, zorder=2,
+                label=f"Model (Bode fit): K={K_bode:.3g}, τ={tau_bode:.3g}s")
+    if y_s is not None:
+        ax.plot(t, y_s, color="C2", linewidth=2.4, linestyle="--", zorder=2,
+                label=f"Model (Step fit): K={K_step:.3g}, τ={tau_step:.3g}s")
+
+    ax.set_xlim(0, t_end)  # <-- keep axis tight to data extent
+    ax.set_xlabel("Time since step (s)")
+    ax.set_ylabel("Velocity per Volt (rad/s per V)")
+    ax.set_title("All UP steps (normalized) vs model step responses")
+    ax.grid(True, linewidth=0.4, alpha=0.6)
+    ax.legend(framealpha=0.95)
+    plt.tight_layout()
+    out = outdir / "up_steps_vs_models.png"
+    fig.savefig(out, dpi=200)
+    plt.close(fig)
+    print(f"[PLOT] Saved {out}")
+
+
 
 
 # ------------------------------ Main -------------------------------
@@ -371,34 +461,41 @@ def main():
     print(f"[INFO] Reading frequency file: {FREQ_FILE}")
     df_freq = read_excel(FREQ_FILE, HEADER_ROW)
 
-    # Bode (use VELOCITY as output)
+    # Bode
     bode = build_bode(df_freq, RESULTS_DIR)
+
+    # Bode-derived K, tau
+    K_bode, tau_bode = estimate_K_tau_from_bode(bode)
+    print(f"[BODE] K≈{K_bode:.4g} rad/s/V, τ≈{tau_bode:.4g} s")
 
     print(f"[INFO] Reading square file: {STEP_FILE}")
     df_step = read_excel(STEP_FILE, HEADER_ROW)
 
-    # Step analysis (use VELOCITY as output)
-    step_summary = analyze_square(df_step, RESULTS_DIR)
+    # Steps (collect UP traces too)
+    step_summary, up_traces = analyze_square(df_step, RESULTS_DIR)
 
-    # Write a short text summary
+    # Step-derived K, tau (robust medians)
+    K_step = float(step_summary["K_rad_per_s_per_V"].median())
+    tau_step = float(step_summary["tau_s"].dropna().median()) if step_summary["tau_s"].notna().any() else np.nan
+    print(f"[STEP]  K≈{K_step:.4g} rad/s/V, τ≈{tau_step:.4g} s")
+
+    # One Bode plot with experimental & both models
+    plot_bode_with_models(bode, K_bode, tau_bode, K_step, tau_step, RESULTS_DIR)
+
+    # One overlay plot: all UP steps vs both model step responses
+    plot_up_steps_vs_models(up_traces, K_bode, tau_bode, K_step, tau_step, RESULTS_DIR)
+
+    # Write a short text summary (kept)
     summary_txt = RESULTS_DIR / "summary.txt"
     with open(summary_txt, "w") as f:
         f.write("=== Bode (from amp_250.xlsx) ===\n")
-        if len(bode):
-            K_est = float(bode.loc[0:2, "Gain_linear_rad_per_s_per_V"].median())
-            plateau_dB = float(20*np.log10(K_est))
-            # corner approx
-            idx = int(np.argmin(np.abs(bode["Gain_dB"].values - (plateau_dB - 3.0))))
-            f_c = float(bode.loc[idx, "f_hz"])
-            tau_est = 1.0/(2*np.pi*f_c)
-            f.write(f"K_lowf_est ~ {K_est:.6g} rad/s/V\n")
-            f.write(f"Corner ~ {f_c:.6g} Hz -> tau ~ {tau_est:.6g} s\n")
+        f.write(f"K_bode ~ {K_bode:.6g} rad/s/V\n")
+        f.write(f"tau_bode ~ {tau_bode:.6g} s\n")
         f.write("\n=== Steps (from square.xlsx) ===\n")
-        K_med = float(step_summary["K_rad_per_s_per_V"].median())
-        tau_med = float(step_summary["tau_s"].dropna().median()) if step_summary["tau_s"].notna().any() else np.nan
-        f.write(f"K_median ~ {K_med:.6g} rad/s/V\n")
-        f.write(f"tau_median ~ {tau_med:.6g} s\n")
+        f.write(f"K_step_median ~ {K_step:.6g} rad/s/V\n")
+        f.write(f"tau_step_median ~ {tau_step:.6g} s\n")
     print(f"[INFO] Wrote {summary_txt}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 === Bode (from amp_250.xlsx) ===
-K_lowf_est ~ 66.7346 rad/s/V
-Corner ~ 5 Hz -> tau ~ 0.031831 s
+K_bode ~ 1.16325 rad/s/V
+tau_bode ~ 0.0299512 s
 
 === Steps (from square.xlsx) ===
-K_median ~ 64.8818 rad/s/V
-tau_median ~ 0.0353851 s
+K_step_median ~ 1.1324 rad/s/V
+tau_step_median ~ 0.0353851 s
