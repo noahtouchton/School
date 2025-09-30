@@ -1,0 +1,3 @@
+station,AOS_utc,LOS_utc,duration_s,max_elev_deg,range_at_max_km,station_lat,station_lon,station_alt_m
+Leaf Space – Jeju (Korea),2027-09-15T08:52:57.169196Z,2027-09-15T09:01:19.468664Z,502,33.1,1137.8,33.383,126.317,0.0
+Leaf Space – Jeju (Korea),2027-09-15T10:25:10.469499Z,2027-09-15T10:32:27.836790Z,437,22.0,1484.6,33.383,126.317,0.0

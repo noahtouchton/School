@@ -1,0 +1,4 @@
+station,AOS_utc,LOS_utc,duration_s,max_elev_deg,range_at_max_km,station_lat,station_lon,station_alt_m
+RBC Signals – Madison (WI),2027-09-14T23:38:54.194126Z,2027-09-14T23:48:08.207053Z,554,77.9,686.0,43.0731,-89.4012,0.0
+RBC Signals – Madison (WI),2027-09-15T01:13:47.144981Z,2027-09-15T01:17:37.436631Z,230,12.3,1947.6,43.0731,-89.4012,0.0
+RBC Signals – Madison (WI),2027-09-15T12:27:04.088650Z,2027-09-15T12:31:03.318171Z,239,40.3,364.9,43.0731,-89.4012,0.0

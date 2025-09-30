@@ -1,0 +1,2 @@
+station,AOS_utc,LOS_utc,duration_s,max_elev_deg,range_at_max_km,station_lat,station_lon,station_alt_m
+NASA NEN White Sands,2027-09-15T01:08:21.507319Z,2027-09-15T01:17:48.144881Z,566,75.6,712.2,32.4,-106.33,0.0

@@ -1,0 +1,2 @@
+station,AOS_utc,LOS_utc,duration_s,max_elev_deg,range_at_max_km,station_lat,station_lon,station_alt_m
+SANSA Hartebeesthoek,2027-09-14T17:09:45.011057Z,2027-09-14T17:17:28.897135Z,463,33.1,1024.0,-25.8897,27.685,0.0

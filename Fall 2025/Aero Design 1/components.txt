@@ -1,0 +1,4 @@
+Transmitter  PULSAR-STX https://www.aac-clyde.space/what-we-do/space-products-components/communications/pulsar-hstx
+microcontroller STM32H723VET6 https://estore.st.com/en/stm32h723vet6-cpn.html
+antenna ISISPACE S-Band Patch Antenna https://www.isispace.nl/product/s-band-patch-antenna/
+transciever GomSpace AX100 https://gomspace.com/shop/subsystems/communication-systems/nanocom-ax100.aspx

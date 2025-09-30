@@ -1,0 +1,47 @@
+[
+  { "name": "KSAT Svalbard (Longyearbyen)", "lat": 78.2288, "lon": 15.4070, "alt_m": 0, "provider": "KSAT", "country": "Norway" },
+  { "name": "KSAT Tromsø", "lat": 69.6492, "lon": 18.9553, "alt_m": 0, "provider": "KSAT", "country": "Norway" },
+  { "name": "KSAT TrollSat (Antarctica)", "lat": -72.0110, "lon": 2.5350, "alt_m": 0, "provider": "KSAT", "country": "Norway/Antarctica" },
+  { "name": "KSAT Inuvik", "lat": 68.3600, "lon": -133.7230, "alt_m": 0, "provider": "KSAT", "country": "Canada" },
+  { "name": "KSAT Punta Arenas", "lat": -53.1638, "lon": -70.9171, "alt_m": 0, "provider": "KSAT", "country": "Chile" },
+
+  { "name": "SSC Esrange (Kiruna) – KIR-2", "lat": 67.858428, "lon": 20.966880, "alt_m": 386, "provider": "SSC/ESA", "country": "Sweden" },
+  { "name": "SSC Esrange (Kiruna) – site", "lat": 67.8830, "lon": 21.0670, "alt_m": 402, "provider": "SSC", "country": "Sweden" },
+  { "name": "SSC Santiago", "lat": -33.4489, "lon": -70.6693, "alt_m": 0, "provider": "SSC", "country": "Chile" },
+  { "name": "SSC Space US North Pole (AK)", "lat": 64.7511, "lon": -147.3494, "alt_m": 0, "provider": "SSC", "country": "USA" },
+
+  { "name": "NASA NEN Fairbanks (ASF)", "lat": 64.8580, "lon": -147.8490, "alt_m": 0, "provider": "NASA NEN", "country": "USA" },
+  { "name": "NASA NEN Wallops", "lat": 37.9400, "lon": -75.4660, "alt_m": 0, "provider": "NASA NEN", "country": "USA" },
+  { "name": "NASA NEN White Sands", "lat": 32.4000, "lon": -106.3300, "alt_m": 0, "provider": "NASA NEN", "country": "USA" },
+  { "name": "NASA NEN McMurdo", "lat": -77.8460, "lon": 166.6860, "alt_m": 0, "provider": "NASA NEN", "country": "Antarctica" },
+  { "name": "SANSA Hartebeesthoek", "lat": -25.8897, "lon": 27.6850, "alt_m": 0, "provider": "SANSA/NEN", "country": "South Africa" },
+
+  { "name": "AWS Ground Station – Ohio", "lat": 39.9612, "lon": -82.9988, "alt_m": 0, "provider": "AWS GS", "country": "USA" },
+  { "name": "AWS Ground Station – Oregon", "lat": 45.8399, "lon": -119.7006, "alt_m": 0, "provider": "AWS GS", "country": "USA" },
+  { "name": "AWS Ground Station – Ireland", "lat": 53.3331, "lon": -6.2489, "alt_m": 0, "provider": "AWS GS", "country": "Ireland" },
+  { "name": "AWS Ground Station – Stockholm", "lat": 59.3293, "lon": 18.0686, "alt_m": 0, "provider": "AWS GS", "country": "Sweden" },
+  { "name": "AWS Ground Station – Seoul", "lat": 37.5665, "lon": 126.9780, "alt_m": 0, "provider": "AWS GS", "country": "South Korea" },
+  { "name": "AWS Ground Station – Singapore", "lat": 1.3521, "lon": 103.8198, "alt_m": 0, "provider": "AWS GS", "country": "Singapore" },
+  { "name": "AWS Ground Station – Punta Arenas", "lat": -53.1638, "lon": -70.9171, "alt_m": 0, "provider": "AWS GS", "country": "Chile" },
+
+  { "name": "Leaf Space – Blönduós (Iceland)", "lat": 65.6330, "lon": -20.2330, "alt_m": 0, "provider": "Leaf Space", "country": "Iceland" },
+  { "name": "Leaf Space – Kandy (Sri Lanka)", "lat": 7.2667, "lon": 80.7167, "alt_m": 0, "provider": "Leaf Space", "country": "Sri Lanka" },
+  { "name": "Leaf Space – Jeju (Korea)", "lat": 33.3830, "lon": 126.3170, "alt_m": 0, "provider": "Leaf Space", "country": "South Korea" },
+  { "name": "Leaf Space – Mon Loisir (Mauritius)", "lat": -20.1330, "lon": 57.6830, "alt_m": 0, "provider": "Leaf Space", "country": "Mauritius" },
+  { "name": "Leaf Space – La Paz (Mexico)", "lat": 24.0830, "lon": -110.3830, "alt_m": 0, "provider": "Leaf Space", "country": "Mexico" },
+  { "name": "Leaf Space – Awarua (New Zealand)", "lat": -46.5170, "lon": 168.3670, "alt_m": 0, "provider": "Leaf Space", "country": "New Zealand" },
+  { "name": "Leaf Space – Santa Maria (Azores)", "lat": 36.9830, "lon": -25.1330, "alt_m": 0, "provider": "Leaf Space", "country": "Portugal (Azores)" },
+  { "name": "Leaf Space – Unst (Shetland, UK)", "lat": 60.7330, "lon": -0.8500, "alt_m": 0, "provider": "Leaf Space", "country": "United Kingdom" },
+  { "name": "Leaf Space – Santiago (Chile)", "lat": -33.4489, "lon": -70.6693, "alt_m": 0, "provider": "Leaf Space", "country": "Chile" },
+
+  { "name": "RBC Signals – Boardman (OR)", "lat": 45.8399, "lon": -119.7006, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Columbus (OH)", "lat": 39.9612, "lon": -82.9988, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Deadhorse (AK)", "lat": 70.2000, "lon": -148.5000, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Fairbanks (AK)", "lat": 64.8580, "lon": -147.8490, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Talkeetna (AK)", "lat": 62.3200, "lon": -150.1100, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Honolulu (HI)", "lat": 21.3069, "lon": -157.8583, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Los Angeles (CA)", "lat": 34.0522, "lon": -118.2437, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Madison (WI)", "lat": 43.0731, "lon": -89.4012, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Miami (FL)", "lat": 25.7617, "lon": -80.1918, "alt_m": 0, "provider": "RBC Signals", "country": "USA" },
+  { "name": "RBC Signals – Winston-Salem (NC)", "lat": 36.0999, "lon": -80.2442, "alt_m": 0, "provider": "RBC Signals", "country": "USA" }
+]

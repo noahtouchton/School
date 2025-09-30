@@ -1,0 +1,4 @@
+station,AOS_utc,LOS_utc,duration_s,max_elev_deg,range_at_max_km,station_lat,station_lon,station_alt_m
+AWS Ground Station – Ohio,2027-09-14T22:08:36.617959Z,2027-09-14T22:13:49.253721Z,312,15.1,1770.7,39.9612,-82.9988,0.0
+AWS Ground Station – Ohio,2027-09-14T23:37:49.427066Z,2027-09-14T23:47:03.745806Z,554,61.9,761.4,39.9612,-82.9988,0.0
+AWS Ground Station – Ohio,2027-09-15T12:27:41.412367Z,2027-09-15T12:31:26.649407Z,225,33.5,406.7,39.9612,-82.9988,0.0

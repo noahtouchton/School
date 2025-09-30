@@ -1,0 +1,4 @@
+station,AOS_utc,LOS_utc,duration_s,max_elev_deg,range_at_max_km,station_lat,station_lon,station_alt_m
+AWS Ground Station – Ireland,2027-09-14T17:31:45.516829Z,2027-09-14T17:40:23.716191Z,518,49.9,816.8,53.3331,-6.2489,0.0
+AWS Ground Station – Ireland,2027-09-14T19:04:12.299980Z,2027-09-14T19:11:50.071104Z,457,26.4,1262.7,53.3331,-6.2489,0.0
+AWS Ground Station – Ireland,2027-09-15T07:45:51.261803Z,2027-09-15T07:50:25.332294Z,274,32.3,538.3,53.3331,-6.2489,0.0
