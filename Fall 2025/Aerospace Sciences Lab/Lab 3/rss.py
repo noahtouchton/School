@@ -1,3 +1,4 @@
+#rss.py
 import math
 import numpy as np
 import sympy as sp
@@ -210,3 +211,169 @@ def align_theta_for_integration(beta_deg, deltaP_data):
     deltaP_aligned = Data(deltaP_data.name + " (aligned)", "deltaP",
                           dp_aligned, sdp_aligned)
     return theta_flow_rad, deltaP_aligned, float(beta_stag)
+
+
+# === Polynomial calibration helpers =========================================
+# Fits U(E) = a0 + a1 E + ... + aN E^N and returns coeffs and full covariance.
+# Works with optional pointwise y-uncertainties (WLS) or weights.
+import numpy as np
+
+def fit_poly_with_cov(x, y, order: int, y_uncert: np.ndarray | float | None = None, weights: np.ndarray | None = None):
+    """
+    Fit polynomial y ≈ sum_{k=0..order} a_k x^k.
+    Returns:
+      coeffs: (order+1,) array [a0, a1, ..., a_order]
+      cov:    (order+1, order+1) covariance matrix of coeffs
+      sigma2: residual variance estimate
+      yhat:   fitted values
+      dof:    degrees of freedom (n - (order+1))
+
+    If y_uncert is supplied (std dev per point) it does WLS with w_i = 1/σ_i^2.
+    If 'weights' is supplied directly, it uses those. y_uncert takes precedence.
+    """
+    x = np.asarray(x, float).ravel()
+    y = np.asarray(y, float).ravel()
+    n = x.size
+    p = order + 1
+    if n < p:
+        raise ValueError(f"Need at least {p} points for a degree-{order} polynomial; got {n}.")
+
+    # Vandermonde: columns [1, x, x^2, ...]
+    X = np.vander(x, N=p, increasing=True)
+
+    if y_uncert is not None:
+        y_uncert = np.asarray(y_uncert, float).ravel()
+        if y_uncert.size not in (1, n):
+            raise ValueError("y_uncert must be scalar or same length as x.")
+        w = 1.0 / (y_uncert**2 if y_uncert.size == n else float(y_uncert)**2)
+    elif weights is not None:
+        w = np.asarray(weights, float).ravel()
+        if w.size != n:
+            raise ValueError("weights must be same length as x.")
+    else:
+        w = None
+
+    if w is None:
+        # OLS normal equations via QR for stability
+        Q, R = np.linalg.qr(X, mode='reduced')
+        coeffs = np.linalg.solve(R, Q.T @ y)
+        # Residuals & variance
+        yhat = X @ coeffs
+        resid = y - yhat
+        dof = n - p
+        sigma2 = float((resid @ resid) / dof)
+        # Covariance of coeffs: σ^2 (X^T X)^{-1}
+        XtX_inv = np.linalg.inv(X.T @ X)
+        cov = sigma2 * XtX_inv
+    else:
+        # WLS using sqrt weights
+        Wsqrt = np.sqrt(w)
+        Xw = X * Wsqrt[:, None]
+        yw = y * Wsqrt
+        Q, R = np.linalg.qr(Xw, mode='reduced')
+        coeffs = np.linalg.solve(R, Q.T @ yw)
+        yhat = X @ coeffs
+        resid = y - yhat
+        dof = n - p
+        # Weighted residual variance estimate (per standard WLS practice)
+        sigma2 = float((w * resid**2).sum() / dof)
+        XtWX_inv = np.linalg.inv(X.T @ (w[:, None] * X))
+        cov = sigma2 * XtWX_inv
+
+    return coeffs, cov, sigma2, yhat, dof
+
+
+def poly_value_uncert(x_eval, coeffs, cov, sigma2=0.0, include_prediction=False, dx_std: float | np.ndarray | None = None):
+    """
+    Uncertainty of y(x) = sum a_k x^k at x_eval, given coeff covariance.
+    - If include_prediction=False -> returns standard error of the mean curve.
+    - If include_prediction=True  -> adds residual variance (prediction interval base).
+    - If dx_std provided (std dev of x), adds delta-method term (dy/dx * dx_std)^2.
+
+    Returns:
+      y_eval:  nominal y at x_eval
+      u_total: standard uncertainty at x_eval (same shape as x_eval)
+    """
+    coeffs = np.asarray(coeffs, float).ravel()
+    p = coeffs.size
+    x_eval = np.asarray(x_eval, float)
+
+    # Build row vector [1, x, x^2, ...] at each x_eval
+    def _row(x):
+        return np.power(x, np.arange(p, dtype=float))
+
+    # Nominal value
+    y_eval = np.polynomial.polynomial.polyval(x_eval, coeffs)
+
+    # Mean-curve uncertainty from coefficient covariance: x* C * x^T
+    # Handle scalar vs vector x_eval
+    if x_eval.ndim == 0:
+        r = _row(float(x_eval))
+        u_mean2 = float(r @ cov @ r.T)
+    else:
+        R = np.stack([_row(x) for x in x_eval], axis=0)  # (n, p)
+        u_mean2 = np.einsum('ni,ij,nj->n', R, cov, R)    # (n,)
+
+    u_total2 = u_mean2
+
+    # Add residual variance for prediction intervals if requested
+    if include_prediction and sigma2 > 0.0:
+        u_total2 = u_total2 + sigma2
+
+    # Optional x-uncertainty via delta method
+    if dx_std is not None:
+        dx_std = np.asarray(dx_std, float)
+        # dy/dx for polynomial: sum_{k=1..p-1} k * a_k x^{k-1}
+        # np.polyder works for power-descending; we have power-ascending, so do manual:
+        deriv_coeffs = np.arange(1, p, dtype=float) * coeffs[1:]
+        # Evaluate derivative in power-ascending basis
+        dy_dx = np.polynomial.polynomial.polyval(x_eval, deriv_coeffs) if deriv_coeffs.size else 0.0
+        u_total2 = u_total2 + (dy_dx * dx_std)**2
+
+    return y_eval, np.sqrt(u_total2)
+
+import matplotlib.pyplot as plt
+
+def plot_poly_fit(x, y, coeffs, cov=None, sigma2=None, x_label="Voltage (V)", y_label="Velocity (m/s)",
+                  title="Calibration Fit", include_uncert=True, y_unc=None):
+    """
+    Plot data points and fitted polynomial curve.
+    Optionally adds uncertainty bands if cov and sigma2 are provided.
+
+    Parameters:
+        x, y          : data arrays
+        coeffs        : polynomial coefficients [a0, a1, ..., an]
+        cov           : covariance matrix of coefficients (optional)
+        sigma2        : residual variance (optional)
+        x_label, y_label, title : labels for plot
+        include_uncert : if True, plot ±1σ band
+        y_unc         : optional uncertainties for data points
+    """
+    x = np.asarray(x)
+    y = np.asarray(y)
+    x_dense = np.linspace(np.min(x), np.max(x), 300)
+    y_fit = np.polynomial.polynomial.polyval(x_dense, coeffs)
+
+    plt.figure(figsize=(8, 5))
+    plt.scatter(x, y, color='blue', label="Measured data", zorder=3)
+    plt.plot(x_dense, y_fit, color='red', label="4th-order fit", zorder=2)
+
+    if y_unc is not None:
+        plt.errorbar(x, y, yerr=y_unc, fmt='none', ecolor='gray', alpha=0.6, label="Data uncertainty")
+
+    if include_uncert and cov is not None:
+        # Compute ±1σ uncertainty band
+        R = np.stack([np.power(x_dense, i) for i in range(len(coeffs))], axis=1)
+        u_mean = np.sqrt(np.einsum('ij,jk,ik->i', R, cov, R))
+        if sigma2:
+            u_mean = np.sqrt(u_mean**2 + sigma2)
+        plt.fill_between(x_dense, y_fit - u_mean, y_fit + u_mean,
+                         color='red', alpha=0.2, label="±1σ fit uncertainty")
+
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
