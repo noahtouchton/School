@@ -34,17 +34,23 @@ b = Data("Calibration Intercept", "b", -0.296, 0.121)
 
 ρ.get_description()
 
+mu = RSS(
+    "Dynamic Viscosity",
+    equations[1],
+    [T, MU_0, T_0, C] 
+)
+
 q_cal_vals = np.array([
     -0.006, -0.047, -0.148, -0.316, -0.560,
     -0.881, -1.302, -1.836, -2.462, -3.176,
     -3.928, -4.684
-]) * inH2O_to_Pa * -1.0
+])  * -1.0
 
 q_cal_uncert = np.array([
     0.060, 0.065, 0.070, 0.076, 0.066,
     0.062, 0.068, 0.065, 0.066, 0.061,
     0.066, 0.064
-]) * 2.0 * inH2O_to_Pa
+]) * 2.0 
 
 q_cal = Data("Q Calibration", "q", q_cal_vals, q_cal_uncert)
 
@@ -92,10 +98,6 @@ print("residual σ:", sigma, "  dof:", dof)
 coeffs_asc = coef_desc[::-1]         # [a0..a4]
 cov_asc    = cov_desc[::-1, ::-1]    # flip rows & cols
 
-# plot_poly_fit(x, y, coeffs_asc, cov=cov_asc, sigma2=sigma2,
-#               y_label="Velocity (m/s)", x_label="Voltage (V)",
-#               title="Hot-Wire Calibration: Velocity vs. Voltage (Excel-style OLS)",
-#               y_unc=None)   # Excel is unweighted; leave None to mirror Excel
 
 coef_stderr_asc = coef_stderr_desc[::-1]
 
@@ -107,3 +109,31 @@ a4 = Data("Polynomial coefficient a4", "a4", coeffs_asc[4], coef_stderr_asc[4])
 
 for a in [a0, a1, a2, a3, a4]:
     a.get_description()
+
+q_cal_pa = q_cal = Data("Q Calibration", "q", q_cal_vals * inH2O_to_Pa, q_cal_uncert * inH2O_to_Pa)
+
+measured_vels = [
+    0.764882,
+    0.789876,
+    0.910817,
+    0.95357,
+]
+
+coeffs = [a0.value, a1.value, a2.value, a3.value, a4.value]
+
+centerline_votltage_val = find_voltage(coeffs, measured_vels[0])
+top_voltage_val = find_voltage(coeffs, measured_vels[1])
+edge_voltage_val = find_voltage(coeffs, measured_vels[2])
+outside_voltage_val = find_voltage(coeffs, measured_vels[3])
+
+centerline_voltage = Data("Centerline Voltage", "V", centerline_votltage_val, 0.02)
+top_voltage = Data("Top Voltage", "V", top_voltage_val, 0.02)
+edge_voltage = Data("Edge Voltage", "V", edge_voltage_val, 0.02)
+outside_voltage = Data("Outside Voltage", "V", outside_voltage_val, 0.02)
+
+centerline_velocity = RSS(
+    "Centerline Velocity",
+    equations[6],
+    [a0, a1, a2, a3, a4, centerline_voltage]
+)
+centerline_velocity.get_description() #wrong 

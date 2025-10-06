@@ -2,6 +2,7 @@
 import math
 import numpy as np
 import sympy as sp
+from numpy.polynomial import Polynomial
 
 class Data:
     def __init__(self, name, var, value, uncertainty=0.0):
@@ -377,3 +378,20 @@ def plot_poly_fit(x, y, coeffs, cov=None, sigma2=None, x_label="Voltage (V)", y_
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.show()
+
+def find_voltage(coeffs, measured_vel):
+    p = Polynomial(coeffs)
+
+    roots = (p - measured_vel).roots()
+    real_roots = roots[np.isreal(roots)].real
+
+    if real_roots.size == 0:
+        print("No real roots found.")
+        return None
+    
+    valid = real_roots[(real_roots >= 0.0) & (real_roots <= 4.5)]
+    if valid.size == 0:
+        print(f"No roots in valid voltage range for U = {measured_vel}")
+        return None
+    
+    return valid[np.argmin(np.abs(valid - 2.5))]
