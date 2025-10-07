@@ -395,3 +395,17 @@ def find_voltage(coeffs, measured_vel):
         return None
     
     return valid[np.argmin(np.abs(valid - 2.5))]
+
+
+import numpy as np
+from numpy.polynomial import Polynomial   # must be this one!
+
+def z_to_v_coeffs(b, Vbar, Vs):
+    """
+    Convert standardized (Z-basis) polynomial coefficients b (ascending)
+    to raw V-basis coefficients (ascending).
+    """
+    pZ = Polynomial(b)                           # b0 + b1*Z + b2*Z^2 + ...
+    Z_poly = Polynomial([-Vbar / Vs, 1.0 / Vs])  # Z = (V - Vbar)/Vs
+    pV = pZ(Z_poly)                              # compose the two polynomials
+    return pV.coef

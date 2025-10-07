@@ -1,6 +1,9 @@
 #uncertainty.py
 from rss import *
 import numpy
+import os
+base_dir = os.path.dirname(__file__)
+path = os.path.join(base_dir, "LVM", "Lab3VelocityCenter.lvm")
 
 inH2O_to_Pa = 249.0889
 
@@ -76,6 +79,27 @@ voltage_cal = Data("Calibration Voltages", "V", voltage_cal_vals, voltage_cal_un
 x = voltage_cal_vals
 y = v_cal.value
 
+Vbar = x.mean()
+Vs   = x.std(ddof=0)        # population std is fine for basis scaling
+z    = (x - Vbar) / Vs
+
+deg = 4
+coefZ_desc, covZ = np.polyfit(z, y, deg, cov=True)  # descending in Z
+pZ = np.poly1d(coefZ_desc)
+
+resid = y - pZ(z)
+dof   = len(x) - (deg + 1)
+sigma2 = float((resid @ resid) / dof)
+coefZ_stderr = np.sqrt(np.diag(covZ))
+
+print("Z-basis coeffs (desc):", coefZ_desc)
+print("Z-basis 1σ:", coefZ_stderr)
+print("residual σ:", np.sqrt(sigma2), "dof:", dof)
+
+b = [1.18124273, 0.95185939, 0.20736036, 0.01209295, 0.00599395]
+a = z_to_v_coeffs(b, Vbar, Vs)
+print("Raw V-basis coefficients (ascending):", a)
+
 y_unc = v_cal.uncertainty  # same shape as y
 
 
@@ -126,7 +150,14 @@ top_voltage_val = find_voltage(coeffs, measured_vels[1])
 edge_voltage_val = find_voltage(coeffs, measured_vels[2])
 outside_voltage_val = find_voltage(coeffs, measured_vels[3])
 
-centerline_voltage = Data("Centerline Voltage", "V", centerline_votltage_val, 0.02)
+centerline_voltages_uncert = np.std(
+    np.loadtxt(path, usecols=1),
+    ddof=1      # sample standard deviation
+) * 2.0
+
+
+centerline_voltage = Data("Centerline Voltage", "V", centerline_votltage_val, centerline_voltages_uncert)
+centerline_voltage.get_description()
 top_voltage = Data("Top Voltage", "V", top_voltage_val, 0.02)
 edge_voltage = Data("Edge Voltage", "V", edge_voltage_val, 0.02)
 outside_voltage = Data("Outside Voltage", "V", outside_voltage_val, 0.02)
@@ -136,4 +167,7 @@ centerline_velocity = RSS(
     equations[6],
     [a0, a1, a2, a3, a4, centerline_voltage]
 )
-centerline_velocity.get_description() #wrong 
+centerline_velocity.get_description() 
+
+
+
