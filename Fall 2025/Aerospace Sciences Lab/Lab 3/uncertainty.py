@@ -2,6 +2,14 @@
 from rss import *
 import numpy
 import os
+from calibration_helpers import (
+    fit_poly_with_z_basis,
+    predict_v_and_uncert,
+    invert_voltage_from_velocity,
+    load_single_column,
+)
+from mc_uncert import simulate_v_from_V
+
 base_dir = os.path.dirname(__file__)
 path = os.path.join(base_dir, "LVM", "Lab3VelocityCenter.lvm")
 
@@ -79,57 +87,25 @@ voltage_cal = Data("Calibration Voltages", "V", voltage_cal_vals, voltage_cal_un
 x = voltage_cal_vals
 y = v_cal.value
 
-Vbar = x.mean()
-Vs   = x.std(ddof=0)        # population std is fine for basis scaling
-z    = (x - Vbar) / Vs
+fit = fit_poly_with_z_basis(x, y, deg=4)
+a_asc  = fit["a_asc"]
+Cov_a  = fit["Cov_a"]
+a_se   = fit["a_stderr_asc"]
+sigma  = fit["sigma"]   # residual std
+dof    = fit["dof"]
+a_desc = fit["a_desc"]
 
-deg = 4
-coefZ_desc, covZ = np.polyfit(z, y, deg, cov=True)  # descending in Z
-pZ = np.poly1d(coefZ_desc)
-
-resid = y - pZ(z)
-dof   = len(x) - (deg + 1)
-sigma2 = float((resid @ resid) / dof)
-coefZ_stderr = np.sqrt(np.diag(covZ))
-
-print("Z-basis coeffs (desc):", coefZ_desc)
-print("Z-basis 1σ:", coefZ_stderr)
-print("residual σ:", np.sqrt(sigma2), "dof:", dof)
-
-b = [1.18124273, 0.95185939, 0.20736036, 0.01209295, 0.00599395]
-a = z_to_v_coeffs(b, Vbar, Vs)
-print("Raw V-basis coefficients (ascending):", a)
+print("V-basis coeffs (asc):", a_asc)
+print("Coeff 1σ (asc):", a_se)
+print("residual σ:", sigma, " dof:", dof)
 
 y_unc = v_cal.uncertainty  # same shape as y
 
-
-# --- Excel-style OLS (unweighted), with covariance ---
-deg = 4
-coef_desc, cov_desc = np.polyfit(x, y, deg, cov=True)   # descending powers [a4..a0]
-p = np.poly1d(coef_desc)
-
-resid = y - p(x)
-dof = len(x) - (deg + 1)
-sigma2 = float((resid @ resid) / dof)
-sigma = np.sqrt(sigma2)
-
-# Coefficient 1σ (same ordering as coef_desc)
-coef_stderr_desc = np.sqrt(np.diag(cov_desc))
-print("Excel-style coeffs (desc):", coef_desc)
-print("coef 1σ (desc):", coef_stderr_desc)
-print("residual σ:", sigma, "  dof:", dof)
-
-coeffs_asc = coef_desc[::-1]         # [a0..a4]
-cov_asc    = cov_desc[::-1, ::-1]    # flip rows & cols
-
-
-coef_stderr_asc = coef_stderr_desc[::-1]
-
-a0 = Data("Polynomial coefficient a0", "a0", coeffs_asc[0], coef_stderr_asc[0])
-a1 = Data("Polynomial coefficient a1", "a1", coeffs_asc[1], coef_stderr_asc[1])
-a2 = Data("Polynomial coefficient a2", "a2", coeffs_asc[2], coef_stderr_asc[2])
-a3 = Data("Polynomial coefficient a3", "a3", coeffs_asc[3], coef_stderr_asc[3])
-a4 = Data("Polynomial coefficient a4", "a4", coeffs_asc[4], coef_stderr_asc[4])
+a0 = Data("Polynomial coefficient a0", "a0", a_asc[0], a_se[0])
+a1 = Data("Polynomial coefficient a1", "a1", a_asc[1], a_se[1])
+a2 = Data("Polynomial coefficient a2", "a2", a_asc[2], a_se[2])
+a3 = Data("Polynomial coefficient a3", "a3", a_asc[3], a_se[3])
+a4 = Data("Polynomial coefficient a4", "a4", a_asc[4], a_se[4])
 
 for a in [a0, a1, a2, a3, a4]:
     a.get_description()
@@ -153,7 +129,8 @@ outside_voltage_val = find_voltage(coeffs, measured_vels[3])
 centerline_voltages_uncert = np.std(
     np.loadtxt(path, usecols=1),
     ddof=1      # sample standard deviation
-) * 2.0
+) * 2.0 / np.sqrt(1000) 
+
 
 
 centerline_voltage = Data("Centerline Voltage", "V", centerline_votltage_val, centerline_voltages_uncert)
