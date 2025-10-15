@@ -135,46 +135,42 @@ def RSS(name, function, data_list):
 
     return Data(str(name), lhs_sym, nominal_value, uncertainty)
 
-def linear_monte_carlo(data_x: list[Data], data_y: list[Data], N=100_000):
+def linear_monte_carlo(data_x: Data, data_y: Data, N=100_000):
 
-    if len(data_x) != len(data_y):
+
+    xv = np.asarray(data_x.value, dtype=float).ravel()
+    yv = np.asarray(data_y.value, dtype=float).ravel()
+
+    if xv.size != yv.size:
         raise ValueError("x and y must have the same number of points.")
-    if len(data_x) < 2:
+    if xv.size < 2:
         raise ValueError("Need at least two (x, y) points to fit a line.")
-    
-    rand_data_x = []
-    rand_data_y = []
 
-    true_x_vals = []
-    true_y_vals = []
+    sx = np.asarray(data_x.uncertainty, dtype=float).ravel()
+    sy = np.asarray(data_y.uncertainty, dtype=float).ravel()
 
-    for d in data_x:
-        if not np.isscalar(d.value) or not np.isscalar(d.uncertainty):
-            raise ValueError("All Data instances must have scalar value and uncertainty.")
-        true_x_vals.append(d.value)
-        rand_data_x.append(np.random.normal(loc=d.value, scale=d.uncertainty/2, size=N))
+    rand_data_x = np.random.normal(loc=xv, scale=sx/2, size=(N, xv.size))
+    rand_data_y = np.random.normal(loc=yv, scale=sy/2, size=(N, yv.size))
 
-    for d in data_y:
-        if not np.isscalar(d.value) or not np.isscalar(d.uncertainty):
-            raise ValueError("All Data instances must have scalar value and uncertainty.")
-        true_y_vals.append(d.value)
-        rand_data_y.append(np.random.normal(loc=d.value, scale=d.uncertainty/2, size=N))
+    Xmean = rand_data_x.mean(axis=1, keepdims=True)
+    Ymean = rand_data_y.mean(axis=1, keepdims=True)
+    Xm = rand_data_x - Xmean
+    Ym = rand_data_y - Ymean
+    Sxx = np.sum(Xm**2, axis=1)
+    Sxy = np.sum(Xm*Ym, axis=1)
 
-    slopes = []
-    intercepts = []
-
-    for i in range(N):
-        x_vals = [rand_data_x[j][i] for j in range(len(data_x))]
-        y_vals = [rand_data_y[j][i] for j in range(len(data_y))]
-
-        m, b = np.polyfit(x_vals, y_vals, 1)
-        slopes.append(m)
-        intercepts.append(b)
+    slopes = Sxy / np.maximum(Sxx, np.finfo(float).eps)
+    intercepts = (Ymean[:, 0]) - slopes * (Xmean[:, 0])
 
     slope_std = np.std(slopes)
     intercept_std = np.std(intercepts)
 
-    slope, intercept = np.polyfit(true_x_vals, true_y_vals, 1)
+    # Fit the nominal line from nominal data
+    slope, intercept = np.polyfit(xv, yv, 1)
 
-    return slope, slope_std*2, intercept, intercept_std*2
+    # Return as Data objects
+    data_slope = Data("Slope", "m", slope, slope_std * 2)
+    data_intercept = Data("Intercept", "b", intercept, intercept_std * 2)
+
+    return data_slope, data_intercept
         
