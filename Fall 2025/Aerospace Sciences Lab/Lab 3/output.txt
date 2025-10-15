@@ -1,0 +1,46 @@
+Density, ρ: 1.191e+00 ± 4.973e-03
+Dynamic Viscosity, mu: 1.829e-05 ± 1.908e-08
+V-basis coeffs (asc): [ 7.78162884 -9.67131615  4.26248689 -0.809671    0.06842533]
+Coeff 1σ (asc): [5.10605547 7.02696779 3.56742009 0.79282633 0.06515596]
+residual σ: 0.013491926524797618  dof: 7
+a0, a0: 7.782e+00 ± 5.106e+00
+a1, a1: -9.671e+00 ± 7.027e+00
+a2, a2: 4.262e+00 ± 3.567e+00
+a3, a3: -8.097e-01 ± 7.928e-01
+a4, a4: 6.843e-02 ± 6.516e-02
+Centerline Voltage (mean), V: 2.961e+00 ± 1.185e-03
+Centerline Velocity (MC), v: 1.195e+01 ± 2.443e-01
+Centerline Reynolds, Re: 1.482e+04 ± 3.097e+02
+Centerline f_peak: 139.500 Hz  (±0.250 Hz)
+Centerline Strouhal, St: 0.2224 ± 0.0046
+Centerline Voltage (mean), V: 2.961e+00 ± 1.185e-03
+Centerline Velocity (MC), v: 1.195e+01 ± 2.443e-01
+Centerline Reynolds, Re: 1.482e+04 ± 3.097e+02
+Centerline Strouhal, St: 2.224e-01 ± 4.567e-03
+Top Voltage (mean), V: 2.979e+00 ± 1.187e-03
+Top Velocity (MC), v: 1.234e+01 ± 2.447e-01
+Top Reynolds, Re: 1.531e+04 ± 3.106e+02
+Top f_peak: 147.000 Hz  (±0.250 Hz)
+Top Strouhal, St: 0.2269 ± 0.0045
+Top Voltage (mean), V: 2.979e+00 ± 1.187e-03
+Top Velocity (MC), v: 1.234e+01 ± 2.447e-01
+Top Reynolds, Re: 1.531e+04 ± 3.106e+02
+Top Strouhal, St: 2.269e-01 ± 4.516e-03
+Edge Voltage (mean), V: 3.066e+00 ± 7.785e-04
+Edge Velocity (MC), v: 1.434e+01 ± 2.438e-01
+Edge Reynolds, Re: 1.779e+04 ± 3.119e+02
+Edge f_peak: 149.000 Hz  (±0.250 Hz)
+Edge Strouhal, St: 0.1979 ± 0.0034
+Edge Voltage (mean), V: 3.066e+00 ± 7.785e-04
+Edge Velocity (MC), v: 1.434e+01 ± 2.438e-01
+Edge Reynolds, Re: 1.779e+04 ± 3.119e+02
+Edge Strouhal, St: 1.979e-01 ± 3.381e-03
+Outside Voltage (mean), V: 3.096e+00 ± 3.995e-04
+Outside Velocity (MC), v: 1.506e+01 ± 2.443e-01
+Outside Reynolds, Re: 1.868e+04 ± 3.134e+02
+Outside f_peak: 160.500 Hz  (±0.250 Hz)
+Outside Strouhal, St: 0.2030 ± 0.0033
+Outside Voltage (mean), V: 3.096e+00 ± 3.995e-04
+Outside Velocity (MC), v: 1.506e+01 ± 2.443e-01
+Outside Reynolds, Re: 1.868e+04 ± 3.134e+02
+Outside Strouhal, St: 2.030e-01 ± 3.307e-03
