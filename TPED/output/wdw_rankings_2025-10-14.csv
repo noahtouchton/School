@@ -1,0 +1,107 @@
+rank,attraction,park,type_guess,scope
+1,Guardians of the Galaxy: Cosmic Rewind,EPCOT,Attraction,overall
+2,Toy Story Mania!,DHS,Attraction,overall
+3,Rock 'n' Roller Coaster Starring Aerosmith,DHS,Coaster,overall
+4,Star Wars: Rise of the Resistance,DHS,Attraction,overall
+5,Expedition Everest - Legend of the Forbidden Mountain,DAK,Coaster,overall
+6,Test Track,EPCOT,High-Speed Dark Ride,overall
+7,Kilimanjaro Safaris,DAK,Safari,overall
+8,Space Mountain,MK,Attraction,overall
+9,Seven Dwarfs Mine Train,MK,Coaster,overall
+10,Big Thunder Mountain Railroad,MK,Attraction,overall
+11,Frozen Ever After,EPCOT,Boat Ride,overall
+12,Living with the Land,EPCOT,Boat Ride,overall
+13,Tiana's Bayou Adventure,MK,Boat Ride,overall
+14,Avatar Flight of Passage,DAK,Attraction,overall
+15,TRON Lightcycle / Run,MK,Coaster,overall
+16,Mickey & Minnie's Runaway Railway,DHS,Trackless Dark Ride,overall
+17,Slinky Dog Dash,DHS,Coaster,overall
+18,Tomorrowland Transit Authority PeopleMover,MK,Attraction,overall
+19,Buzz Lightyear's Space Ranger Spin,MK,Interactive/Shooter,overall
+20,"""it's a small world""",MK,Boat Ride,overall
+21,Remy's Ratatouille Adventure,EPCOT,Attraction,overall
+22,Pirates of the Caribbean,MK,Boat Ride,overall
+23,Haunted Mansion,MK,Dark Ride,overall
+24,Spaceship Earth,EPCOT,Omnimover,overall
+25,Jungle Cruise,MK,Attraction,overall
+26,Soarin' Around the World,EPCOT,Soarin’ Glider,overall
+27,Monsters Inc. Laugh Floor,MK,Attraction,overall
+28,The Many Adventures of Winnie the Pooh,MK,Dark Ride,overall
+29,Peter Pan's Flight,MK,Dark Ride,overall
+30,The Twilight Zone Tower of Terror™,DHS,Drop Tower,overall
+31,DINOSAUR,DAK,Dark Ride,overall
+32,Millennium Falcon: Smugglers Run,DHS,Interactive/Shooter,overall
+33,Na'vi River Journey,DAK,Boat Ride,overall
+34,Gran Fiesta Tour Starring The Three Caballeros,EPCOT,Attraction,overall
+35,"Journey of Water, Inspired by Moana",EPCOT,Attraction,overall
+36,The Seas with Nemo & Friends,EPCOT,Attraction,overall
+37,The Barnstormer,MK,Coaster,overall
+38,Under the Sea - Journey of The Little Mermaid,MK,Dark Ride,overall
+39,Awesome Planet,EPCOT,Attraction,overall
+40,Journey Into Imagination With Figment,EPCOT,Attraction,overall
+41,Dumbo the Flying Elephant,MK,Spinner,overall
+42,Wildlife Express Train,DAK,Attraction,overall
+43,Astro Orbiter,MK,Spinner,overall
+44,Zootopia: Better Zoogether!,DAK,Attraction,overall
+45,Prince Charming Regal Carrousel,MK,Attraction,overall
+46,The Magic Carpets of Aladdin,MK,Spinner,overall
+47,Canada Far and Wide in Circle-Vision 360,EPCOT,Attraction,overall
+48,Kali River Rapids,DAK,Rapids,overall
+49,Star Tours – The Adventures Continue,DHS,Simulator,overall
+50,Tomorrowland Speedway,MK,Attraction,overall
+51,Alien Swirling Saucers,DHS,Attraction,overall
+52,Mad Tea Party,MK,Attraction,overall
+53,Mission: SPACE,EPCOT,Simulator,overall
+1,Space Mountain,MK,Attraction,MK
+2,Seven Dwarfs Mine Train,MK,Coaster,MK
+3,Big Thunder Mountain Railroad,MK,Attraction,MK
+4,TRON Lightcycle / Run,MK,Coaster,MK
+5,"""it's a small world""",MK,Boat Ride,MK
+6,Tiana's Bayou Adventure,MK,Boat Ride,MK
+7,Haunted Mansion,MK,Dark Ride,MK
+8,Tomorrowland Transit Authority PeopleMover,MK,Attraction,MK
+9,Buzz Lightyear's Space Ranger Spin,MK,Interactive/Shooter,MK
+10,Pirates of the Caribbean,MK,Boat Ride,MK
+11,Jungle Cruise,MK,Attraction,MK
+12,The Many Adventures of Winnie the Pooh,MK,Dark Ride,MK
+13,Monsters Inc. Laugh Floor,MK,Attraction,MK
+14,Peter Pan's Flight,MK,Dark Ride,MK
+15,Under the Sea - Journey of The Little Mermaid,MK,Dark Ride,MK
+16,The Barnstormer,MK,Coaster,MK
+17,Astro Orbiter,MK,Spinner,MK
+18,Tomorrowland Speedway,MK,Attraction,MK
+19,The Magic Carpets of Aladdin,MK,Spinner,MK
+20,Mad Tea Party,MK,Attraction,MK
+21,Dumbo the Flying Elephant,MK,Spinner,MK
+22,Prince Charming Regal Carrousel,MK,Attraction,MK
+1,Guardians of the Galaxy: Cosmic Rewind,EPCOT,Attraction,EPCOT
+2,Test Track,EPCOT,High-Speed Dark Ride,EPCOT
+3,Frozen Ever After,EPCOT,Boat Ride,EPCOT
+4,Living with the Land,EPCOT,Boat Ride,EPCOT
+5,Remy's Ratatouille Adventure,EPCOT,Attraction,EPCOT
+6,Spaceship Earth,EPCOT,Omnimover,EPCOT
+7,Soarin' Around the World,EPCOT,Soarin’ Glider,EPCOT
+8,Journey Into Imagination With Figment,EPCOT,Attraction,EPCOT
+9,The Seas with Nemo & Friends,EPCOT,Attraction,EPCOT
+10,"Journey of Water, Inspired by Moana",EPCOT,Attraction,EPCOT
+11,Awesome Planet,EPCOT,Attraction,EPCOT
+12,Gran Fiesta Tour Starring The Three Caballeros,EPCOT,Attraction,EPCOT
+13,Canada Far and Wide in Circle-Vision 360,EPCOT,Attraction,EPCOT
+14,Mission: SPACE,EPCOT,Simulator,EPCOT
+1,Toy Story Mania!,DHS,Attraction,DHS
+2,Rock 'n' Roller Coaster Starring Aerosmith,DHS,Coaster,DHS
+3,Star Wars: Rise of the Resistance,DHS,Attraction,DHS
+4,Mickey & Minnie's Runaway Railway,DHS,Trackless Dark Ride,DHS
+5,Slinky Dog Dash,DHS,Coaster,DHS
+6,Millennium Falcon: Smugglers Run,DHS,Interactive/Shooter,DHS
+7,The Twilight Zone Tower of Terror™,DHS,Drop Tower,DHS
+8,Star Tours – The Adventures Continue,DHS,Simulator,DHS
+9,Alien Swirling Saucers,DHS,Attraction,DHS
+1,Expedition Everest - Legend of the Forbidden Mountain,DAK,Coaster,DAK
+2,Avatar Flight of Passage,DAK,Attraction,DAK
+3,Kilimanjaro Safaris,DAK,Safari,DAK
+4,DINOSAUR,DAK,Dark Ride,DAK
+5,Na'vi River Journey,DAK,Boat Ride,DAK
+6,Wildlife Express Train,DAK,Attraction,DAK
+7,Zootopia: Better Zoogether!,DAK,Attraction,DAK
+8,Kali River Rapids,DAK,Rapids,DAK

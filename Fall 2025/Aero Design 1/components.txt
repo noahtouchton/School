@@ -1,9 +1,9 @@
 High-Rate Transmitter  PULSAR-STX https://www.aac-clyde.space/what-we-do/space-products-components/communications/pulsar-hstx
-microcontroller STM32H723VET6 https://estore.st.com/en/stm32h723vet6-cpn.html
+TRY TO REPLACE microcontroller STM32H723VET6 https://estore.st.com/en/stm32h723vet6-cpn.html
 antenna ISISPACE S-Band Patch Antenna https://www.isispace.nl/product/s-band-patch-antenna/
 transciever GomSpace AX100 https://gomspace.com/shop/subsystems/communication-systems/nanocom-ax100.aspx
 2x InterSatComm Antenna AAC ANT-100 Static Whip https://www.aac-clyde.space/what-we-do/space-products-components/communications/ant-100
-2x InterSatComm transciever SX1262MB2CAS board https://www.digikey.com/en/products/detail/semtech-corporation/SX1262MB2CAS/9625070?gclsrc=aw.ds&gad_source=1&gad_campaignid=20243136172&gbraid=0AAAAADrbLli-xloOLWaVm0MLoPN0RAmw2&gclid=CjwKCAjwxfjGBhAUEiwAKWPwDs8W3k61irrexI08QmKrJoz_I8UK30Jcm7xZijF-zRrKwhkMdvzNIhoC8DwQAvD_BwE
+NEED TO REPLACE 2x InterSatComm transciever SX1262MB2CAS board https://www.digikey.com/en/products/detail/semtech-corporation/SX1262MB2CAS/9625070?gclsrc=aw.ds&gad_source=1&gad_campaignid=20243136172&gbraid=0AAAAADrbLli-xloOLWaVm0MLoPN0RAmw2&gclid=CjwKCAjwxfjGBhAUEiwAKWPwDs8W3k61irrexI08QmKrJoz_I8UK30Jcm7xZijF-zRrKwhkMdvzNIhoC8DwQAvD_BwE
 4x RF Pigtail Cables https://p1db.com/shop/category/cable-assemblies-pigtail-cables-29
-Data Storage SDINBDG4-64G-ZA3 https://www.mouser.com/ProductDetail/SanDisk/SDINBDG4-64G-ZA3?qs=Z%252BL2brAPG1L%252Ba21c%2FnyFBQ%3D%3D
+NEED TO REPLACE Data Storage SDINBDG4-64G-ZA3 https://www.mouser.com/ProductDetail/SanDisk/SDINBDG4-64G-ZA3?qs=Z%252BL2brAPG1L%252Ba21c%2FnyFBQ%3D%3D
 
