@@ -7,3 +7,59 @@ NEED TO REPLACE 2x InterSatComm transciever SX1262MB2CAS board https://www.digik
 4x RF Pigtail Cables https://p1db.com/shop/category/cable-assemblies-pigtail-cables-29
 NEED TO REPLACE Data Storage SDINBDG4-64G-ZA3 https://www.mouser.com/ProductDetail/SanDisk/SDINBDG4-64G-ZA3?qs=Z%252BL2brAPG1L%252Ba21c%2FnyFBQ%3D%3D
 
+
+
+
+High-Rate Transmitter
+	•	PULSAR-STX (AAC Clyde Space)
+https://www.aac-clyde.space/what-we-do/space-products-components/communications/pulsar-hstx
+Primary S-band downlink, up to 2–10 Mbps; flight heritage.
+
+⸻
+
+Microcontroller / On-Board Computer (OBC)
+	•	3D PLUS FUSIO-RT Computer Core (3DMC0754)
+https://www.3d-plus.com/app/uploads/2023/04/3DFP-0754.pdf
+Rad-tolerant ARM/FPGA-based computer core; replaces STM32H723VET6.
+
+⸻
+
+S-Band Antenna
+	•	ISISPACE S-Band Patch Antenna
+https://www.isispace.nl/product/s-band-patch-antenna/
+Matched to PULSAR-STX for payload downlink; fixed mount, 6 dBic gain.
+
+⸻
+
+TT&C UHF Transceiver
+	•	GomSpace NanoCom AX100
+https://gomspace.com/shop/subsystems/communication-systems/nanocom-ax100.aspx
+Flight-proven UHF TT&C radio; 9.6–19.2 kbps; compatible with 3.3 V logic.
+
+⸻
+
+Inter-Satellite Communications Transceivers (×2)
+	•	AAC Clyde Space TRX-U (UHF Transceiver)
+https://www.aac-clyde.space/wp-content/uploads/2021/11/TRX-U-datasheet.pdf
+Replaces SX1262 LoRa dev boards; 2.4–19.2 kbps; 1–5 W RF; 3.3 V CMOS I/O; space-qualified.
+
+⸻
+
+Inter-Satellite Antennas (×2)
+	•	AAC ANT-100 Static Whip Antenna
+https://www.aac-clyde.space/what-we-do/space-products-components/communications/ant-100
+Matched to TRX-U (50 Ω UHF); rugged, non-deployable, flight heritage.
+
+⸻
+
+Data Storage / Payload Memory
+	•	3D PLUS RTIMS Radiation-Tolerant Flash (64 Gbit Example)
+https://www.3d-plus.com/products/space-radiation-tolerant-rtims-flash/
+Replaces SanDisk SDINBDG4; integrated EDAC + TMR; 3.3 V; TID > 50 krad.
+
+⸻
+
+RF Cables / Pigtails (×4)
+	•	SV Microwave Space-Qualified MCX→SMA Coax Assemblies
+https://www.svmicrowave.com/products/space-products
+Replaces generic p1db pigtails; 50 Ω, low outgassing, space certified; connects TRX-U (MCX) ↔ ANT-100 (SMA).
