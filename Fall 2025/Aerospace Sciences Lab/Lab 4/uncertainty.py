@@ -19,6 +19,7 @@ equations = [
     "v = sqrt(2*q/ρ)",
     "A = 3.14159 * d**2 / 4",
     "Cd = F / (q * A)",
+    "V = Vraw + Vtare",
 ]
 
 # Gas & Sutherland constants
@@ -84,7 +85,14 @@ cal_voltages_uncert = np.array([
 ])*2.0
 
 cal_weights = Data("Weights", "W", cal_weights_val, 0.0)
-cal_voltages = Data("Voltages", "V", cal_voltages_val, cal_voltages_uncert)
+cal_voltages_raw = Data("Raw Voltages", "Vraw", cal_voltages_val, cal_voltages_uncert)
+cal_voltages_offset = Data("Voltage offset", "Vtare", 1.807454545, 0.000522233*2)
+
+cal_voltages = RSS(
+    "Voltages",
+    equations[8],
+    [cal_voltages_raw, cal_voltages_offset]
+)
 
 cal_slope, cal_intercept = linear_monte_carlo(cal_voltages, cal_weights) 
 

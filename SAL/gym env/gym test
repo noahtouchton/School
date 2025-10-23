@@ -1,0 +1,28 @@
+# pip install gymnasium[classic-control]
+import gymnasium as gym
+import time
+
+env = gym.make("CartPole-v1", render_mode="human")
+obs, info = env.reset(seed=0)
+
+terminated = False
+truncated = False
+
+try:
+    while True:
+        # random action; swap in your policy later
+        action = env.action_space.sample()
+        obs, reward, terminated, truncated, info = env.step(action)
+
+        # human render: shows a Pygame window
+        env.render()
+
+        # slow it down so it doesn't finish instantly
+        time.sleep(1/60)
+
+        # if episode ended, auto-reset and keep the window open
+        if terminated or truncated:
+            obs, info = env.reset()
+            terminated = truncated = False
+finally:
+    env.close()

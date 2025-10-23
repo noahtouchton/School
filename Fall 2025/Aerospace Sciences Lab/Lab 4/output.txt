@@ -1,0 +1,74 @@
+Dynamic Viscosity, mu: 1.831e-05 ± 1.907e-08
+Density, ρ: 1.190e+00 ± 4.964e-03
+Slope, m: -2.226e+00 ± 6.324e-04
+Intercept, b: 4.027e+00 ± 1.186e-03
+
+--- Case 0 Summary ---
+Circular Flat Disk Diameter, d: 5.035e-02 ± 2.000e-05
+Dynamic Pressure (45Hz), q: 6.133e+02 ± 3.288e+01
+Reynolds Number, Re: 1.050e+05 ± 2.861e+03
+Circular Flat Disk Drag Force (45Hz), F: 1.415e+00 ± 8.953e-03
+Drag Coefficient, Cd: 1.159e+00 ± 6.258e-02
+
+--- Case 1 Summary ---
+Hollow Hemisphere Up Diameter, d: 5.332e-02 ± 2.000e-05
+Dynamic Pressure (45Hz), q: 6.133e+02 ± 3.288e+01
+Reynolds Number, Re: 1.112e+05 ± 3.029e+03
+Hollow Hemisphere Up Drag Force (45Hz), F: 1.791e+00 ± 1.091e-02
+Drag Coefficient, Cd: 1.308e+00 ± 7.059e-02
+
+--- Case 2 Summary ---
+Hollow Hemisphere Down Diameter, d: 5.311e-02 ± 2.000e-05
+Dynamic Pressure (45Hz), q: 6.133e+02 ± 3.288e+01
+Reynolds Number, Re: 1.108e+05 ± 3.017e+03
+Hollow Hemisphere Down Drag Force (45Hz), F: 5.104e-01 ± 3.214e-03
+Drag Coefficient, Cd: 3.757e-01 ± 2.028e-02
+
+--- Case 3 Summary ---
+Smooth Sphere Diameter, d: 5.083e-02 ± 2.000e-05
+Dynamic Pressure (45Hz), q: 6.133e+02 ± 3.288e+01
+Reynolds Number, Re: 1.060e+05 ± 2.888e+03
+Smooth Sphere Drag Force (45Hz), F: 5.436e-01 ± 6.504e-03
+Drag Coefficient, Cd: 4.368e-01 ± 2.400e-02
+
+--- Case 4 Summary ---
+Rough Sphere Diameter, d: 5.244e-02 ± 2.000e-05
+Dynamic Pressure (45Hz), q: 6.133e+02 ± 3.288e+01
+Reynolds Number, Re: 1.094e+05 ± 2.979e+03
+Rough Sphere Drag Force (45Hz), F: 4.232e-01 ± 3.047e-03
+Drag Coefficient, Cd: 3.195e-01 ± 1.728e-02
+
+--- Case 5 Summary ---
+Circular Flat Disk Diameter, d: 5.035e-02 ± 2.000e-05
+Dynamic Pressure (55Hz), q: 9.784e+02 ± 3.288e+01
+Reynolds Number, Re: 1.327e+05 ± 2.318e+03
+Circular Flat Disk Drag Force (55Hz), F: 2.244e+00 ± 7.095e-03
+Drag Coefficient, Cd: 1.152e+00 ± 3.889e-02
+
+--- Case 6 Summary ---
+Hollow Hemisphere Up Diameter, d: 5.332e-02 ± 2.000e-05
+Dynamic Pressure (55Hz), q: 9.784e+02 ± 3.288e+01
+Reynolds Number, Re: 1.405e+05 ± 2.455e+03
+Hollow Hemisphere Up Drag Force (55Hz), F: 2.856e+00 ± 1.138e-02
+Drag Coefficient, Cd: 1.307e+00 ± 4.426e-02
+
+--- Case 7 Summary ---
+Hollow Hemisphere Down Diameter, d: 5.311e-02 ± 2.000e-05
+Dynamic Pressure (55Hz), q: 9.784e+02 ± 3.288e+01
+Reynolds Number, Re: 1.400e+05 ± 2.445e+03
+Hollow Hemisphere Down Drag Force (55Hz), F: 8.070e-01 ± 3.291e-03
+Drag Coefficient, Cd: 3.723e-01 ± 1.261e-02
+
+--- Case 8 Summary ---
+Smooth Sphere Diameter, d: 5.083e-02 ± 2.000e-05
+Dynamic Pressure (55Hz), q: 9.784e+02 ± 3.288e+01
+Reynolds Number, Re: 1.339e+05 ± 2.340e+03
+Smooth Sphere Drag Force (55Hz), F: 8.637e-01 ± 4.816e-03
+Drag Coefficient, Cd: 4.350e-01 ± 1.482e-02
+
+--- Case 9 Summary ---
+Rough Sphere Diameter, d: 5.244e-02 ± 2.000e-05
+Dynamic Pressure (55Hz), q: 9.784e+02 ± 3.288e+01
+Reynolds Number, Re: 1.382e+05 ± 2.415e+03
+Rough Sphere Drag Force (55Hz), F: 6.968e-01 ± 8.470e-03
+Drag Coefficient, Cd: 3.297e-01 ± 1.179e-02
