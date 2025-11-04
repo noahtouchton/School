@@ -5,6 +5,9 @@ m2 = 0.00377 kg
 J2 = 0.00002929 kgm^2
 l2 = 0.1472 m
 
+bm = 0.0146 Nms/rad
+Jo = 0.04 kgm^2
+
 
 m_pend = 0.00491 kg
 m_nuts = 0.00377 kg
@@ -14,3 +17,6 @@ d3=0.1472m
 
 ICom = 0.000008866 kgm^2
 Inuts = 0.00002042 kgm^2
+
+k_gain = 1.0297
+time constant = 1.2583
