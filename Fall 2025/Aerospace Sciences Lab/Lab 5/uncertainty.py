@@ -603,24 +603,33 @@ print(corr_list_df.to_string(index=False))
 
 # 5) Build min/max summary tables for each dataset
 def extrema_table(name, df, alpha_col, cols=("Cl","Cd","Cm")):
+    """
+    Returns min/max table including corresponding α and 1σ uncertainties.
+    Assumes df includes columns like Cl_unc, Cd_unc, Cm_unc if available.
+    """
     rows = []
     for col in cols:
-        # skip missing columns safely
         if col not in df.columns:
             continue
-        # drop NaNs to avoid idxmin/idxmax issues
         sub = df[[alpha_col, col]].dropna()
         if sub.empty:
             continue
+
         i_min = sub[col].idxmin()
         i_max = sub[col].idxmax()
+
+        # Find uncertainties if they exist (like Cl_unc, Cd_unc, etc.)
+        unc_col = f"{col}_unc" if f"{col}_unc" in df.columns else None
+
         rows.append({
             "Dataset": name,
             "Property": col,
             "Min": float(sub.loc[i_min, col]),
             "Min α": float(sub.loc[i_min, alpha_col]),
+            "Min Unc": float(df.loc[i_min, unc_col]) if unc_col else np.nan,
             "Max": float(sub.loc[i_max, col]),
             "Max α": float(sub.loc[i_max, alpha_col]),
+            "Max Unc": float(df.loc[i_max, unc_col]) if unc_col else np.nan,
         })
     return pd.DataFrame(rows)
 
