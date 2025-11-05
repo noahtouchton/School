@@ -538,12 +538,12 @@ save_plot4(
 )
 
 
-# === FINAL ORGANIZED SUMMARY PRINTS (keeps all prior functionality) ===
+# === FINAL ORGANIZED SUMMARY PRINTS (requested format) ===
 print("\n" + "="*78)
 print("FINAL ORGANIZED SUMMARY")
 print("="*78)
 
-# 1) Scalars / environment
+# 1) Scalars / environment (unchanged)
 print("\n-- Environment / Flow scalars --")
 print(f"ρ    = {ρ.value:.6f} ± {ρ.uncertainty:.6f} kg/m³")
 print(f"μ    = {mu.value:.7f} ± {mu.uncertainty:.7f} Pa·s")
@@ -553,7 +553,7 @@ print(f"Re   = {Re.value:.3e} ± {Re.uncertainty:.3e}")
 print(f"Mach = {Mach.value:.4f} ± {Mach.uncertainty:.4f}")
 
 # 2) Blockage parameters summary (uses already-built eps_by_angle)
-eps_vals = list(eps_by_angle.values())
+eps_vals = list(eps_by_angle.values()) if 'eps_by_angle' in globals() else []
 eps_min = min(eps_vals) if eps_vals else float('nan')
 eps_max = max(eps_vals) if eps_vals else float('nan')
 
@@ -564,69 +564,93 @@ print(f"Λ   = {Lambda.value:.3f}   (body shape factor)")
 print(f"ε_sb (solid blockage) = {eps_sb:.6e}")
 print(f"ε range (total)       = [{eps_min:.6e}, {eps_max:.6e}]")
 
-# 3) Build per-angle tables (uncorrected vs corrected)
+# 3) Build per-angle listings in the exact format requested
 # Uncorrected experimental (from taps)
-unc_rows = []
+unc_list_rows = []
 for ang in sorted(Cn_by_angle.keys()):
-    unc_rows.append({
+    unc_list_rows.append({
         "alpha_deg": ang,
         "Cl_u": Cl_by_angle[ang].value,
-        "Cl_u_unc": Cl_by_angle[ang].uncertainty,
-        "Cd_u(p-only)": Cd_by_angle[ang].value,
-        "Cd_u_unc": Cd_by_angle[ang].uncertainty,
-        "Cm_u(c/4)": Cm_by_angle[ang].value,
-        "Cm_u_unc": Cm_by_angle[ang].uncertainty,
-        "ε_total": eps_by_angle.get(ang, float('nan')),
+        "Cd_u": Cd_by_angle[ang].value,
+        "Cm_u": Cm_by_angle[ang].value,
     })
-unc_df = pd.DataFrame(unc_rows)
+unc_list_df = pd.DataFrame(unc_list_rows).sort_values("alpha_deg").reset_index(drop=True)
 
-# Corrected experimental
-corr_rows = []
+# Corrected experimental (using corrected alpha)
+corr_list_rows = []
 for ang in sorted(Cl_corr_by_angle.keys()):
-    corr_rows.append({
-        "alpha_u_deg": ang,
+    corr_list_rows.append({
         "alpha_corr_deg": alpha_corr_by_angle.get(ang, np.nan),
         "Cl_corr": Cl_corr_by_angle[ang].value,
-        "Cl_corr_unc": Cl_corr_by_angle[ang].uncertainty,
-        "Cm_corr(c/4)": Cm_corr_by_angle[ang].value,
-        "Cm_corr_unc": Cm_corr_by_angle[ang].uncertainty,
-        "Re_corr": Re_corr_by_angle[ang].value if ang in Re_corr_by_angle else np.nan,
-        "Re_corr_unc": Re_corr_by_angle[ang].uncertainty if ang in Re_corr_by_angle else np.nan,
-        "q_corr": q_corr_by_angle[ang].value if ang in q_corr_by_angle else np.nan,
-        "q_corr_unc": q_corr_by_angle[ang].uncertainty if ang in q_corr_by_angle else np.nan,
+        "Cd_corr": Cd_corr_by_angle[ang].value if ang in Cd_corr_by_angle else np.nan,
+        "Cm_corr": Cm_corr_by_angle[ang].value,
     })
-corr_df = pd.DataFrame(corr_rows)
+corr_list_df = pd.DataFrame(corr_list_rows).sort_values("alpha_corr_deg").reset_index(drop=True)
 
-# XFOIL viscous polar (already computed as df_x)
-xfoil_v_df = df_x[["alpha", "Cl", "Cd", "Cm"]].copy()
-xfoil_v_df = xfoil_v_df.rename(columns={"alpha":"alpha_deg", "Cm":"Cm(c/4)"})
+# XFOIL & TAT dataframes in a consistent shape for extrema tables
+xfoil_df = df_x[["alpha", "Cl", "Cd", "Cm"]].copy().rename(columns={"alpha": "alpha_deg", "Cm":"Cm"})
+tat_df   = df_inv[["alpha", "Cl", "Cd", "Cm"]].copy().rename(columns={"alpha": "alpha_deg", "Cm":"Cm"})
 
-# Inviscid / TAT reference (df_inv already built)
-xfoil_i_df = df_inv[["alpha", "Cl", "Cd", "Cm"]].copy()
-xfoil_i_df = xfoil_i_df.rename(columns={"alpha":"alpha_deg", "Cm":"Cm(c/4)"})
-
-# 4) Pretty prints
+# 4) Print the two requested per-AOA tables
 pd.set_option("display.width", 120)
 pd.set_option("display.max_columns", None)
 
-print("\n-- Uncorrected experimental (pressure-tap based) --")
-print(unc_df.to_string(index=False))
+print("\n-- Experimental (UNCORRECTED): Cl, Cd, Cm at each α --")
+print(unc_list_df.to_string(index=False))
 
-print("\n-- Corrected experimental (wind-tunnel corrections applied) --")
-print(corr_df.to_string(index=False))
+print("\n-- Experimental (CORRECTED): Cl, Cd, Cm at each corrected α --")
+print(corr_list_df.to_string(index=False))
 
-print("\n-- XFOIL viscous polar --")
-print(xfoil_v_df.to_string(index=False))
+# 5) Build min/max summary tables for each dataset
+def extrema_table(name, df, alpha_col, cols=("Cl","Cd","Cm")):
+    rows = []
+    for col in cols:
+        # skip missing columns safely
+        if col not in df.columns:
+            continue
+        # drop NaNs to avoid idxmin/idxmax issues
+        sub = df[[alpha_col, col]].dropna()
+        if sub.empty:
+            continue
+        i_min = sub[col].idxmin()
+        i_max = sub[col].idxmax()
+        rows.append({
+            "Dataset": name,
+            "Property": col,
+            "Min": float(sub.loc[i_min, col]),
+            "Min α": float(sub.loc[i_min, alpha_col]),
+            "Max": float(sub.loc[i_max, col]),
+            "Max α": float(sub.loc[i_max, alpha_col]),
+        })
+    return pd.DataFrame(rows)
 
-print(f"\n-- {inviscid_label} --")
-print(xfoil_i_df.to_string(index=False))
+# Create DF versions tailored for extrema
+unc_ext_df = unc_list_df.rename(columns={
+    "alpha_deg":"alpha",
+    "Cl_u":"Cl", "Cd_u":"Cd", "Cm_u":"Cm"
+})
+corr_ext_df = corr_list_df.rename(columns={
+    "alpha_corr_deg":"alpha",
+    "Cl_corr":"Cl", "Cd_corr":"Cd", "Cm_corr":"Cm"
+})
 
-# 5) Save organized tables to CSVs (alongside your plots)
+ext_unc  = extrema_table("Experimental Uncorrected", unc_ext_df,  "alpha")
+ext_corr = extrema_table("Experimental Corrected",   corr_ext_df, "alpha")
+ext_xf   = extrema_table("XFOIL Viscous",            xfoil_df,     "alpha_deg")
+ext_tat  = extrema_table("Thin Airfoil Theory",      tat_df,       "alpha_deg")
+
+extrema_all = pd.concat([ext_unc, ext_corr, ext_xf, ext_tat], ignore_index=True)
+
+print("\n-- Min/Max summary (value and corresponding α) --")
+print(extrema_all.to_string(index=False))
+
+# 6) Save tables to CSV (alongside your plots)
 summary_dir = outdir  # already created above
-unc_df.to_csv(os.path.join(summary_dir, "summary_experimental_uncorrected.csv"), index=False)
-corr_df.to_csv(os.path.join(summary_dir, "summary_experimental_corrected.csv"), index=False)
-xfoil_v_df.to_csv(os.path.join(summary_dir, "summary_xfoil_viscous.csv"), index=False)
-xfoil_i_df.to_csv(os.path.join(summary_dir, "summary_inviscid_or_TAT.csv"), index=False)
+unc_list_df.to_csv(os.path.join(summary_dir, "per_aoa_experimental_uncorrected.csv"), index=False)
+corr_list_df.to_csv(os.path.join(summary_dir, "per_aoa_experimental_corrected.csv"), index=False)
+xfoil_df.to_csv(os.path.join(summary_dir, "per_aoa_xfoil_viscous.csv"), index=False)
+tat_df.to_csv(os.path.join(summary_dir, "per_aoa_thin_airfoil_theory.csv"), index=False)
+extrema_all.to_csv(os.path.join(summary_dir, "summary_extrema_all.csv"), index=False)
 
-print("\nSaved summary CSVs to:", summary_dir)
+print("\nSaved per-AOA and extrema CSVs to:", summary_dir)
 print("="*78)
