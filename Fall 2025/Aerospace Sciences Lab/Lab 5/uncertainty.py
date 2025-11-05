@@ -292,51 +292,101 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
-outdir = os.path.join(
-    os.path.dirname(__file__),   # directory of uncertainty.py
-    "xfoil_outputs"
-)
+# ---------- build experimental dataframe from your Cp-based results ----------
+exp_rows = []
+for ang in sorted(Cn_by_angle.keys()):
+    exp_rows.append({
+        "alpha": ang,
+        "Cl": Cl_by_angle[ang].value,
+        "Cd": Cd_by_angle[ang].value,
+        "Cm": Cm_by_angle[ang].value,
+    })
+exp_df = pd.DataFrame(exp_rows).sort_values("alpha").reset_index(drop=True)
+
+# ---------- try to get an inviscid reference ----------
+def try_xfoil_inviscid():
+    try:
+        return run_xfoil_polar(
+            airfoil="NACA 4412",
+            Re=None,                # signals inviscid in our driver (<=0 or None)
+            Mach=0.0,
+            Ncrit=None,
+            a_start=int(exp_df["alpha"].min()),
+            a_end=int(exp_df["alpha"].max()),
+            a_step=1,
+            iter_lim=200,
+            xfoil_path=r"C:\Users\noaht\Downloads\xfoil6.99\xfoil.exe",
+            viscous=False           # if your driver supports this flag
+        )
+    except Exception:
+        return None
+
+df_inv = try_xfoil_inviscid()
+
+# Fallback: thin-airfoil line if inviscid run not available
+if df_inv is None:
+    alphas = exp_df["alpha"].to_numpy()
+    alpha0L_deg = -2.0
+    a_per_rad = 2*np.pi                    # ≈ 6.283/rad
+    Cl_tat = a_per_rad * np.deg2rad(alphas - alpha0L_deg)
+    Cm_tat = np.full_like(Cl_tat, -0.10)   # NACA 4412 typical order; tweak if you prefer
+    Cd_tat = np.zeros_like(Cl_tat)         # pressure-only theory
+    df_inv = pd.DataFrame({
+        "alpha": alphas,
+        "Cl": Cl_tat,
+        "Cd": Cd_tat,
+        "Cm": Cm_tat,
+    })
+    inviscid_label = "Thin-airfoil theory"
+else:
+    inviscid_label = "XFOIL inviscid"
+
+# ---------- output folder (relative to this file so it works on GitHub) ----------
+outdir = os.path.join(os.path.dirname(__file__), "xfoil_outputs")
 os.makedirs(outdir, exist_ok=True)
 print(f"Saving plots to: {outdir}")
 
-# df_x is the DataFrame from run_xfoil_polar(...)
-df_x.to_csv(os.path.join(outdir, "polar.csv"), index=False)
+# also save the viscous polar you already computed
+df_x.to_csv(os.path.join(outdir, "polar_viscous.csv"), index=False)
+exp_df.to_csv(os.path.join(outdir, "polar_experimental.csv"), index=False)
+df_inv.to_csv(os.path.join(outdir, "polar_inviscid_or_TAT.csv"), index=False)
+
+# ---------- plots: overlay Experimental vs XFOIL (viscous) vs Inviscid/Theory ----------
+def save_plot(xlabel, ylabel, title, x_exp, y_exp, x_v, y_v, x_i, y_i, filename):
+    plt.figure()
+    plt.plot(x_exp, y_exp, "o-", label="Experimental")
+    plt.plot(x_v,   y_v,   "s-", label="XFOIL viscous")
+    plt.plot(x_i,   y_i,   "^-", label=inviscid_label)
+    plt.xlabel(xlabel); plt.ylabel(ylabel); plt.title(title)
+    plt.grid(True, alpha=0.3); plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(outdir, filename), dpi=200)
+    plt.close()
 
 # Cl vs alpha
-plt.figure()
-plt.plot(df_x["alpha"], df_x["Cl"], marker="o")
-plt.xlabel("Alpha (deg)")
-plt.ylabel("Cl")
-plt.title("NACA 4412 — Cl vs Alpha")
-plt.grid(True, alpha=0.3)
-plt.savefig(os.path.join(outdir, "Cl_vs_alpha.png"), dpi=200)
+save_plot("Alpha (deg)", "Cl", "NACA 4412 — Cl vs Alpha",
+          exp_df["alpha"], exp_df["Cl"],
+          df_x["alpha"],   df_x["Cl"],
+          df_inv["alpha"], df_inv["Cl"],
+          "Cl_vs_alpha_all.png")
 
 # Cd vs alpha
-plt.figure()
-plt.plot(df_x["alpha"], df_x["Cd"], marker="o")
-plt.xlabel("Alpha (deg)")
-plt.ylabel("Cd")
-plt.title("NACA 4412 — Cd vs Alpha")
-plt.grid(True, alpha=0.3)
-plt.savefig(os.path.join(outdir, "Cd_vs_alpha.png"), dpi=200)
+save_plot("Alpha (deg)", "Cd", "NACA 4412 — Cd vs Alpha",
+          exp_df["alpha"], exp_df["Cd"],
+          df_x["alpha"],   df_x["Cd"],
+          df_inv["alpha"], df_inv["Cd"],
+          "Cd_vs_alpha_all.png")
 
 # Cm vs alpha
-plt.figure()
-plt.plot(df_x["alpha"], df_x["Cm"], marker="o")
-plt.xlabel("Alpha (deg)")
-plt.ylabel("Cm (c/4)")
-plt.title("NACA 4412 — Cm(c/4) vs Alpha")
-plt.grid(True, alpha=0.3)
-plt.savefig(os.path.join(outdir, "Cm_vs_alpha.png"), dpi=200)
+save_plot("Alpha (deg)", "Cm (c/4)", "NACA 4412 — Cm(c/4) vs Alpha",
+          exp_df["alpha"], exp_df["Cm"],
+          df_x["alpha"],   df_x["Cm"],
+          df_inv["alpha"], df_inv["Cm"],
+          "Cm_vs_alpha_all.png")
 
 # Drag polar (Cl vs Cd)
-plt.figure()
-plt.plot(df_x["Cd"], df_x["Cl"], marker="o")
-plt.xlabel("Cd")
-plt.ylabel("Cl")
-plt.title("NACA 4412 — Drag Polar")
-plt.grid(True, alpha=0.3)
-plt.savefig(os.path.join(outdir, "Drag_Polar.png"), dpi=200)
-
-
-
+save_plot("Cd", "Cl", "NACA 4412 — Drag Polar",
+          exp_df["Cd"], exp_df["Cl"],
+          df_x["Cd"],   df_x["Cl"],
+          df_inv["Cd"], df_inv["Cl"],
+          "Drag_Polar_all.png")
