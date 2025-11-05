@@ -80,6 +80,17 @@ equations = [
     "v = sqrt(2*q/ρ)",
     "Re = ρ * v * L / mu",
     "Mach = v/sqrt(gamma*R*T)",
+    "σ = ((3.14^2)/48) * (c/h)^2",
+    "ε_sb = Λ * (pi**2 / 48) * (c / h)**2",                                 # (5) Solid blockage
+    "ε_wb = (c / h)**2 * Cd_u",                                             # (6) Wake blockage
+    "ε = ε_sb + ε_wb",                                                      # (4) Total velocity increment
+    "V = V_u * (1 + ε)",                                                    # (4)
+    "q = q_u * (1 + ε)",                                                    # (7)
+    "Re_corr = Re_u * (1 + ε)",                                             # (8)
+    "α_corr = α_u + (57.3 * (pi**2 / 48) * (c / h)**2 / (2 * pi)) * (Cl_u + 4 * Cm_u)",  # (9)
+    "Cl_corr = Cl_u * (1 - (pi**2 / 48) * (c / h)**2 - 2 * ε)",             # (10)
+    "Cm_corr = Cm_u * (1 - 2 * (pi**2 / 48) * (c / h)**2) + 0.25 * (pi**2 / 48) * (c / h)**2 * Cl_corr",  # (11)
+    "Cd0_corr = Cd0_u * (1 - 3 * ε_sb - 2 * ε_wb)"    ,
 ]
 
 ρ = RSS("Density", equations[0], [P,R,T])
@@ -94,6 +105,9 @@ xU = Data("Upper X", "x", xU_vals, 0.0)
 xL = Data("Lower X", "x", xL_vals, 0.0)
 
 c = Data("Chord Length", "c", c_val, 0.0)
+h = Data("Tunnel Height", "h", 24.0, 0.0)
+
+
 
 Cp_by_angle = build_Cp_by_angle_P_over_q(all_data)
 print("\n=== Pressure Coefficient Summary ===")
@@ -277,6 +291,78 @@ print("\n=== Drag coefficient Cd (pressure-only) by angle ===")
 for ang in sorted(Cd_by_angle.keys()):
     d = Cd_by_angle[ang]
     print(f"α={ang:+3}°  Cd = {d.value: .5f} ± {d.uncertainty:.5f}")
+
+
+# ---- Wind-tunnel corrections (solid + wake blockage) ----
+# Body-shape factor Λ from your lab manual (set this to the right value for your model)
+Lambda = Data("Body shape factor", "Λ", 1.0, 0.0)  # <-- update per lab
+
+# Helpers
+pi = np.pi
+c_over_h = c.value / h.value
+sigma = (pi**2 / 48.0) * (c_over_h**2)                 # σ = (π^2/48)*(c/h)^2
+eps_sb = Lambda.value * sigma                           # solid blockage
+# We'll build angle-by-angle dicts:
+alpha_corr_by_angle = {}
+Cl_corr_by_angle    = {}
+Cm_corr_by_angle    = {}
+Re_corr_by_angle    = {}
+q_corr_by_angle     = {}
+
+for ang in sorted(Cl_by_angle.keys()):
+    # Uncorrected inputs per angle
+    Cl_u = Cl_by_angle[ang]      # Data
+    Cm_u = Cm_by_angle[ang]      # Data
+    Cd_u = Cd_by_angle.get(ang)  # Data (pressure-only drag from taps)
+    if Cd_u is None:
+        continue
+
+    # Wake blockage with local Cd
+    eps_wb = (c_over_h**2) * max(Cd_u.value, 0.0)
+    eps    = eps_sb + eps_wb
+
+    # --- Corrected quantities ---
+    # Angle (deg): α_corr = α_u + (57.3 * σ / (2π)) * (Cl_u + 4 Cm_u)
+    alpha_corr = ang + (57.3 * sigma / (2.0 * pi)) * (Cl_u.value + 4.0 * Cm_u.value)
+
+    # Lift: Cl_corr = Cl_u * (1 - σ - 2 ε)
+    Cl_scale   = (1.0 - sigma - 2.0 * eps)
+    Cl_corr_val = Cl_u.value * Cl_scale
+    # Simple uncertainty propagation (linear scaling of Cl uncertainty)
+    Cl_corr_unc = abs(Cl_scale) * Cl_u.uncertainty
+
+    # Moment: Cm_corr = Cm_u*(1 - 2σ) + 0.25*σ*Cl_corr
+    Cm_a = (1.0 - 2.0 * sigma)
+    Cm_b = 0.25 * sigma
+    Cm_corr_val = Cm_a * Cm_u.value + Cm_b * Cl_corr_val
+    # Uncertainty (RSS of two independent terms)
+    Cm_corr_unc = np.sqrt((abs(Cm_a) * Cm_u.uncertainty)**2 + (abs(Cm_b) * Cl_corr_unc)**2)
+
+    # Re, q corrections with same eps
+    Re_corr_val = Re.value * (1.0 + eps)
+    Re_corr_unc = abs(1.0 + eps) * Re.uncertainty
+
+    q_corr_val  = q.value * (1.0 + eps)
+    q_corr_unc  = abs(1.0 + eps) * q.uncertainty
+
+    # Store as Data
+    alpha_corr_by_angle[ang] = alpha_corr  # plain float is fine for plotting
+    Cl_corr_by_angle[ang] = Data("Lift Coefficient (corrected)", sp.Symbol("C_L_corr"),
+                                 Cl_corr_val, Cl_corr_unc)
+    Cm_corr_by_angle[ang] = Data("Moment Coefficient (c/4, corrected)", sp.Symbol("C_m_corr"),
+                                 Cm_corr_val, Cm_corr_unc)
+    Re_corr_by_angle[ang] = Data("Reynolds Number (corrected)", sp.Symbol("Re_corr"),
+                                 Re_corr_val, Re_corr_unc)
+    q_corr_by_angle[ang]  = Data("Dynamic Pressure (corrected)", sp.Symbol("q_corr"),
+                                 q_corr_val, q_corr_unc)
+
+# --- Quick sanity print (optional) ---
+print("\n=== Corrected vs Uncorrected (samples) ===")
+for ang in [-10, 0, 10]:
+    if ang in Cl_by_angle and ang in Cl_corr_by_angle:
+        print(f"α={ang:+2}°  α_corr={alpha_corr_by_angle[ang]:6.2f}°  "
+              f"Cl_u={Cl_by_angle[ang].value: .3f} → Cl_corr={Cl_corr_by_angle[ang].value: .3f}  "
+              f"Cm_u={Cm_by_angle[ang].value: .3f} → Cm_corr={Cm_corr_by_angle[ang].value: .3f}")
 
 
 df_x = run_xfoil_polar(
