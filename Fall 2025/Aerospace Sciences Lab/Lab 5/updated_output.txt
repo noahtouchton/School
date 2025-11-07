@@ -70,16 +70,16 @@ c/h = 0.16667
       21.985204  0.961611  0.388516 -0.316290
 
 -- Min/Max summary (value and corresponding α) --
-                 Dataset Property       Min      Min α       Max      Max α
-Experimental Uncorrected       Cl -0.534486 -22.000000  1.208108   8.000000
-Experimental Uncorrected       Cd -0.010057  -2.000000  0.404539  22.000000
-Experimental Uncorrected       Cm -0.321334  22.000000 -0.042718  -8.000000
-  Experimental Corrected       Cl -0.518916 -22.041910  1.176012   8.018022
-  Experimental Corrected       Cd -0.009885  -2.010163  0.388516  21.985204
-  Experimental Corrected       Cm -0.316290  21.985204 -0.042588  -8.022216
-           XFOIL Viscous       Cl -0.401500  -8.000000  1.422800  17.000000
-           XFOIL Viscous       Cd  0.009730  -0.000000  0.275670  22.000000
-           XFOIL Viscous       Cm -0.140300  22.000000 -0.007400 -22.000000
-     Thin Airfoil Theory       Cl -2.193245 -22.000000  2.631895  22.000000
-     Thin Airfoil Theory       Cd  0.000000 -22.000000  0.000000 -22.000000
-     Thin Airfoil Theory       Cm -0.100000 -22.000000 -0.100000 -22.000000
+                 Dataset Property       Min  Min α  Min Unc       Max  Max α  Max Unc
+Experimental Uncorrected       Cl -0.534486  -22.0 0.001097  1.208108    8.0 0.000465
+Experimental Uncorrected       Cd -0.010057   -2.0 0.000020  0.404539   22.0 0.000708
+Experimental Uncorrected       Cm -0.321334   22.0 0.000668 -0.042718   -8.0 0.000606
+  Experimental Corrected       Cl -0.518916  -22.0 0.001065  1.176012    8.0 0.000453
+  Experimental Corrected       Cd -0.009885   -2.0 0.000019  0.388516   22.0 0.000680
+  Experimental Corrected       Cm -0.316290   22.0 0.000660 -0.042588   -8.0 0.000599
+           XFOIL Viscous       Cl -0.401500   -8.0      NaN  1.422800   17.0      NaN
+           XFOIL Viscous       Cd  0.009730   -0.0      NaN  0.275670   22.0      NaN
+           XFOIL Viscous       Cm -0.140300   22.0      NaN -0.007400  -22.0      NaN
+     Thin Airfoil Theory       Cl -2.193245  -22.0      NaN  2.631895   22.0      NaN
+     Thin Airfoil Theory       Cd  0.000000  -22.0      NaN  0.000000  -22.0      NaN
+     Thin Airfoil Theory       Cm -0.100000  -22.0      NaN -0.100000  -22.0      NaN

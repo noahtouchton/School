@@ -538,6 +538,120 @@ save_plot4(
 )
 
 
+# ---------- Build experimental DataFrames (uncorrected & corrected) ----------
+
+def build_uncorrected_df(Cl_by_angle, Cd_by_angle, Cm_by_angle, eps_by_angle):
+    rows = []
+    for ang in sorted(Cl_by_angle.keys()):
+        cl = Cl_by_angle[ang]
+        cd = Cd_by_angle.get(ang)
+        cm = Cm_by_angle.get(ang)
+        if cd is None or cm is None:
+            continue
+        rows.append({
+            "alpha_deg": ang,
+            "Cl": cl.value,           "Cl_unc": cl.uncertainty,
+            "Cd": cd.value,           "Cd_unc": cd.uncertainty,
+            "Cm": cm.value,           "Cm_unc": cm.uncertainty,
+            "ε_total": eps_by_angle.get(ang, np.nan),
+        })
+    return pd.DataFrame(rows).sort_values("alpha_deg").reset_index(drop=True)
+
+def build_corrected_df(alpha_corr_by_angle, Cl_corr_by_angle, Cd_corr_by_angle, Cm_corr_by_angle,
+                       Re_corr_by_angle=None, q_corr_by_angle=None):
+    rows = []
+    for ang in sorted(Cl_corr_by_angle.keys()):
+        cl = Cl_corr_by_angle[ang]
+        cm = Cm_corr_by_angle[ang]
+        cd = Cd_corr_by_angle.get(ang) if Cd_corr_by_angle is not None else None
+        rows.append({
+            "alpha_u_deg": ang,
+            "alpha_corr_deg": float(alpha_corr_by_angle.get(ang, np.nan)),
+            "Cl": cl.value,               "Cl_unc": cl.uncertainty,
+            "Cd": (cd.value if cd else np.nan),
+            "Cd_unc": (cd.uncertainty if cd else np.nan),
+            "Cm": cm.value,               "Cm_unc": cm.uncertainty,
+            "Re_corr": (Re_corr_by_angle[ang].value if Re_corr_by_angle and ang in Re_corr_by_angle else np.nan),
+            "Re_corr_unc": (Re_corr_by_angle[ang].uncertainty if Re_corr_by_angle and ang in Re_corr_by_angle else np.nan),
+            "q_corr": (q_corr_by_angle[ang].value if q_corr_by_angle and ang in q_corr_by_angle else np.nan),
+            "q_corr_unc": (q_corr_by_angle[ang].uncertainty if q_corr_by_angle and ang in q_corr_by_angle else np.nan),
+        })
+    return pd.DataFrame(rows).sort_values("alpha_corr_deg").reset_index(drop=True)
+
+# Build the two experimental tables
+unc_df  = build_uncorrected_df(Cl_by_angle, Cd_by_angle, Cm_by_angle, eps_by_angle)
+corr_df = build_corrected_df(alpha_corr_by_angle, Cl_corr_by_angle, Cd_corr_by_angle, Cm_corr_by_angle,
+                             Re_corr_by_angle, q_corr_by_angle)
+
+# (Optional) Build XFOIL & TAT tables (no uncertainties there)
+xfoil_v_df = df_x[["alpha", "Cl", "Cd", "Cm"]].rename(columns={"alpha":"alpha_deg"}).copy()
+tat_df     = df_inv[["alpha","Cl","Cd","Cm"]].rename(columns={"alpha":"alpha_deg"}).copy()
+
+# ---------- Pretty prints: full per-AOA tables for exp (uncorr & corr) ----------
+pd.set_option("display.width", 140)
+pd.set_option("display.max_columns", None)
+
+print("\n-- Experimental (Uncorrected): per-AOA Cl, Cd, Cm with uncertainties --")
+print(unc_df.to_string(index=False))
+
+print("\n-- Experimental (Corrected): per-AOA α_corr, Cl, Cd, Cm with uncertainties --")
+print(corr_df.to_string(index=False))
+
+print("\n-- XFOIL viscous (reference) --")
+print(xfoil_v_df.to_string(index=False))
+
+print("\n-- Thin Airfoil Theory (reference) --")
+print(tat_df.to_string(index=False))
+
+# ---------- Extrema tables (mins & maxes) WITH uncertainties ----------
+
+def extrema_table_with_unc(name, df, alpha_col, props=("Cl","Cd","Cm")):
+    """
+    Returns a min/max summary including α and 1σ uncertainties per property.
+    Assumes uncertainty columns exist with suffix '_unc' (e.g., 'Cl_unc').
+    Missing uncertainties → NaN (e.g., for XFOIL/TAT).
+    """
+    rows = []
+    for prop in props:
+        if prop not in df.columns or alpha_col not in df.columns:
+            continue
+        sub = df[[alpha_col, prop]].dropna()
+        if sub.empty:
+            continue
+        i_min = sub[prop].idxmin()
+        i_max = sub[prop].idxmax()
+        unc_col = f"{prop}_unc" if f"{prop}_unc" in df.columns else None
+        rows.append({
+            "Dataset": name,
+            "Property": prop,
+            "Min": float(df.loc[i_min, prop]),
+            "Min α": float(df.loc[i_min, alpha_col]),
+            "Min Unc": float(df.loc[i_min, unc_col]) if unc_col else np.nan,
+            "Max": float(df.loc[i_max, prop]),
+            "Max α": float(df.loc[i_max, alpha_col]),
+            "Max Unc": float(df.loc[i_max, unc_col]) if unc_col else np.nan,
+        })
+    return pd.DataFrame(rows)
+
+ext_unc  = extrema_table_with_unc("Experimental Uncorrected", unc_df,  "alpha_deg")
+ext_corr = extrema_table_with_unc("Experimental Corrected",   corr_df, "alpha_corr_deg")
+ext_xf   = extrema_table_with_unc("XFOIL Viscous",            xfoil_v_df, "alpha_deg")
+ext_tat  = extrema_table_with_unc("Thin Airfoil Theory",      tat_df, "alpha_deg")
+
+print("\n-- Min/Max summary with uncertainties (where available) --")
+ext_all = pd.concat([ext_unc, ext_corr, ext_xf, ext_tat], ignore_index=True)
+print(ext_all.to_string(index=False))
+
+# Save the tables next to your plots
+outdir = os.path.join(os.path.dirname(__file__), "xfoil_outputs")
+os.makedirs(outdir, exist_ok=True)
+unc_df.to_csv(os.path.join(outdir, "table_exp_uncorrected.csv"), index=False)
+corr_df.to_csv(os.path.join(outdir, "table_exp_corrected.csv"), index=False)
+xfoil_v_df.to_csv(os.path.join(outdir, "table_xfoil.csv"), index=False)
+tat_df.to_csv(os.path.join(outdir, "table_tat.csv"), index=False)
+ext_all.to_csv(os.path.join(outdir, "table_extrema_all.csv"), index=False)
+
+
 # === FINAL ORGANIZED SUMMARY PRINTS (requested format) ===
 print("\n" + "="*78)
 print("FINAL ORGANIZED SUMMARY")
@@ -602,7 +716,7 @@ print("\n-- Experimental (CORRECTED): Cl, Cd, Cm at each corrected α --")
 print(corr_list_df.to_string(index=False))
 
 # 5) Build min/max summary tables for each dataset
-def extrema_table(name, df, alpha_col, cols=("Cl","Cd","Cm")):
+def extrema_table_with_unc(name, df, alpha_col, cols=("Cl","Cd","Cm")):
     """
     Returns min/max table including corresponding α and 1σ uncertainties.
     Assumes df includes columns like Cl_unc, Cd_unc, Cm_unc if available.
@@ -643,10 +757,11 @@ corr_ext_df = corr_list_df.rename(columns={
     "Cl_corr":"Cl", "Cd_corr":"Cd", "Cm_corr":"Cm"
 })
 
-ext_unc  = extrema_table("Experimental Uncorrected", unc_ext_df,  "alpha")
-ext_corr = extrema_table("Experimental Corrected",   corr_ext_df, "alpha")
-ext_xf   = extrema_table("XFOIL Viscous",            xfoil_df,     "alpha_deg")
-ext_tat  = extrema_table("Thin Airfoil Theory",      tat_df,       "alpha_deg")
+ext_unc  = extrema_table_with_unc("Experimental Uncorrected", unc_df,  "alpha_deg")
+ext_corr = extrema_table_with_unc("Experimental Corrected",   corr_df, "alpha_u_deg")
+ext_xf   = extrema_table_with_unc("XFOIL Viscous",            xfoil_v_df, "alpha_deg")
+ext_tat  = extrema_table_with_unc("Thin Airfoil Theory",      tat_df, "alpha_deg")
+
 
 extrema_all = pd.concat([ext_unc, ext_corr, ext_xf, ext_tat], ignore_index=True)
 

@@ -1,0 +1,19 @@
+TT&C - Telemetry, Tracking, and Command
+C&DH - Command and Data Handling
+ACK/NACK - Acknowledge / Negative Acknowledge
+UHF - Ultra High Frequency
+ISM - Industrial, Scientific, and Medical
+HPBW - Half Power Beam Width
+RF - Radio Frequency
+VSWR - Voltage Standing Wave Ratio
+TID - Total Ionizing Dose
+SEL - Single Event Latch-up
+FOV - Field of View
+CRC - Cyclic Redundancy Check
+FEC - Forward Error Correction
+ITU - International Telecommunication Union
+SEU - Single Event Upset
+SPI - Serial Peripheral Interface
+eMMC - Embedded MultiMediaCard
+EDAC - Error Detection and Correction
+TMR - Triple Modular Redundancy

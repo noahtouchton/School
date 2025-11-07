@@ -26,6 +26,11 @@ Flight-proven UHF TT&C radio; 9.6–19.2 kbps; compatible with 3.3 V logic.
 
 ⸻
 
+TT&C UHF Antenna
+https://gomspace.com/shop/subsystems/communication-systems/nanocom-ant430.aspx
+
+
+No longer
 Inter-Satellite Communications Transceivers (×2)
 	•	AAC Clyde Space TRX-U (UHF Transceiver)
 https://www.aac-clyde.space/wp-content/uploads/2021/11/TRX-U-datasheet.pdf
