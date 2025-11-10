@@ -19,13 +19,14 @@ Matched to PULSAR-STX for payload downlink; fixed mount, 6 dBic gain.
 
 ⸻
 
-TT&C UHF Transceiver
+TT&C UHF Transceiver (x3)
 	•	GomSpace NanoCom AX100
 https://gomspace.com/shop/subsystems/communication-systems/nanocom-ax100.aspx
 Flight-proven UHF TT&C radio; 9.6–19.2 kbps; compatible with 3.3 V logic.
 
 ⸻
 
+<<<<<<< HEAD
 TT&C UHF Antenna
 https://gomspace.com/shop/subsystems/communication-systems/nanocom-ant430.aspx
 
@@ -35,8 +36,9 @@ Inter-Satellite Communications Transceivers (×2)
 	•	AAC Clyde Space TRX-U (UHF Transceiver)
 https://www.aac-clyde.space/wp-content/uploads/2021/11/TRX-U-datasheet.pdf
 Replaces SX1262 LoRa dev boards; 2.4–19.2 kbps; 1–5 W RF; 3.3 V CMOS I/O; space-qualified.
+=======
+>>>>>>> 6d07778 (lab 4)
 
-⸻
 
 Inter-Satellite Antennas (×2)
 	•	AAC ANT-100 Static Whip Antenna

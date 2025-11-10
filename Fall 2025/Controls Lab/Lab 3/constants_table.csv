@@ -1,0 +1,19 @@
+Symbol,Units,Value,Method
+R,Ω,16.0,Motor datasheet/spec
+K_m,N·m/A,0.525,Motor datasheet/spec
+L_1,m,0.1231,Ruler/tape measure
+m_pend,kg,0.00491,Mass scale
+m_nuts,kg,0.00377,Mass scale
+d_2,m,0.0736,Ruler/calipers (pivot→pend COM)
+d_3,m,0.1472,Ruler/calipers (pivot→nuts)
+I_COM,kg·m^2,8.866e-06,CAD or geometry calc about COM
+I_nuts,kg·m^2,2.042e-05,CAD/assumption about nut cluster
+J_0,kg·m^2,0.04,Given/estimation for base inertia
+b_1,N·m·s/rad,0.0146,Experimental identification (platen)
+b_2,N·m·s,4.72e-05,Free-swing logarithmic decrement
+m_tot,kg,0.00868,m_pend + m_nuts
+l_COM,m,0.10556682027649769,(m_pend d2 + m_nuts d3)/m_tot
+k,N·m/rad,0.008989099200000001,m_tot g l_COM (small-angle)
+J_2,kg·m^2,0.00013757103040000002,Parallel-axis from parts
+k_gain,—,1.0297,Step test (closed-loop gain)
+tau,s,1.2583,Step test (closed-loop time constant)
