@@ -48,11 +48,11 @@ A = [0 0 1 0 0;
 B = [0; 0; 0; 0; 1/Lm];
 
 
-qt1 = 0.01;
-qt2 = 10;
-qv1 = 1;
-qv2 = 1;
-qi = 0.0001;
+qt1 = 1e-4;
+qt2 = 400;
+qv1 = 50;
+qv2 = 200;
+qi = 3;
 
 
 Q = [qt1 0 0 0 0;
@@ -66,3 +66,5 @@ R = [0.1];
 
 K = lqr(A,B,Q,R)
 
+Acl = A - B*K;
+eig(Acl)   % should all have negative real parts
