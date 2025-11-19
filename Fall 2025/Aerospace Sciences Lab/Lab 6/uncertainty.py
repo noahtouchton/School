@@ -263,7 +263,7 @@ tchar = RSS("Characteristic Time", equations[3], [V, A, ai])
 #find choke points
 
 P_choke = (1 + 0.5 * (gamma.value - 1)) ** (gamma.value / (gamma.value - 1))
-print("Choke Pressure Ratio:", P_choke)
+
 for pressure in Pabs_small.value:
     if pressure / P_amb.value <= P_choke:
         print(f"Small orifice is choked at pressure: {pressure:.2f} Pa")
@@ -294,7 +294,7 @@ import matplotlib.pyplot as plt
 P_choke = (1 + 0.5*(gamma.value - 1.0))**(gamma.value/(gamma.value - 1.0))
 P_atm   = P_amb.value  # Pa
 
-print(f"Choke Pressure Ratio (P0/P_atm): {P_choke:.6f}")
+
 
 def nondim_with_errors(tD: Data, PabsD: Data, tchar_scalar: float, label: str):
     """
@@ -349,6 +349,9 @@ tchar_small = float(tchar.value[0])
 tchar_med   = float(tchar.value[1])
 tchar_large = float(tchar.value[2])
 
+tchar.get_error()
+slope.get_error()
+intercept.get_error()
 here = os.path.dirname(os.path.abspath(__file__))
 
 

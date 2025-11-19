@@ -44,9 +44,9 @@ A = [0 0 1 0 0;
      0 0 0 1 0;
      A31 A32 A33 A34 B31_t*Km;
      A41 A42 A43 A44 B41_t*Km;
-     0   0   -Km/Lm 0 -R/Lm];
+     0   0   -Km/Lm 0 -R/Lm]
 
-B = [0; 0; 0; 0; 1/Lm];
+B = [0; 0; 0; 0; 1/Lm]
 
 
 qt1 = 1e-4;
@@ -69,3 +69,11 @@ K = lqr(A,B,Q,R)
 
 Acl = A - B*K;
 eig(Acl)   % should all have negative real parts
+
+C = [1 0 0 0 0;
+     0 1 0 0 0];
+
+% choose poles ~5x faster than controller
+poles = [-50 -55 -60 -65 -70];
+L = place(A', C', poles)';
+
