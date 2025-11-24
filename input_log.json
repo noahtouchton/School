@@ -1,0 +1,437 @@
+[
+    {
+        "type": "mouse_click",
+        "button": "Button.left",
+        "position": [
+            263,
+            14
+        ],
+        "time": 1.8330581188201904,
+        "dt": 1.8330581188201904
+    },
+    {
+        "type": "mouse_click",
+        "button": "Button.left",
+        "position": [
+            232,
+            20
+        ],
+        "time": 2.3014166355133057,
+        "dt": 0.46835851669311523
+    },
+    {
+        "type": "mouse_click",
+        "button": "Button.left",
+        "position": [
+            213,
+            69
+        ],
+        "time": 3.2472283840179443,
+        "dt": 0.9458117485046387
+    },
+    {
+        "type": "url_marker",
+        "time": 4.170206069946289,
+        "dt": 0.9229776859283447
+    },
+    {
+        "type": "key_press",
+        "key": "Key.enter",
+        "time": 9.946200132369995,
+        "dt": 5.775994062423706
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 11.921679973602295,
+        "dt": 1.9754798412322998
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.170633316040039,
+        "dt": 0.24895334243774414
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.203829526901245,
+        "dt": 0.033196210861206055
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.236708402633667,
+        "dt": 0.032878875732421875
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.26961350440979,
+        "dt": 0.03290510177612305
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.303301811218262,
+        "dt": 0.03368830680847168
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.33633041381836,
+        "dt": 0.033028602600097656
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.36879014968872,
+        "dt": 0.03245973587036133
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.402475595474243,
+        "dt": 0.03368544578552246
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.434784173965454,
+        "dt": 0.03230857849121094
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.468072891235352,
+        "dt": 0.03328871726989746
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.50120496749878,
+        "dt": 0.033132076263427734
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.53363585472107,
+        "dt": 0.03243088722229004
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.567232847213745,
+        "dt": 0.03359699249267578
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.599472999572754,
+        "dt": 0.03224015235900879
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.632881879806519,
+        "dt": 0.03340888023376465
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.666704654693604,
+        "dt": 0.03382277488708496
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.699455976486206,
+        "dt": 0.03275132179260254
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.731488943099976,
+        "dt": 0.03203296661376953
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.764798164367676,
+        "dt": 0.033309221267700195
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.79815673828125,
+        "dt": 0.03335857391357422
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.830847024917603,
+        "dt": 0.03269028663635254
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.864413499832153,
+        "dt": 0.03356647491455078
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.896743297576904,
+        "dt": 0.03232979774475098
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.930237770080566,
+        "dt": 0.03349447250366211
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.963366270065308,
+        "dt": 0.03312849998474121
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 12.99574589729309,
+        "dt": 0.0323796272277832
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.028603315353394,
+        "dt": 0.032857418060302734
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.062212467193604,
+        "dt": 0.03360915184020996
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.095219373703003,
+        "dt": 0.033006906509399414
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.127743244171143,
+        "dt": 0.03252387046813965
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.160950899124146,
+        "dt": 0.03320765495300293
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.19403862953186,
+        "dt": 0.033087730407714844
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.226983070373535,
+        "dt": 0.032944440841674805
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.259937286376953,
+        "dt": 0.03295421600341797
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.29268741607666,
+        "dt": 0.03275012969970703
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.326052904129028,
+        "dt": 0.033365488052368164
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.359313249588013,
+        "dt": 0.033260345458984375
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.39243483543396,
+        "dt": 0.033121585845947266
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.424872159957886,
+        "dt": 0.03243732452392578
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.45752501487732,
+        "dt": 0.032652854919433594
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.490843772888184,
+        "dt": 0.03331875801086426
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.523917436599731,
+        "dt": 0.03307366371154785
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.557429075241089,
+        "dt": 0.03351163864135742
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.589747905731201,
+        "dt": 0.032318830490112305
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.622558355331421,
+        "dt": 0.03281044960021973
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.655912637710571,
+        "dt": 0.03335428237915039
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.689413785934448,
+        "dt": 0.03350114822387695
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.722357511520386,
+        "dt": 0.0329437255859375
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.755047798156738,
+        "dt": 0.03269028663635254
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.787655591964722,
+        "dt": 0.0326077938079834
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.821336269378662,
+        "dt": 0.03368067741394043
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.85421371459961,
+        "dt": 0.032877445220947266
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.886985778808594,
+        "dt": 0.032772064208984375
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.920099258422852,
+        "dt": 0.03311347961425781
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.953485250473022,
+        "dt": 0.0333859920501709
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 13.985644817352295,
+        "dt": 0.03215956687927246
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 14.019088506698608,
+        "dt": 0.03344368934631348
+    },
+    {
+        "type": "key_press",
+        "key": "Key.down",
+        "time": 14.051638126373291,
+        "dt": 0.03254961967468262
+    },
+    {
+        "type": "mouse_click",
+        "button": "Button.left",
+        "position": [
+            175,
+            732
+        ],
+        "time": 15.540911436080933,
+        "dt": 1.4892733097076416
+    },
+    {
+        "type": "mouse_click",
+        "button": "Button.left",
+        "position": [
+            439,
+            843
+        ],
+        "time": 16.330033779144287,
+        "dt": 2.7891223430633545
+    },
+    {
+        "type": "mouse_click",
+        "button": "Button.left",
+        "position": [
+            69,
+            253
+        ],
+        "time": 25.35752820968628,
+        "dt": 9.027494430541992
+    },
+    {
+        "type": "mouse_click",
+        "button": "Button.left",
+        "position": [
+            84,
+            177
+        ],
+        "time": 28.126723051071167,
+        "dt": 2.7691948413848877
+    }
+]

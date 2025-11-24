@@ -285,16 +285,16 @@ for pressure in Pabs_large.value:
         print(f"Choke occurs at time: {t_large.value[choke_index]:.2f} s")
         break
 
+import os
+import numpy as np
 import matplotlib.pyplot as plt
 
 # ------------------------------------------------------------
-# Build nondimensional P+ and t+ with error bars, separate plot per orifice
+# Build nondimensional P+ and t+ with error bars, per orifice
 # ------------------------------------------------------------
 
 P_choke = (1 + 0.5*(gamma.value - 1.0))**(gamma.value/(gamma.value - 1.0))
 P_atm   = P_amb.value  # Pa
-
-
 
 def nondim_with_errors(tD: Data, PabsD: Data, tchar_scalar: float, label: str):
     """
@@ -337,7 +337,7 @@ def nondim_with_errors(tD: Data, PabsD: Data, tchar_scalar: float, label: str):
     # Uncertainty in P_plus via linear propagation:
     # P+ = P / P0  ->  σ_P+ ≈ P+ * sqrt( (σ_P/P)^2 + (σ_P0/P0)^2 )
     eps = 1e-12
-    rel_var_P  = (sigP_ch / np.maximum(np.abs(P_ch),  eps))**2
+    rel_var_P  = (sigP_ch / np.maximum(np.abs(P_ch), eps))**2
     rel_var_P0 = (sigP0   / max(abs(P0), eps))**2
     sigma_P_plus = P_plus * np.sqrt(rel_var_P + rel_var_P0)
 
@@ -349,51 +349,147 @@ tchar_small = float(tchar.value[0])
 tchar_med   = float(tchar.value[1])
 tchar_large = float(tchar.value[2])
 
+# (Optional) force evaluation of these uncertainties
 tchar.get_error()
 slope.get_error()
 intercept.get_error()
+
 here = os.path.dirname(os.path.abspath(__file__))
 
+# ------------------------------------------------------------
+# Precompute theory constants (same gamma for all orifices)
+# ------------------------------------------------------------
 
-# Small orifice
+gamma_val = float(gamma.value)
+
+# Constant C = ((γ+1)/2)^{-(γ+1)/(2(γ-1))}
+C = ((gamma_val + 1.0) / 2.0) ** (-(gamma_val + 1.0) / (2.0 * (gamma_val - 1.0)))
+
+def add_theory_curves(t_plus_data: np.ndarray):
+    if t_plus_data.size == 0:
+        return
+
+    tmax = float(np.max(t_plus_data))
+    tplus_theory = np.linspace(0.0, max(1.2 * tmax, 1.0), 400)
+
+    Pplus_iso = np.exp(-C * tplus_theory)
+    Pplus_adi = (
+        1.0 + 0.5 * (gamma_val - 1.0) * C * tplus_theory
+    ) ** (-2.0 * gamma_val / (gamma_val - 1.0))
+
+    # Plot ADIABATIC on top in RED
+    plt.plot(tplus_theory, Pplus_adi, "-",
+             color="red", linewidth=2, zorder=5,
+             label="Choked adiabatic theory")
+
+    # Plot ISOTHERMAL slightly below it
+    plt.plot(tplus_theory, Pplus_iso, "--",
+             linewidth=2, zorder=4,
+             label="Choked isentropic theory")
+
+
+
+# ------------------------------------------------------------
+# Small orifice: data + theory
+# ------------------------------------------------------------
 ts, Ps, sigPs = nondim_with_errors(t_small, Pabs_small, tchar_small, "Small")
-plt.figure(figsize=(7,5))
+plt.figure(figsize=(7, 5))
+
+# 1️⃣ Plot data FIRST (under everything else)
 if ts.size > 0:
-    plt.errorbar(ts, Ps, yerr=sigPs, fmt='o', capsize=3, label="Small Orifice")
+    plt.errorbar(ts, Ps, yerr=sigPs, fmt='o', capsize=3,
+                 label="Small Orifice data",
+                 zorder=1)   # << LOWER than theory
+
+# 2️⃣ Then theory curves
+add_theory_curves(ts)
+
+
+
 plt.xlabel(r"$t^+ = t / t_{\rm char}$")
 plt.ylabel(r"$P^+ = P / P_0$")
 plt.title("Non-Dimensional Choked Tank Discharge – Small Orifice")
 plt.grid(True, linestyle="--", alpha=0.5)
 plt.legend()
 plt.tight_layout()
-plt.savefig(os.path.join(here, "lab6_nondim_small.png"), dpi=300)
+plt.savefig(os.path.join(here, "lab6_nondim_small_with_theory.png"), dpi=300)
 plt.show()
 
-# Medium orifice
+# ------------------------------------------------------------
+# Medium orifice: data + theory
+# ------------------------------------------------------------
+# MEDIUM
 tm, Pm, sigPm = nondim_with_errors(t_med, Pabs_med, tchar_med, "Medium")
-plt.figure(figsize=(7,5))
+plt.figure(figsize=(7, 5))
 if tm.size > 0:
-    plt.errorbar(tm, Pm, yerr=sigPm, fmt='s', capsize=3, label="Medium Orifice")
+    plt.errorbar(tm, Pm, yerr=sigPm, fmt='s', capsize=3,
+                 label="Medium Orifice data",
+                 zorder=1)
+add_theory_curves(tm)
+
+
+
 plt.xlabel(r"$t^+ = t / t_{\rm char}$")
 plt.ylabel(r"$P^+ = P / P_0$")
 plt.title("Non-Dimensional Choked Tank Discharge – Medium Orifice")
 plt.grid(True, linestyle="--", alpha=0.5)
 plt.legend()
 plt.tight_layout()
-plt.savefig(os.path.join(here,"lab6_nondim_medium.png"), dpi=300)
+plt.savefig(os.path.join(here, "lab6_nondim_medium_with_theory.png"), dpi=300)
 plt.show()
 
-# Large orifice
+# ------------------------------------------------------------
+# Large orifice: data + theory
+# ------------------------------------------------------------
+# LARGE
 tl, Pl, sigPl = nondim_with_errors(t_large, Pabs_large, tchar_large, "Large")
-plt.figure(figsize=(7,5))
+plt.figure(figsize=(7, 5))
 if tl.size > 0:
-    plt.errorbar(tl, Pl, yerr=sigPl, fmt='^', capsize=3, label="Large Orifice")
+    plt.errorbar(tl, Pl, yerr=sigPl, fmt='^', capsize=3,
+                 label="Large Orifice data",
+                 zorder=1)
+add_theory_curves(tl)
+
+
+
 plt.xlabel(r"$t^+ = t / t_{\rm char}$")
 plt.ylabel(r"$P^+ = P / P_0$")
 plt.title("Non-Dimensional Choked Tank Discharge – Large Orifice")
 plt.grid(True, linestyle="--", alpha=0.5)
 plt.legend()
 plt.tight_layout()
-plt.savefig(os.path.join(here, "lab6_nondim_large.png"), dpi=300)
+plt.savefig(os.path.join(here, "lab6_nondim_large_with_theory.png"), dpi=300)
 plt.show()
+
+
+# ------------------------------------------------------------
+# Temperature vs nondimensional time (all three orifices)
+# ------------------------------------------------------------
+
+tplus_T_small = np.asarray(t_small.value, dtype=float) / tchar_small
+tplus_T_med   = np.asarray(t_med.value,   dtype=float) / tchar_med
+tplus_T_large = np.asarray(t_large.value, dtype=float) / tchar_large
+
+plt.figure(figsize=(8, 6))
+
+plt.plot(tplus_T_small, T_small.value, 'o-', label="Small Orifice")
+plt.plot(tplus_T_med,   T_med.value,   's-', label="Medium Orifice")
+plt.plot(tplus_T_large, T_large.value, '^-', label="Large Orifice")
+
+plt.axhline(T_amb.value, linestyle="--", alpha=0.6,
+            label=f"Ambient $T_{{amb}} \\approx {T_amb.value:.1f}\\,\\mathrm{{K}}$")
+
+plt.xlabel(r"$t^+ = t / t_{\rm char}$")
+plt.ylabel(r"Temperature $T$ [K]")
+plt.title("Tank Temperature vs Nondimensional Time – All Orifices")
+plt.grid(True, linestyle="--", alpha=0.5)
+plt.legend()
+
+# *** UPDATED AXIS RANGE ***
+plt.ylim(273, 320)
+
+plt.tight_layout()
+plt.savefig(os.path.join(here, "lab6_temperature_vs_tchar.png"), dpi=300)
+plt.show()
+
 
