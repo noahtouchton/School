@@ -49,7 +49,7 @@ A = [0 0 1 0 0;
 B = [0; 0; 0; 0; 1/Lm]
 
 
-qt1 = 1e-4;
+qt1 = 100;
 qt2 = 400;
 qv1 = 300;
 qv2 = 200;
@@ -62,18 +62,22 @@ Q = [qt1 0 0 0 0;
     0 0 0 qv2 0;
     0 0 0 0 qi];
 
-R = [10];
+R = [7];
 
 
 K = lqr(A,B,Q,R)
 
 Acl = A - B*K;
-eig(Acl)   % should all have negative real parts
+eig(Acl);   % should all have negative real parts
 
 C = [1 0 0 0 0;
      0 1 0 0 0];
-
+dt = 0.001;
 % choose poles ~5x faster than controller
 poles = [-50 -55 -60 -65 -70];
 L = place(A', C', poles)';
 
+disp(L)
+
+Ad_obs = eye(5) + dt*(A - L*C);
+eig(Ad_obs)
