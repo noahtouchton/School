@@ -49,11 +49,11 @@ A = [0 0 1 0 0;
 B = [0; 0; 0; 0; 1/Lm]
 
 
-qt1 = 100;
-qt2 = 400;
-qv1 = 300;
-qv2 = 200;
-qi = 3;
+qt1 = 3.65;
+qt2 = 150;
+qv1 = 0.2778;
+qv2 = 0.2;
+qi = 0.25;
 
 
 Q = [qt1 0 0 0 0;
@@ -62,7 +62,7 @@ Q = [qt1 0 0 0 0;
     0 0 0 qv2 0;
     0 0 0 0 qi];
 
-R = [7];
+R = [0.1];
 
 
 K = lqr(A,B,Q,R)
@@ -74,10 +74,13 @@ C = [1 0 0 0 0;
      0 1 0 0 0];
 dt = 0.001;
 % choose poles ~5x faster than controller
-poles = [-50 -55 -60 -65 -70];
-L = place(A', C', poles)';
+%poles = [-5 -6 -7 -8 -9];   % 10x slower
+%L = place(A', C', poles).';
 
-disp(L)
 
-Ad_obs = eye(5) + dt*(A - L*C);
-eig(Ad_obs)
+%format long g
+%L
+
+
+%Ad_obs = eye(5) + dt*(A - L*C);
+%eig(Ad_obs)
