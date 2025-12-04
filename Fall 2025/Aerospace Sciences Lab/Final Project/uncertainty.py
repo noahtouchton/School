@@ -549,3 +549,17 @@ U_inf_45_data, delta_b_45_data, delta_t_45_data = summarize_bl("45 Hz", y_45hz, 
 U_inf_60_data, delta_b_60_data, delta_t_60_data = summarize_bl("60 Hz", y_60hz, v_60hz, H_data)
 
 
+def print_uncert_column(data_obj, label):
+    """
+    Prints uncertainties as a clean, one-value-per-line column,
+    ready to paste directly into Excel.
+    """
+    arr = np.asarray(data_obj.uncertainty, dtype=float).ravel()
+    print(f"{label} velocity uncertainties (m/s):")
+    for u in arr:
+        print(u)
+    print()  # blank line between blocks
+
+#print_uncert_column(v_30hz, "30 Hz")
+#print_uncert_column(v_45hz, "45 Hz")
+#print_uncert_column(v_60hz, "60 Hz")
