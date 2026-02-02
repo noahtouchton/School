@@ -1,0 +1,30 @@
+{
+  "test_set_size": 14,
+  "overall_accuracy": 0.9285714285714286,
+  "type_a": {
+    "accuracy": 1.0,
+    "precision": 0.9090909090909091,
+    "recall": 1.0,
+    "f1": 0.9523809523809523,
+    "true_positives": 10,
+    "false_negatives": 0
+  },
+  "type_b": {
+    "accuracy": 0.75,
+    "precision": 1.0,
+    "recall": 0.75,
+    "f1": 0.8571428571428571,
+    "true_positives": 3,
+    "false_negatives": 1
+  },
+  "confusion_matrix": [
+    [
+      10,
+      0
+    ],
+    [
+      1,
+      3
+    ]
+  ]
+}
