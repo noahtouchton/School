@@ -1,0 +1,15 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+
+# --- Virtual environments ---
+venv/
+.venv/
+env/
+ENV/
+soil_classification_env/
+
+# --- macOS ---
+.DS_Store
