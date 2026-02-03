@@ -3,6 +3,8 @@ import math
 import numpy as np
 import sympy as sp
 from numpy.polynomial import Polynomial
+from pathlib import Path
+import pandas as pd
 
 class Data:
     def __init__(self, name, var, value, uncertainty=0.0):
@@ -193,3 +195,101 @@ def linear_monte_carlo(data_x: Data, data_y: Data, N=100_000):
 
     return data_slope, data_intercept
         
+
+
+
+def load_lab_dataframe(file_path):
+    """
+    Load lab instrument data exported as a fake .xls file containing
+    tab-delimited text with metadata rows at the top.
+
+    Steps:
+    - Reads raw text
+    - Splits rows by tabs
+    - Automatically finds header row
+    - Builds a clean pandas DataFrame
+    - Makes duplicate column names unique
+    - Converts numeric columns where possible
+    - Drops empty columns
+
+    Parameters
+    ----------
+    file_path : str or Path
+        Path to exported data file.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Cleaned data table.
+    """
+
+    file_path = Path(file_path)
+
+    # ---------- Read raw file ----------
+    raw = file_path.read_text(errors="ignore")
+    lines = [ln for ln in raw.splitlines() if ln.strip()]
+    rows = [ln.split("\t") for ln in lines]
+
+    # ---------- Find header row ----------
+    header_idx = None
+    for i, r in enumerate(rows):
+        joined = " ".join(r).lower()
+        if "iteration" in joined and "time" in joined:
+            header_idx = i
+            break
+
+    if header_idx is None:
+        raise ValueError("Header row not found in file.")
+
+    header = _make_unique_headers([h.strip() for h in rows[header_idx]])
+    data_rows = rows[header_idx + 1:]
+    ncol = len(header)
+
+    # ---------- Normalize row widths ----------
+    cleaned_rows = []
+    for r in data_rows:
+        r = [x.strip() for x in r]
+        if len(r) < ncol:
+            r += [""] * (ncol - len(r))
+        else:
+            r = r[:ncol]
+        cleaned_rows.append(r)
+
+    df = pd.DataFrame(cleaned_rows, columns=header)
+
+    # ---------- Strip whitespace ----------
+    df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
+
+    # ---------- Convert numerics ----------
+    def try_numeric(col):
+        try:
+            return pd.to_numeric(col)
+        except Exception:
+            return col
+
+    df = df.apply(try_numeric, axis=0)
+
+    # ---------- Drop empty columns ----------
+    df = df.dropna(axis=1, how="all")
+
+    return df
+
+
+def _make_unique_headers(names):
+    """Ensure column names are unique."""
+    seen = {}
+    result = []
+
+    for name in names:
+        name = (name or "").strip()
+        if name == "":
+            name = "col"
+
+        if name in seen:
+            seen[name] += 1
+            result.append(f"{name}_{seen[name]}")
+        else:
+            seen[name] = 0
+            result.append(name)
+
+    return result
