@@ -1,9 +1,0 @@
-# Soil Classification Dataset Configuration
-path: /Users/anthonytorla/Image_Processing/yolo_dataset
-train: train
-val: val
-test: test
-
-# Classes
-nc: 2  # number of classes
-names: ['type_a', 'type_b']  # class names
