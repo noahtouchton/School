@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Camera → UNO R4 Matrix</title>
+  <style>
+    body{font-family:system-ui;padding:16px;}
+    video{width:100%;max-width:520px;border-radius:12px;background:#000;}
+    button{padding:10px 12px;margin:8px 8px 0 0;border-radius:10px;border:1px solid #ccc;background:#fff;cursor:pointer;}
+    input{padding:10px;border-radius:10px;border:1px solid #ccc; width: 320px;}
+    pre{background:#f6f6f6;padding:12px;border-radius:12px;overflow:auto;}
+  </style>
+</head>
+<body>
+  <h2>Camera → UNO R4 LED Matrix (Debug)</h2>
+
+  <p>
+    Arduino base URL:
+    <input id="base" value="http://192.168.1.114">
+  </p>
+
+  <div>
+    <button id="start">Start Camera</button>
+    <button id="stop">Stop</button>
+    <button id="clear">Clear Arduino</button>
+  </div>
+
+  <p><b>Status:</b></p>
+  <pre id="log"></pre>
+
+  <video id="v" playsinline autoplay muted></video>
+  <canvas id="c" width="160" height="120" style="display:none;"></canvas>
+
+<script>
+const logEl = document.getElementById('log');
+function log(msg){
+  logEl.textContent += msg + "\n";
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+const video = document.getElementById('v');
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const baseEl = document.getElementById('base');
+
+let running=false, timer=null, stream=null;
+
+function baseUrl(){
+  return baseEl.value.replace(/\/+$/,'');
+}
+
+// IMPORTANT: Some browsers require this to be in a user gesture (button click).
+async function startCamera(){
+  log("Clicked Start.");
+  log("Origin: " + window.location.origin);
+  log("Secure context: " + (window.isSecureContext ? "YES" : "NO"));
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    log("❌ navigator.mediaDevices.getUserMedia is not available in this browser.");
+    return;
+  }
+
+  // List devices (helps confirm permission state)
+  try{
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    log("Devices visible: " + devices.map(d => d.kind).join(", "));
+  } catch(e){
+    log("enumerateDevices error (normal if blocked): " + e);
+  }
+
+  try{
+    // Use explicit constraints; Safari/Chrome behave better with these.
+    const constraints = {
+      audio: false,
+      video: {
+        facingMode: "user",
+        width: { ideal: 640 },
+        height: { ideal: 480 }
+      }
+    };
+
+    log("Requesting camera permission...");
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    log("✅ getUserMedia success. Starting stream…");
+
+    video.srcObject = stream;
+    await video.play().catch(()=>{});
+    running = true;
+
+    // stream to arduino at ~2 fps
+    if (timer) clearInterval(timer);
+    timer = setInterval(tick, 500);
+
+  } catch(e){
+    log("❌ getUserMedia failed:");
+    log(String(e));
+    // Common ones:
+    // NotAllowedError, NotFoundError, NotReadableError, SecurityError
+  }
+}
+
+function stopCamera(){
+  running=false;
+  if(timer) clearInterval(timer);
+  timer=null;
+
+  if(stream){
+    stream.getTracks().forEach(t=>t.stop());
+    stream=null;
+  }
+  video.srcObject=null;
+  log("Stopped.");
+}
+
+async function clearArduino(){
+  const url = baseUrl() + "/clear";
+  log("Clearing Arduino: " + url);
+  try{ await fetch(url).catch(()=>{}); } catch(e){}
+}
+
+// Send one row at a time: /row?y=0..7&bits=12 chars 0/1
+async function sendRow(y,bits){
+  const url = `${baseUrl()}/row?y=${y}&bits=${bits}`;
+  // no-cors is fine because we don't need to read the response
+  try{ await fetch(url, {mode:"no-cors"}); } catch(e){}
+}
+
+function downsampleCenterTo12x8(){
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const w=canvas.width, h=canvas.height;
+  const size=Math.min(w,h);
+  const fx=(w-size)/2, fy=(h-size)/2;
+
+  const tmp=document.createElement('canvas'); tmp.width=12; tmp.height=8;
+  const tctx=tmp.getContext('2d');
+  tctx.drawImage(canvas, fx, fy, size, size, 0, 0, 12, 8);
+  const data=tctx.getImageData(0,0,12,8).data;
+
+  let rows=[];
+  for(let y=0;y<8;y++){
+    let bits='';
+    for(let x=0;x<12;x++){
+      const i=(y*12+x)*4;
+      const r=data[i], g=data[i+1], b=data[i+2];
+      const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+      bits += (lum < 110) ? '1' : '0';
+    }
+    rows.push(bits);
+  }
+  return rows;
+}
+
+async function tick(){
+  if(!running) return;
+  const rows = downsampleCenterTo12x8();
+  for(let y=0;y<8;y++) await sendRow(y, rows[y]);
+}
+
+document.getElementById('start').onclick = startCamera;
+document.getElementById('stop').onclick = stopCamera;
+document.getElementById('clear').onclick = clearArduino;
+
+log("Loaded page.");
+log("Tip: Use Chrome on Mac for easiest camera permission.");
+</script>
+</body>
+</html>

@@ -1,90 +1,74 @@
 # uncertainty.py
-import os
-import pandas as pd
 import numpy as np
-from rss import Data, RSS, linear_monte_carlo
-import sympy as sp
+import math
 
-from pathlib import Path
-import re
-from rss import load_lab_dataframe
-
-equations = [
-  rho = 1000 * (1 - ((T + 288.9414) / (508929.2 * (T + 68.12963))) * (T - 3.9863)**2),
-
-]
+from rss import Data, load_large_run, load_small_run1
 
 
+# -------------------------------------------------
+# Pipe diameters
+# -------------------------------------------------
+big_vals = [18.86, 18.84, 18.89, 18.82, 18.85]   # mm
+small_vals = [9.42, 9.40, 9.41, 9.42, 9.42]      # mm
+
+caliper_unc_mm = 0.02  # mm (reasonable digital caliper)
+caliper_unc_m = caliper_unc_mm / 1000.0
+
+big_std_m = np.std(big_vals, ddof=1) / 1000.0
+small_std_m = np.std(small_vals, ddof=1) / 1000.0
+
+d_big = Data(
+    "Large Pipe Diameter",
+    "d_big",
+    np.mean(big_vals) / 1000.0,
+    math.sqrt(caliper_unc_m**2 + big_std_m**2),
+)
+
+d_small = Data(
+    "Small Pipe Diameter",
+    "d_small",
+    np.mean(small_vals) / 1000.0,
+    math.sqrt(caliper_unc_m**2 + small_std_m**2),
+)
 
 
-PCTS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+# -------------------------------------------------
+# Instrument uncertainties (set these from your equipment)
+# dp_inst_unc: uncertainty in PSID for the DP channels you use
+# temp_inst_unc: uncertainty in deg C (thermocouple)
+#
+# NOTE: If you want different DP uncertainties per channel (1 psi vs 15 psi),
+# we can split dp_inst_unc into dp_large_unc, dp_small_unc, dp_elbow_unc later.
+# -------------------------------------------------
+DP_INST_UNC = 0.0008   # psi (example: PX409 1 psi range -> ±0.0008 psi)
+TEMP_INST_UNC = 2.2    # °C (Type J standard limits, conservative)
 
 
-def load_pipe_loss_data(base_dir="data"):
-    """
-    Loads all pipe loss lab files into dictionaries of DataFrames.
+# -------------------------------------------------
+# Load runs (arrays)
+# -------------------------------------------------
+large_run1 = load_large_run(1, base_dir="data", dp_inst_unc=DP_INST_UNC, temp_inst_unc=TEMP_INST_UNC)
+large_run2 = load_large_run(2, base_dir="data", dp_inst_unc=DP_INST_UNC, temp_inst_unc=TEMP_INST_UNC)
+large_run3 = load_large_run(3, base_dir="data", dp_inst_unc=DP_INST_UNC, temp_inst_unc=TEMP_INST_UNC)
 
-    Expected structure:
-      data/
-        Large Pipe/
-          Run 1/
-            largepipe_run1_0.xls ... largepipe_run1_100.xls
-          Run 2/
-            largepipe_run2_0.xls ... largepipe_run2_100.xls
-          Run 3/
-            largepipe_run3_0.xls ... largepipe_run3_100.xls
-        Small Pipe/
-          smallpipe_run1_0.xls ... smallpipe_run1_100.xls
-
-    Returns:
-      large: dict[int run][int pct] -> DataFrame
-      small: dict[int pct] -> DataFrame
-    """
-    base_dir = Path(base_dir)
-
-    # ---------------- Large Pipe ----------------
-    large = {}
-    large_root = base_dir / "Large Pipe"
-    for run in [1, 2, 3]:
-        run_dir = large_root / f"Run {run}"
-        if not run_dir.exists():
-            raise FileNotFoundError(f"Missing folder: {run_dir}")
-
-        large[run] = {}
-        for pct in PCTS:
-            f = run_dir / f"largepipe_run{run}_{pct}.xls"
-            if not f.exists():
-                raise FileNotFoundError(f"Missing file: {f}")
-
-            large[run][pct] = load_lab_dataframe(f)
-
-    # ---------------- Small Pipe ----------------
-    small = {}
-    small_root = base_dir / "Small Pipe"
-    if not small_root.exists():
-        raise FileNotFoundError(f"Missing folder: {small_root}")
-
-    for pct in PCTS:
-        f = small_root / f"smallpipe_run1_{pct}.xls"
-        if not f.exists():
-            raise FileNotFoundError(f"Missing file: {f}")
-
-        small[pct] = load_lab_dataframe(f)
-
-    return large, small
+small_run1 = load_small_run1(base_dir="data", dp_inst_unc=DP_INST_UNC, temp_inst_unc=TEMP_INST_UNC)
 
 
+# -------------------------------------------------
+# Print uncertainties (all points)
+# -------------------------------------------------
+def print_run(run):
+    print(f"\n===== {run.name} =====")
+    for i, pct in enumerate(run.pcts):
+        print(f"\n--- {pct}% ---")
+        run.Q_lpm[i].get_error()
+        run.dp_large_psid[i].get_error()
+        run.dp_small_psid[i].get_error()
+        run.dp_elbow_psid[i].get_error()
+        run.T_C[i].get_error()
 
-# loads the data
-large, small = load_pipe_loss_data("data")
 
-# quick sanity prints
-print("Loaded large runs:", list(large.keys()))
-print("Loaded large pcts for Run 1:", list(large[1].keys()))
-print("Loaded small pcts:", list(small.keys()))
-
-print("\nExample Large Run2 40% head:")
-print(large[2][40].head())
-
-print("\nExample Small 70% columns:")
-print(small[70].columns.tolist())
+print_run(large_run1)
+print_run(large_run2)
+print_run(large_run3)
+print_run(small_run1)
