@@ -101,46 +101,54 @@ for run in (small_run1,):
         run.head_loss.append(hl)
 
 
-def plot_head_loss_vs_flow_sq(run, out_png):
-    """
-    Plot head loss vs flowrate^2 with uncertainty bars.
-    """
+def get_arrays(run):
     Q = np.array([d.value for d in run.Q_lpm], dtype=float)
     Q_unc = np.array([d.uncertainty for d in run.Q_lpm], dtype=float)
 
-    # Flowrate squared
     Q2 = Q**2
-
-    # Uncertainty propagation: σ(Q²) = 2 Q σ_Q
     Q2_unc = 2 * np.abs(Q) * Q_unc
 
     hl = np.array([d.value for d in run.head_loss], dtype=float)
     hl_unc = np.array([d.uncertainty for d in run.head_loss], dtype=float)
 
-    plt.figure()
-    plt.errorbar(Q2, hl, xerr=Q2_unc, yerr=hl_unc, fmt='o', capsize=3)
+    return Q2, Q2_unc, hl, hl_unc
 
-    plt.xlabel("Flowrate² (LPM²)")
-    plt.ylabel("Head loss (inches of water)")
-    plt.title(f"{run.name}: Head loss vs Flowrate²")
+plt.figure()
 
-    plt.grid(True, which="both", linestyle="--", linewidth=0.5)
-    plt.tight_layout()
-    plt.savefig(out_png, dpi=200)
-    plt.close()
-
-out_dir = os.path.dirname(os.path.abspath(__file__))
-
-runs_to_plot = [
-    (large_run1, os.path.join(out_dir, "head_loss_sq_large_run1.png")),
-    (large_run2, os.path.join(out_dir, "head_loss_sq_large_run2.png")),
-    (large_run3, os.path.join(out_dir, "head_loss_sq_large_run3.png")),
-    (small_run1, os.path.join(out_dir, "head_loss_sq_small_run1.png")),
+runs = [
+    (large_run1, "Large Run 1"),
+    (large_run2, "Large Run 2"),
+    (large_run3, "Large Run 3"),
+    (small_run1, "Small Run"),
 ]
 
-for r, fn in runs_to_plot:
-    plot_head_loss_vs_flow_sq(r, fn)
-    print(f"Saved plot: {fn}")
+for run, label in runs:
+    Q2, Q2_unc, hl, hl_unc = get_arrays(run)
+
+    plt.errorbar(
+        Q2, hl,
+        xerr=Q2_unc,
+        yerr=hl_unc,
+        fmt='o',
+        capsize=3,
+        label=label
+    )
+
+plt.xlabel("Flowrate² (LPM²)")
+plt.ylabel("Head loss (inches of water)")
+plt.title("Head Loss vs Flowrate²")
+plt.legend()
+plt.grid(True, linestyle="--", linewidth=0.5)
+
+plt.tight_layout()
+
+out_dir = os.path.dirname(os.path.abspath(__file__))
+fname = os.path.join(out_dir, "head_loss_all_runs.png")
+
+plt.savefig(fname, dpi=200)
+plt.close()
+
+print(f"Saved combined plot: {fname}")
 
 #print_run(large_run1)
 #print_run(large_run2)
