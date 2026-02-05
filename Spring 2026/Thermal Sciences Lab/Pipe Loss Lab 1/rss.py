@@ -97,6 +97,8 @@ class RunArrays:
         self.dp_small_psid = []
         self.dp_elbow_psid = []
         self.T_C = []
+        self.rho = []
+        self.head_loss = []
 
 
 # ============================================================
@@ -273,11 +275,11 @@ def operating_point(file_path, label, dp_inst_unc, temp_inst_unc):
     dE_unc = math.sqrt(dp_inst_unc**2 + dEs**2)
     T_unc  = math.sqrt(temp_inst_unc**2 + Ts**2)
 
-    Q  = Data(f"{label} Flow Rate", "Q_lpm", Qm, Q_unc)
-    dpL = Data(f"{label} dP Large", "dpL_psid", dLm, dL_unc)
-    dpS = Data(f"{label} dP Small", "dpS_psid", dSm, dS_unc)
-    dpE = Data(f"{label} dP Elbow", "dpE_psid", dEm, dE_unc)
-    T  = Data(f"{label} Water Temp", "T_C", Tm, T_unc)
+    Q  = Data(f"{label} Flow Rate", "Q", Qm, Q_unc)
+    dpL = Data(f"{label} dP Large", "dp", dLm, dL_unc)
+    dpS = Data(f"{label} dP Small", "dp", dSm, dS_unc)
+    dpE = Data(f"{label} dP Elbow", "dp", dEm, dE_unc)
+    T  = Data(f"{label} Water Temp", "T", Tm, T_unc)
 
     return Q, dpL, dpS, dpE, T
 
