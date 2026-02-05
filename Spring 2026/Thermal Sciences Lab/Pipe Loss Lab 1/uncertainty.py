@@ -10,6 +10,7 @@ import re
 from rss import load_lab_dataframe
 
 equations = [
+  rho = 1000 * (1 - ((T + 288.9414) / (508929.2 * (T + 68.12963))) * (T - 3.9863)**2),
 
 ]
 
