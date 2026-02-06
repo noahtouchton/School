@@ -5,16 +5,21 @@ import sympy as sp
 import pandas as pd
 from pathlib import Path
 
-
 # ============================================================
-# Data class
+# Data class (now stores components: std + instrument)
 # ============================================================
 class Data:
-    def __init__(self, name, var, value, uncertainty=0.0):
+    def __init__(self, name, var, value, uncertainty=0.0, std=0.0, inst_unc=0.0):
         self.name = name
         self.var = var
         self.value = float(value) if np.isscalar(value) else value
+
+        # Total uncertainty (RSS of components)
         self.uncertainty = float(uncertainty) if np.isscalar(uncertainty) else uncertainty
+
+        # Components (for lab tables)
+        self.std = float(std) if np.isscalar(std) else std               # sample standard deviation
+        self.inst_unc = float(inst_unc) if np.isscalar(inst_unc) else inst_unc  # instrument-only
 
     def get_error(self):
         print(f"{self.name}: {self.value:.6f} ± {self.uncertainty:.6f}")
@@ -24,7 +29,7 @@ class Data:
 
 
 # ============================================================
-# RSS uncertainty propagation (kept simple, your style)
+# RSS uncertainty propagation
 # ============================================================
 def RSS(name, function, data_list):
     """
@@ -37,7 +42,6 @@ def RSS(name, function, data_list):
 
     lhs, rhs = function.split("=", 1)
 
-    # Build symbol map and substitution map
     sym_map = {}
     subs = {}
 
@@ -48,12 +52,10 @@ def RSS(name, function, data_list):
 
     expr = sp.sympify(rhs, locals=sym_map)
 
-    # Nominal value
     ordered_syms = list(sym_map.values())
     f = sp.lambdify(ordered_syms, expr, modules="numpy")
     nominal = f(*[subs[s] for s in ordered_syms])
 
-    # RSS
     rss_sq = 0.0
     for d in data_list:
         s = sym_map[str(d.var)]
@@ -64,7 +66,6 @@ def RSS(name, function, data_list):
 
     unc = np.sqrt(rss_sq)
 
-    # Return as Data
     return Data(name, lhs, float(nominal), float(unc))
 
 
@@ -73,15 +74,12 @@ def RSS(name, function, data_list):
 # ============================================================
 PCTS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
-# Flowmeter full scales (LPM) based on your Proteus list:
-# - Small Flowmeter 0205C24: 1.9–9.5 LPM  => FS = 9.5
-# - Medium Flowmeter 0250B* : 6–45 LPM    => FS = 45
-# - Large Flowmeter 0270P24 : 35–225 LPM  => FS = 225
+# Flowmeter full scales (LPM)
 FLOW_FS_LOW  = 9.5
 FLOW_FS_MED  = 45.0
 FLOW_FS_HIGH = 225.0
 
-FLOW_ACC_FS = 0.03  # ±3% of full scale (Proteus stated)
+FLOW_ACC_FS = 0.03  # ±3% of full scale
 
 
 # ============================================================
@@ -99,24 +97,23 @@ class RunArrays:
         self.T_C = []
         self.rho = []
         self.head_loss = []
+        self.d = []
+        self.A = []
+        self.v = []
+        self.Re = []
+        self.f = []
 
 
 # ============================================================
-# Data loading (robust for tab-dump "xls")
+# Data loading (tab-dump "xls")
 # ============================================================
 def _make_unique_headers(headers):
-    """
-    Your files repeat header names like 'Diff press (PSID)' 3 times.
-    Pandas will allow duplicates, but it breaks later selection.
-    This makes them unique: 'Diff press (PSID)', 'Diff press (PSID)_1', ...
-    """
     seen = {}
     out = []
     for h in headers:
         h = (h or "").strip()
         if h == "":
             h = "col"
-
         if h not in seen:
             seen[h] = 0
             out.append(h)
@@ -127,15 +124,6 @@ def _make_unique_headers(headers):
 
 
 def load_lab_dataframe(file_path):
-    """
-    Reads your 'fake .xls' (actually tab-delimited text) and returns a clean DataFrame.
-
-    - finds the real header row (starts with 'Iteration' and contains 'Time')
-    - splits rows on tabs
-    - makes headers unique
-    - pads/truncates rows to header length
-    - converts numeric values
-    """
     file_path = Path(file_path)
     raw = file_path.read_text(errors="ignore")
 
@@ -144,14 +132,12 @@ def load_lab_dataframe(file_path):
 
     header_idx = None
     for i, r in enumerate(rows):
-        # Find the row that contains Iteration and Time (seconds)
         joined = " ".join(r)
         if joined.startswith("Iteration") and ("Time" in joined):
             header_idx = i
             break
 
     if header_idx is None:
-        # fallback: any row containing Iteration and Time
         for i, r in enumerate(rows):
             joined = " ".join(r)
             if ("Iteration" in joined) and ("Time" in joined):
@@ -176,13 +162,10 @@ def load_lab_dataframe(file_path):
 
     df = pd.DataFrame(fixed, columns=header)
 
-    # Convert to numeric when possible
     for c in df.columns:
         df[c] = pd.to_numeric(df[c], errors="coerce")
 
-    # Drop empty columns
     df = df.dropna(axis=1, how="all")
-
     return df
 
 
@@ -197,10 +180,6 @@ def mean_std(series):
 
 
 def pick_active_flow(df):
-    """
-    Picks the flow column with largest mean absolute value.
-    Closed meters hover near 0 / negative noise.
-    """
     cols = [c for c in df.columns if c.startswith("Flowrate") and "(lpm)" in c]
     if not cols:
         raise ValueError("No flowrate columns found (expected 'Flowrate * (lpm)').")
@@ -214,11 +193,7 @@ def pick_active_flow(df):
 
 
 def flow_inst_unc_from_col(col_name):
-    """
-    Returns ±3% of the correct full-scale range depending on low/medium/high meter.
-    """
     c = col_name.lower()
-
     if "low" in c:
         fs = FLOW_FS_LOW
     elif "medium" in c:
@@ -226,22 +201,14 @@ def flow_inst_unc_from_col(col_name):
     elif "high" in c:
         fs = FLOW_FS_HIGH
     else:
-        # If the column naming ever changes, fail loudly
         raise ValueError(f"Cannot determine flow range from column name: {col_name}")
-
     return FLOW_ACC_FS * fs
 
 
 def dp_columns(df):
-    """
-    Returns the three diff pressure columns in the order they appear in the file:
-      Large Pipe, Small Pipe, Elbow
-    (because your header row lists them in that order)
-    """
     cols = [c for c in df.columns if c.startswith("Diff press (PSID)")]
     if len(cols) < 3:
         raise ValueError(f"Expected 3 diff pressure columns, found: {cols}")
-
     ordered = [c for c in df.columns if c in cols]
     return ordered[0], ordered[1], ordered[2]
 
@@ -250,6 +217,11 @@ def dp_columns(df):
 # Operating point extraction
 # ============================================================
 def operating_point(file_path, label, dp_inst_unc, temp_inst_unc):
+    """
+    dp_inst_unc can be:
+      - float: same instrument uncertainty for all DP channels
+      - (dpL_inst, dpS_inst, dpE_inst): per-channel instrument uncertainty
+    """
     df = load_lab_dataframe(file_path)
 
     flow_col = pick_active_flow(df)
@@ -264,33 +236,36 @@ def operating_point(file_path, label, dp_inst_unc, temp_inst_unc):
         raise ValueError("Temperature column 'deg C' not found.")
     Tm, Ts, _ = mean_std(df["deg C"])
 
-    # Flow instrument uncertainty depends on which meter is active
     flow_inst_unc = flow_inst_unc_from_col(flow_col)
 
+    if isinstance(dp_inst_unc, (list, tuple)) and len(dp_inst_unc) == 3:
+        dpL_inst, dpS_inst, dpE_inst = dp_inst_unc
+    else:
+        dpL_inst = dpS_inst = dpE_inst = float(dp_inst_unc)
+
     # Total uncertainty = RSS(instrument, sample std)
-    # (you said you want no steady trimming; this uses all samples)
     Q_unc  = math.sqrt(flow_inst_unc**2 + Qs**2)
-    dL_unc = math.sqrt(dp_inst_unc**2 + dLs**2)
-    dS_unc = math.sqrt(dp_inst_unc**2 + dSs**2)
-    dE_unc = math.sqrt(dp_inst_unc**2 + dEs**2)
+    dL_unc = math.sqrt(dpL_inst**2 + dLs**2)
+    dS_unc = math.sqrt(dpS_inst**2 + dSs**2)
+    dE_unc = math.sqrt(dpE_inst**2 + dEs**2)
     T_unc  = math.sqrt(temp_inst_unc**2 + Ts**2)
 
-    Q  = Data(f"{label} Flow Rate", "Q", Qm, Q_unc)
-    dpL = Data(f"{label} dP Large", "dp", dLm, dL_unc)
-    dpS = Data(f"{label} dP Small", "dp", dSm, dS_unc)
-    dpE = Data(f"{label} dP Elbow", "dp", dEm, dE_unc)
-    T  = Data(f"{label} Water Temp", "T", Tm, T_unc)
+    # Vars match your equations: Q, dp, T
+    Q   = Data(f"{label} Flow Rate",  "Qv",  Qm,  Q_unc,  std=Qs, inst_unc=flow_inst_unc)
+    dpL = Data(f"{label} dP Large",   "dp", dLm, dL_unc, std=dLs, inst_unc=dpL_inst)
+    dpS = Data(f"{label} dP Small",   "dp", dSm, dS_unc, std=dSs, inst_unc=dpS_inst)
+    dpE = Data(f"{label} dP Elbow",   "dp", dEm, dE_unc, std=dEs, inst_unc=dpE_inst)
+    T   = Data(f"{label} Water Temp", "T",  Tm,  T_unc,  std=Ts, inst_unc=temp_inst_unc)
 
     return Q, dpL, dpS, dpE, T
 
 
 # ============================================================
-# Run loaders (arrays)
+# Run loaders
 # ============================================================
 def load_large_run(run_num, base_dir="data", dp_inst_unc=0.0, temp_inst_unc=0.0):
     run = RunArrays(f"Large Run {run_num}")
     base_dir = Path(base_dir)
-
     run_dir = base_dir / "Large Pipe" / f"Run {run_num}"
 
     for pct in PCTS:
@@ -298,7 +273,6 @@ def load_large_run(run_num, base_dir="data", dp_inst_unc=0.0, temp_inst_unc=0.0)
         label = f"Large Run {run_num} {pct}%"
 
         Q, dpL, dpS, dpE, T = operating_point(f, label, dp_inst_unc, temp_inst_unc)
-
         run.Q_lpm.append(Q)
         run.dp_large_psid.append(dpL)
         run.dp_small_psid.append(dpS)
@@ -311,7 +285,6 @@ def load_large_run(run_num, base_dir="data", dp_inst_unc=0.0, temp_inst_unc=0.0)
 def load_small_run1(base_dir="data", dp_inst_unc=0.0, temp_inst_unc=0.0):
     run = RunArrays("Small Run 1")
     base_dir = Path(base_dir)
-
     run_dir = base_dir / "Small Pipe"
 
     for pct in PCTS:
@@ -319,7 +292,6 @@ def load_small_run1(base_dir="data", dp_inst_unc=0.0, temp_inst_unc=0.0):
         label = f"Small Run 1 {pct}%"
 
         Q, dpL, dpS, dpE, T = operating_point(f, label, dp_inst_unc, temp_inst_unc)
-
         run.Q_lpm.append(Q)
         run.dp_large_psid.append(dpL)
         run.dp_small_psid.append(dpS)
