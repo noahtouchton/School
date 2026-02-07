@@ -16,6 +16,7 @@ equations = [
     "f = 2 * g * (hl/39.37007874) * d / (L * v**2)",
     "h_el_m = 6894.76 * dp / (rho * g)",            # meters (for KL)
     "Kl = 2 * g * h_el_m / (v**2)",
+    "Le = 4.4 * d * Re**(1/6)",
 
 ]
 
@@ -77,6 +78,7 @@ def compute_rho_and_hl(run, dp_list, size):
     run.Re = []
     run.f = []
     
+    
 
     # Density per point
     for T in run.T_C:
@@ -120,14 +122,28 @@ def compute_kl(run, elbow_dp_list):
         kl = RSS("Kl", equations[8], [elbow_hl, v, g])
         run.kl.append(kl)
 
+def compute_le(run):
+    run.Le = []
+    for d, Re in zip(run.d, run.Re):
+        # If Re is non-physical, store NaN so tables/plots can skip it
+        if Re.value <= 0 or not np.isfinite(Re.value):
+            run.Le.append(Data("Le", "Le", float("nan"), float("nan")))
+            continue
+
+        Le = RSS("Le", equations[9], [d, Re])
+        run.Le.append(Le)
+
+
 
 for run in (large_run1, large_run2, large_run3):
     compute_rho_and_hl(run, run.dp_large_psid, size="large")
     compute_kl(run, run.dp_elbow_psid)
+    compute_le(run)
 
 compute_rho_and_hl(small_run1, small_run1.dp_small_psid, size="small")
 
 compute_kl(small_run1, small_run1.dp_elbow_psid)
+compute_le(small_run1)
 
 # -------------------------------------------------
 # Plot: one combined graph (hl vs Q^2) with uncertainty bars
@@ -159,7 +175,7 @@ for run, label, marker in runs:
 
 plt.xlabel("Flowrate² (LPM²)")
 plt.ylabel("Head loss (inches of water)")
-plt.title("Head Loss vs Flowrate²")
+#plt.title("Head Loss vs Flowrate²")
 plt.legend()
 plt.grid(True, linestyle="--", linewidth=0.5)
 plt.tight_layout()
@@ -286,7 +302,7 @@ plt.yscale("log")  # optional, but most Moody-style plots use log-log
 
 plt.xlabel("Reynolds number, Re")
 plt.ylabel("Darcy friction factor, f")
-plt.title("Friction Factor vs Reynolds Number")
+#plt.title("Friction Factor vs Reynolds Number")
 plt.legend()
 plt.grid(True, which="both", linestyle="--", linewidth=0.5)
 plt.tight_layout()
@@ -325,7 +341,7 @@ plot_elbow_hL_vs_Q2(large_run3, "Elbow (Large Run 3)", '^')
 
 plt.xlabel("Flow rate squared, $Q^2$ (m$^6$/s$^2$)")
 plt.ylabel("Elbow head loss, $h_L$ (m)")
-plt.title("Elbow Loss: $h_L$ vs $Q^2$")
+#plt.title("Elbow Loss: $h_L$ vs $Q^2$")
 plt.legend()
 plt.grid(True, linestyle="--", linewidth=0.5)
 plt.tight_layout()
@@ -464,8 +480,91 @@ def print_measurement_uncertainty_table(
                 )
 
 
+def print_kl_table(run, pipe_type="small"):
+    """
+    Prints table rows for Excel paste.
+    Nominal flow column is ignored.
+    Rows printed 100% -> 0%.
+    """
+
+    if pipe_type == "large":
+        dp_list = run.dp_large_psid
+    elif pipe_type == "small":
+        dp_list = run.dp_small_psid
+    else:
+        raise ValueError("pipe_type must be 'large' or 'small'")
+
+    header = (
+        "Actual Flow (LPM),"
+        "Flow Uncertainty (± LPM),"
+        "Head Loss Δh (in),"
+        "Std Dev Head Loss (in),"
+        "Total Head Loss Uncertainty (± in),"
+        "Loss Coefficient KL,"
+        "KL Uncertainty"
+    )
+    print(header)
+
+    for i in reversed(range(len(run.Q_lpm))):
+
+        Q_act = run.Q_lpm[i].value
+        Q_unc = run.Q_lpm[i].uncertainty
+
+        hl = run.head_loss[i].value
+        hl_unc_total = run.head_loss[i].uncertainty
+
+        # std dev from DP only
+        dp_std = dp_list[i].std
+        rho = run.rho[i].value
+
+        hl_std = (dp_std * 6894.76) / (rho * 9.81) * 39.37007874
+
+        KL = run.kl[i].value
+        KL_unc = run.kl[i].uncertainty
+
+        print(
+            f"{Q_act:.3f},"
+            f"{Q_unc:.4f},"
+            f"{hl:.3f},"
+            f"{hl_std:.3f},"
+            f"{hl_unc_total:.4f},"
+            f"{KL:.4f},"
+            f"{KL_unc:.4f}"
+        )
+
+def print_re_le_table(run):
+    """
+    Prints table rows for Excel paste.
+    Nominal flow column is ignored.
+    Rows printed 100% -> 0%.
+    """
+
+    
+
+    header = (
+        "Re +- Uncertainty,"
+        "Le +- Uncertainty,"
+    )
+    print(header)
+
+    for i in reversed(range(len(run.Q_lpm))):
+
+        Re_act = run.Re[i].value
+        Re_unc = run.Re[i].uncertainty
+
+        Le = run.Le[i].value
+        Le_unc = run.Le[i].uncertainty
+
+        print(
+            f"{Re_act:.3f} ± {Re_unc:.4f},"
+            f"{Le:.4f} ± {Le_unc:.4f}"
+        )
+
+
 # Example outputs:
-print_run(large_run1)
+print_run(large_run2)
 print_head_loss_table(small_run1, pipe_type="small")
 
+print_kl_table(large_run2, pipe_type="large")
 
+print_re_le_table(small_run1)
