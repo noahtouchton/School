@@ -102,6 +102,8 @@ class RunArrays:
         self.v = []
         self.Re = []
         self.f = []
+        self.hl_elbow = []
+        self.kl = []
 
 
 # ============================================================
