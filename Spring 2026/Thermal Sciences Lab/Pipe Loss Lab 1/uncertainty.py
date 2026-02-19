@@ -34,7 +34,7 @@ small_std_m = np.std(small_vals, ddof=1) / 1000.0
 
 
 g = Data("Gravity", "g", 9.81, 0.0)
-mu = Data("Dynamic Viscosity", "mu", 0.000653, 0.0)  # Pa·s (kg/(m·s))
+mu = Data("Dynamic Viscosity", "mu",    0.000653, 0.0)  # Pa·s (kg/(m·s))
 L = Data("Pipe Length", "L", 1.0, 0.0)  # m 
 
 d_big = Data("Large Pipe Diameter", "d",
@@ -487,12 +487,7 @@ def print_kl_table(run, pipe_type="small"):
     Rows printed 100% -> 0%.
     """
 
-    if pipe_type == "large":
-        dp_list = run.dp_large_psid
-    elif pipe_type == "small":
-        dp_list = run.dp_small_psid
-    else:
-        raise ValueError("pipe_type must be 'large' or 'small'")
+    dp_list = run.dp_elbow_psid  
 
     header = (
         "Actual Flow (LPM),"
@@ -510,8 +505,8 @@ def print_kl_table(run, pipe_type="small"):
         Q_act = run.Q_lpm[i].value
         Q_unc = run.Q_lpm[i].uncertainty
 
-        hl = run.head_loss[i].value
-        hl_unc_total = run.head_loss[i].uncertainty
+        hl = run.hl_elbow[i].value
+        hl_unc_total = run.hl_elbow[i].uncertainty
 
         # std dev from DP only
         dp_std = dp_list[i].std
