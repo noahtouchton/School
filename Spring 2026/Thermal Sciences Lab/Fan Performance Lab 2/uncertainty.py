@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 import rss
 
+# Create the graphs directory if it doesn't exist
+os.makedirs("graphs", exist_ok=True)
+
 D_IMPELLER = 0.15 
 RHO_AIR = 1.2
 
@@ -45,26 +48,19 @@ def plot_head_vs_flow(lab_data):
             df = lab_data[impeller_name][speed]
             
             # --- 1. GET FLOW RATE (Q) ---
-            # Try to find the calculated column first
             q_cols = [c for c in df.columns if "Volumetric Flow" in c]
             if q_cols:
                 Q = df[q_cols[0]]
             else:
-                # Fallback: Calculate from Nozzle dP (P1)
-                # Q = Cd * A * sqrt(2 * dP / rho)
-                # Simplified approximation if density/area const: Q proportional to sqrt(P1)
-                # But let's look for the Mass Flow or just warn.
                 print(f"Warning: Volumetric Flow column missing for {impeller_name} {speed}")
                 continue
 
             # --- 2. GET HEAD RISE (H) ---
-            # Try to find "Fan Total Pressure" first (Best)
             h_cols = [c for c in df.columns if "Total Pressure" in c]
             
             if h_cols:
                 H = df[h_cols[0]]
             else:
-                # Fallback: Calculate P3 - P2 (Outlet - Inlet)
                 try:
                     p3_col = [c for c in df.columns if "P3" in c or "Outlet" in c][0]
                     p2_col = [c for c in df.columns if "P2" in c or "Inlet" in c and "Nozzle" not in c][0]
@@ -74,12 +70,11 @@ def plot_head_vs_flow(lab_data):
                     continue
 
             # Plot the curve
-            # Sort by flow rate to make the line smooth
             sort_idx = np.argsort(Q)
             ax.plot(Q.iloc[sort_idx], H.iloc[sort_idx], marker='o', label=f"{speed} RPM")
 
         # Styling
-        ax.set_title(f"{impeller_name.capitalize()} Impeller: Head Rise vs Flow Rate")
+        #ax.set_title(f"{impeller_name.capitalize()} Impeller: Head Rise vs Flow Rate")
         ax.set_xlabel("Volumetric Flow Rate ($m^3/s$)")
         ax.set_ylabel("Head Rise / Total Pressure (Pa)")
         ax.grid(True, which='both', linestyle='--', alpha=0.7)
@@ -87,9 +82,11 @@ def plot_head_vs_flow(lab_data):
 
     # Generate the two plots
     process_impeller('radial', ax1, None)
-    process_impeller('backwards', ax2, None) # Note: dictionary key might be 'backwards' or 'backward' check your dict
+    process_impeller('backwards', ax2, None)
 
     plt.tight_layout()
+    # Save the figure to the graphs folder
+    plt.savefig("graphs/Page_2_Head_vs_Flow.png", bbox_inches='tight')
     plt.show()
 
 
@@ -97,48 +94,24 @@ def augment_data(df, rpm):
     """
     Adds calculated columns (BHP, WHP, Efficiency, Coeffs) to the dataframe.
     """
-    # 1. Get Power Loss for this speed
     p_loss = MECH_LOSS_MAP.get(rpm, 0)
     
-    # 2. Extract Basic Variables
-    # Try to find columns intelligently
     try:
         Q = df[[c for c in df.columns if "Volumetric Flow" in c][0]]
-        # Total Pressure (Head)
         dP = df[[c for c in df.columns if "Total Pressure" in c][0]]
-        # Total Power (Input) - usually "Power (W)"
         P_total = df[[c for c in df.columns if "Power" in c and "Mechanical" not in c][0]]
-        # Torque
         Torque = df[[c for c in df.columns if "Torque" in c][0]]
     except IndexError:
-        return df # Return empty if cols missing
+        return df
 
-    # 3. Calculate Powers
-    # BHP = Total Power Displayed - Mechanical Loss
-    # (Alternatively: BHP = Torque * Omega, but manual says subtract loss from display)
     df['BHP_W'] = P_total - p_loss
-    
-    # WHP = Flow * Total Pressure
     df['WHP_W'] = Q * dP
-    
-    # 4. Calculate Efficiency
-    # Avoid division by zero
     df['Efficiency_Calc'] = (df['WHP_W'] / df['BHP_W']) * 100
     
-    # 5. Non-Dimensional Coefficients
-    # N must be in rev/s for these standard formulas
     n = rpm / 60.0 
-    
-    # Flow Coeff: Cq = Q / (n * D^3)
     df['Cq'] = Q / (n * D_IMPELLER**3)
-    
-    # Head Coeff: Ch = dP / (rho * n^2 * D^2)
     df['Ch'] = dP / (RHO_AIR * (n**2) * (D_IMPELLER**2))
-    
-    # Power Coeff: Cp = BHP / (rho * n^3 * D^5)
     df['Cp'] = df['BHP_W'] / (RHO_AIR * (n**3) * (D_IMPELLER**5))
-    
-    # Store constants for tables
     df['Mech_Loss_W'] = p_loss
     
     return df
@@ -172,12 +145,15 @@ def plot_bhp_whp_vs_flow(lab_data):
             ax.plot(Q, df['BHP_W'], 'b-o', label=f'Backward BHP')
             ax.plot(Q, df['WHP_W'], 'b--s', label=f'Backward WHP')
 
-        ax.set_title(f"Power Analysis at {rpm} RPM")
+        #ax.set_title(f"Power Analysis at {rpm} RPM")
         ax.set_xlabel("Volumetric Flow Rate ($m^3/s$)")
         ax.set_ylabel("Power (Watts)")
         ax.grid(True, linestyle='--', alpha=0.6)
         ax.legend()
         plt.tight_layout()
+        
+        # Save each figure uniquely by RPM
+        plt.savefig(f"graphs/Pages_3_to_5_Power_vs_Flow_{rpm}RPM.png", bbox_inches='tight')
         plt.show()
 
 # ==========================================
@@ -199,10 +175,9 @@ def plot_efficiency(lab_data):
             df = augment_data(lab_data[key][rpm].copy(), rpm)
             Q = df[[c for c in df.columns if "Volumetric" in c][0]]
             
-            # Use calculated efficiency or raw if preferred
             ax.plot(Q, df['Efficiency_Calc'], marker='.', label=f'{rpm} RPM')
             
-        ax.set_title(f"{title} Impeller Efficiency")
+        #ax.set_title(f"{title} Impeller Efficiency")
         ax.set_xlabel("Volumetric Flow Rate ($m^3/s$)")
         ax.set_ylabel("Efficiency (%)")
         ax.set_ylim(0, 100)
@@ -210,6 +185,8 @@ def plot_efficiency(lab_data):
         ax.legend()
         
     plt.tight_layout()
+    # Save the figure to the graphs folder
+    plt.savefig("graphs/Page_6_Efficiency_vs_Flow.png", bbox_inches='tight')
     plt.show()
 
 # ==========================================
@@ -226,7 +203,6 @@ def plot_nondimensional_curves(lab_data):
     for key, ax, title in impellers:
         if key not in lab_data: continue
         
-        # Aggregate all speeds for this impeller
         all_Cq, all_Ch, all_Cp = [], [], []
         
         for rpm in lab_data[key]:
@@ -235,27 +211,24 @@ def plot_nondimensional_curves(lab_data):
             all_Ch.extend(df['Ch'])
             all_Cp.extend(df['Cp'])
             
-        # Plot Scatter for all points
         ax.scatter(all_Cq, all_Ch, c='blue', label='$C_H$ (Head Coeff)')
         ax.scatter(all_Cq, all_Cp, c='red', marker='x', label='$C_P$ (Power Coeff)')
         
-        ax.set_title(f"{title} Non-Dimensional Performance")
+        #ax.set_title(f"{title} Non-Dimensional Performance")
         ax.set_xlabel("Flow Coefficient ($C_Q$)")
         ax.set_ylabel("Coefficient Value")
         ax.grid(True)
         ax.legend()
         
     plt.tight_layout()
+    # Save the figure to the graphs folder
+    plt.savefig("graphs/Page_7_Nondimensional_Curves.png", bbox_inches='tight')
     plt.show()
 
 # ==========================================
 # PAGE 8: Annual Cost Calculation
 # ==========================================
 def calculate_annual_cost(lab_data):
-    """
-    Calculates cost for Backward Impeller at 100% valve (Series 1 usually)
-    for all speeds.
-    """
     HOURS_PER_YEAR = 2800
     RATE_PER_KWH = 0.15
     MOTOR_EFF = 0.80
@@ -270,18 +243,11 @@ def calculate_annual_cost(lab_data):
 
     for rpm in sorted(lab_data['backwards'].keys()):
         df = augment_data(lab_data['backwards'][rpm].copy(), rpm)
-        
-        # Assuming Series 1 (Index 0 or 1 depending on grouping) is 100% open
-        # We take the point with MAX flow rate to be safe
         Q_col = [c for c in df.columns if "Volumetric" in c][0]
         max_flow_idx = df[Q_col].idxmax()
         
         bhp_watts = df.loc[max_flow_idx, 'BHP_W']
-        
-        # Grid Power = Shaft Power / Motor Efficiency
-        # (Note: Manual implies simple calc, but standard is P_elec = P_shaft / eta_motor)
         grid_power_kw = (bhp_watts / MOTOR_EFF) / 1000.0
-        
         annual_cost = grid_power_kw * HOURS_PER_YEAR * RATE_PER_KWH
         
         print(f"{rpm:<10} | {bhp_watts:<10.2f} | {grid_power_kw:<15.4f} | ${annual_cost:<15.2f}")
@@ -291,35 +257,26 @@ def calculate_annual_cost(lab_data):
 # PAGE 9: Data Tables
 # ==========================================
 def generate_data_tables(lab_data):
-    """
-    Prints or returns formatted tables for the Appendix.
-    Includes: Speed, Slider, Torque, Total Power, dP1, P2, P3, Q, Loss, Head, Eff.
-    """
     print("=== PAGE 9: EXPERIMENTAL DATA TABLES ===")
     
-    # Define column mapping for clean output
-    # You might need to adjust the keys on the left to match your exact VDAS names
     target_cols = [
         'Speed (rev.min-1)', 
         'Slide Valve Position (%)',
         'Torque (Nm)',
-        'Power (W)', # Total Power
-        'Nozzle Total Pressure (Pa)', # dP1
-        'Inlet Pressure (Pa)', # P2
-        'Outlet Pressure (Pa)', # P3
+        'Power (W)', 
+        'Nozzle Total Pressure (Pa)', 
+        'Inlet Pressure (Pa)', 
+        'Outlet Pressure (Pa)', 
         'Volumetric Flow Rate (m3.s-1)',
         'Mech_Loss_W',
-        'Fan Total Pressure (Pa)', # Head Rise
+        'Fan Total Pressure (Pa)', 
         'Efficiency_Calc'
     ]
     
     for impeller in lab_data:
         for rpm in lab_data[impeller]:
             df = augment_data(lab_data[impeller][rpm].copy(), rpm)
-            
-            # Filter columns that exist
             cols_to_show = [c for c in target_cols if c in df.columns or c in ['Mech_Loss_W', 'Efficiency_Calc']]
-            
             print(f"\nTable: {impeller.capitalize()} Impeller - {rpm} RPM")
             print(df[cols_to_show].round(3).to_string()) 
 
@@ -327,17 +284,12 @@ def generate_data_tables(lab_data):
 # PAGE 10: Sample Calculations
 # ==========================================
 def generate_sample_calculations(lab_data):
-    """
-    Generates a text block of sample calcs for one specific point.
-    """
     print("\n=== PAGE 10: SAMPLE CALCULATIONS ===")
     
-    # Pick one point: Radial 2000 RPM, approx 50% flow (middle of dataset)
     try:
         df = lab_data['radial'][2000]
-        row = df.iloc[len(df)//2] # Middle row
+        row = df.iloc[len(df)//2] 
         
-        # Extract raw values
         N = row[[c for c in df.columns if "Speed" in c][0]]
         T = row[[c for c in df.columns if "Torque" in c][0]]
         P_tot = row[[c for c in df.columns if "Power" in c and "Mech" not in c][0]]
@@ -374,4 +326,4 @@ plot_efficiency(lab_data)
 plot_nondimensional_curves(lab_data)
 calculate_annual_cost(lab_data)
 generate_sample_calculations(lab_data)
-generate_data_tables(lab_data) # Uncomment to print large tables
+# generate_data_tables(lab_data) # Uncomment to print large tables
