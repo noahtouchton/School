@@ -1,0 +1,38 @@
+// Control Logic Flowchart
+digraph Soil_Sampling_Robot {
+	nodesep=0.8 rankdir=TB ranksep=0.8 splines=ortho
+	node [fontname=Arial fontsize=12 shape=rect style="rounded,filled"]
+	Start [label=Start fillcolor="#333333" fontcolor=white shape=ellipse]
+	Iterate [label="Iterate over
+each Soil Bag" fillcolor="#E1BEE7" shape=diamond]
+	Gantry [label="Gantry Loop" fillcolor="#BBDEFB"]
+	Display [label="Display Results" fillcolor="#C8E6C9" shape=parallelogram]
+	End [label=End fillcolor="#333333" fontcolor=white shape=ellipse]
+	subgraph cluster_main {
+		color=grey label="Processing Cycle" style=dashed
+		Main [label="Main Loop" fillcolor="#FFF9C4" width=1.5]
+		node [fillcolor=white shape=box style=filled]
+		Stir [label=Stir]
+		Scoop [label=Scoop]
+		Scan [label="Scan Soil
+(AI Analysis)"]
+		Unscoop [label=Unscoop]
+	}
+	Start -> Iterate [label="Starting coords"]
+	Iterate -> Gantry [label="Next Location
+(If not last)"]
+	Gantry -> Iterate [label=Confirmation color=red]
+	Iterate -> Main [label="Start Process"]
+	Main -> Iterate [label="Process Complete" color=red]
+	Main -> Stir [label=Activate]
+	Stir -> Main [label=Complete]
+	Main -> Scoop [label=Activate]
+	Scoop -> Main [label=Complete]
+	Main -> Scan [label="Send to AI"]
+	Scan -> Main [label="Soil Type"]
+	Main -> Unscoop [label=Release]
+	Unscoop -> Main [label=Confirm]
+	Iterate -> Display [label="If Last Iteration
+(Results)"]
+	Display -> End
+}

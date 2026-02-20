@@ -1,0 +1,38 @@
+// Ortho Flowchart
+digraph Soil_Robot_Straight {
+	nodesep=0.8 rankdir=TB ranksep=0.8 splines=ortho
+	node [fontname=Arial fontsize=12 shape=rect style="rounded,filled"]
+	Start [label=Start fillcolor="#333333" fontcolor=white shape=circle width=0.8]
+	Iterate [label="Iterate over
+Soil Bags" fillcolor="#E1BEE7" height=1.2 shape=diamond]
+	Gantry [label="Gantry Loop" fillcolor="#BBDEFB"]
+	Display [label="Display Results" fillcolor="#C8E6C9" shape=parallelogram]
+	End [label=End fillcolor="#333333" fontcolor=white shape=circle width=0.6]
+	subgraph cluster_processing {
+		color=grey label="Processing Cycle" style=dashed
+		Main [label="Main Loop" fillcolor="#FFF9C4" width=2.5]
+		{
+			rank=same
+			Stir [label=Stir]
+			Scoop [label=Scoop]
+			Scan [label="Scan Soil
+(AI)"]
+			Unscoop [label=Unscoop]
+		}
+	}
+	Start -> Iterate [label="Start Coords"]
+	Iterate -> Gantry [label="Next Loc" headport=n tailport=w]
+	Gantry -> Iterate [label=Confirm color="#D32F2F" headport=w tailport=s]
+	Iterate -> Main [label="Start Process" headport=n tailport=s]
+	Main -> Stir [label=Actuate headport=n tailport=sw]
+	Stir -> Main [label=Done color="#D32F2F" headport=w tailport=s]
+	Main -> Scoop [label=Actuate headport=n tailport=s]
+	Scoop -> Main [label=Done color="#D32F2F" headport=w tailport=s]
+	Main -> Scan [label=Scan headport=n tailport=s]
+	Scan -> Main [label=Data color="#D32F2F" headport=e tailport=s]
+	Main -> Unscoop [label=Release headport=n tailport=se]
+	Unscoop -> Main [label=Confirm color="#D32F2F" headport=e tailport=s]
+	Main -> Iterate [label="Cycle Complete" color="#D32F2F" headport=e tailport=e]
+	Iterate -> Display [label="Last Item" headport=n tailport=e]
+	Display -> End
+}
