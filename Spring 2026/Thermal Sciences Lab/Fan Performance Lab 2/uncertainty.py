@@ -9,7 +9,15 @@ import rss
 # Create the graphs directory if it doesn't exist
 os.makedirs("graphs", exist_ok=True)
 
-D_IMPELLER = 0.15 
+# Impeller diameter measurements (in mm)
+backwards_impeller_vals = [154.84, 154.90, 154.42, 154.67, 154.40]
+forwards_impeller_vals = [153.42, 153.67, 153.76, 153.54, 153.75]
+
+# Average the measurements and convert mm to meters
+D_BACKWARDS = np.mean(backwards_impeller_vals) / 1000.0
+# Assuming 'forwards' measurements belong to the Radial impeller used in the lab
+D_RADIAL = np.mean(forwards_impeller_vals) / 1000.0 
+
 RHO_AIR = 1.2
 
 MECH_LOSS_MAP = {
@@ -20,44 +28,38 @@ MECH_LOSS_MAP = {
     3000: 14
 }
 
+# Styling lists for unique colors and markers
+COLORS = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+MARKERS = ['o', 's', '^', 'D', 'v']
+
 lab_data = rss.load_all_lab_runs()
 
-# Accessing specific data:
-# df_1500 = lab_data['radial'][1500]
-# print(df_1500)
+def get_trendline(x, y, degree=2):
+    """Helper function to generate a smooth trendline."""
+    z = np.polyfit(x, y, degree)
+    p = np.poly1d(z)
+    x_smooth = np.linspace(x.min(), x.max(), 100)
+    return x_smooth, p(x_smooth)
 
 def plot_head_vs_flow(lab_data):
-    """
-    Plots Head Rise vs. Flow Rate for Radial and Backward impellers.
-    Assumes lab_data is the dictionary structure: 
-    lab_data['radial'][1000] -> DataFrame
-    """
+    impellers = [('radial', 'Radial'), ('backwards', 'Backward')]
     
-    # Setup the two plots
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-    
-    # Helper to process one impeller's data
-    def process_impeller(impeller_name, ax, color_map):
-        if impeller_name not in lab_data:
-            print(f"No data found for {impeller_name}")
-            return
-
-        speeds = sorted(lab_data[impeller_name].keys())
+    for key, title in impellers:
+        if key not in lab_data:
+            print(f"No data found for {key}")
+            continue
+            
+        plt.figure(figsize=(8, 6))
+        speeds = sorted(lab_data[key].keys())
         
-        for speed in speeds:
-            df = lab_data[impeller_name][speed]
+        for idx, speed in enumerate(speeds):
+            df = lab_data[key][speed]
             
-            # --- 1. GET FLOW RATE (Q) ---
             q_cols = [c for c in df.columns if "Volumetric Flow" in c]
-            if q_cols:
-                Q = df[q_cols[0]]
-            else:
-                print(f"Warning: Volumetric Flow column missing for {impeller_name} {speed}")
-                continue
+            if not q_cols: continue
+            Q = df[q_cols[0]]
 
-            # --- 2. GET HEAD RISE (H) ---
             h_cols = [c for c in df.columns if "Total Pressure" in c]
-            
             if h_cols:
                 H = df[h_cols[0]]
             else:
@@ -66,41 +68,37 @@ def plot_head_vs_flow(lab_data):
                     p2_col = [c for c in df.columns if "P2" in c or "Inlet" in c and "Nozzle" not in c][0]
                     H = df[p3_col] - df[p2_col]
                 except IndexError:
-                    print(f"Warning: Pressure columns missing for {impeller_name} {speed}")
                     continue
 
-            # Plot the curve
             sort_idx = np.argsort(Q)
-            ax.plot(Q.iloc[sort_idx], H.iloc[sort_idx], marker='o', label=f"{speed} RPM")
+            Q_sorted = Q.iloc[sort_idx]
+            H_sorted = H.iloc[sort_idx]
 
-        # Styling
-        #ax.set_title(f"{impeller_name.capitalize()} Impeller: Head Rise vs Flow Rate")
-        ax.set_xlabel("Volumetric Flow Rate ($m^3/s$)")
-        ax.set_ylabel("Head Rise / Total Pressure (Pa)")
-        ax.grid(True, which='both', linestyle='--', alpha=0.7)
-        ax.legend(title="Fan Speed")
+            c = COLORS[idx % len(COLORS)]
+            m = MARKERS[idx % len(MARKERS)]
 
-    # Generate the two plots
-    process_impeller('radial', ax1, None)
-    process_impeller('backwards', ax2, None)
+            # Scatter points
+            plt.plot(Q_sorted, H_sorted, linestyle='', marker=m, color=c, label=f"{speed} RPM")
+            # Trendline
+            x_line, y_line = get_trendline(Q_sorted, H_sorted)
+            plt.plot(x_line, y_line, linestyle='-', color=c)
 
-    plt.tight_layout()
-    # Save the figure to the graphs folder
-    plt.savefig("graphs/Page_2_Head_vs_Flow.png", bbox_inches='tight')
-    plt.show()
+        plt.xlabel("Volumetric Flow Rate ($m^3/s$)")
+        plt.ylabel("Head Rise / Total Pressure (Pa)")
+        plt.grid(True, which='both', linestyle='--', alpha=0.7)
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(f"graphs/Page_2_Head_vs_Flow_{title}.png", bbox_inches='tight')
+        plt.close()
 
-
-def augment_data(df, rpm):
-    """
-    Adds calculated columns (BHP, WHP, Efficiency, Coeffs) to the dataframe.
-    """
+def augment_data(df, rpm, impeller_type):
     p_loss = MECH_LOSS_MAP.get(rpm, 0)
+    d_impeller = D_BACKWARDS if impeller_type == 'backwards' else D_RADIAL
     
     try:
         Q = df[[c for c in df.columns if "Volumetric Flow" in c][0]]
         dP = df[[c for c in df.columns if "Total Pressure" in c][0]]
         P_total = df[[c for c in df.columns if "Power" in c and "Mechanical" not in c][0]]
-        Torque = df[[c for c in df.columns if "Torque" in c][0]]
     except IndexError:
         return df
 
@@ -109,9 +107,9 @@ def augment_data(df, rpm):
     df['Efficiency_Calc'] = (df['WHP_W'] / df['BHP_W']) * 100
     
     n = rpm / 60.0 
-    df['Cq'] = Q / (n * D_IMPELLER**3)
-    df['Ch'] = dP / (RHO_AIR * (n**2) * (D_IMPELLER**2))
-    df['Cp'] = df['BHP_W'] / (RHO_AIR * (n**3) * (D_IMPELLER**5))
+    df['Cq'] = Q / (n * d_impeller**3)
+    df['Ch'] = dP / (RHO_AIR * (n**2) * (d_impeller**2))
+    df['Cp'] = df['BHP_W'] / (RHO_AIR * (n**3) * (d_impeller**5))
     df['Mech_Loss_W'] = p_loss
     
     return df
@@ -120,110 +118,128 @@ def augment_data(df, rpm):
 # PAGE 3-5: BHP & WHP vs Flow (5 Graphs)
 # ==========================================
 def plot_bhp_whp_vs_flow(lab_data):
-    """
-    Generates 5 separate figures (one per RPM).
-    Each figure compares Radial vs Backward for both BHP and WHP.
-    """
     speeds = [1000, 1500, 2000, 2500, 3000]
     
     for rpm in speeds:
-        fig, ax = plt.subplots(figsize=(10, 6))
+        plt.figure(figsize=(8, 6))
         
-        # Plot Radial
+        # Plot configurations: (Impeller, Value_Col, Label, Color, Marker)
+        configs = []
         if 'radial' in lab_data and rpm in lab_data['radial']:
-            df = augment_data(lab_data['radial'][rpm].copy(), rpm)
-            Q = df[[c for c in df.columns if "Volumetric" in c][0]]
+            df_rad = augment_data(lab_data['radial'][rpm].copy(), rpm, 'radial')
+            configs.extend([
+                (df_rad, 'BHP_W', 'Radial BHP', COLORS[0], MARKERS[0]),
+                (df_rad, 'WHP_W', 'Radial WHP', COLORS[1], MARKERS[1])
+            ])
             
-            ax.plot(Q, df['BHP_W'], 'r-o', label=f'Radial BHP')
-            ax.plot(Q, df['WHP_W'], 'r--s', label=f'Radial WHP')
-            
-        # Plot Backward
         if 'backwards' in lab_data and rpm in lab_data['backwards']:
-            df = augment_data(lab_data['backwards'][rpm].copy(), rpm)
-            Q = df[[c for c in df.columns if "Volumetric" in c][0]]
-            
-            ax.plot(Q, df['BHP_W'], 'b-o', label=f'Backward BHP')
-            ax.plot(Q, df['WHP_W'], 'b--s', label=f'Backward WHP')
+            df_back = augment_data(lab_data['backwards'][rpm].copy(), rpm, 'backwards')
+            configs.extend([
+                (df_back, 'BHP_W', 'Backward BHP', COLORS[2], MARKERS[2]),
+                (df_back, 'WHP_W', 'Backward WHP', COLORS[3], MARKERS[3])
+            ])
 
-        #ax.set_title(f"Power Analysis at {rpm} RPM")
-        ax.set_xlabel("Volumetric Flow Rate ($m^3/s$)")
-        ax.set_ylabel("Power (Watts)")
-        ax.grid(True, linestyle='--', alpha=0.6)
-        ax.legend()
+        for df, col, label, c, m in configs:
+            Q = df[[c for c in df.columns if "Volumetric" in c][0]]
+            sort_idx = np.argsort(Q)
+            Q_sorted = Q.iloc[sort_idx]
+            Y_sorted = df[col].iloc[sort_idx]
+            
+            # Scatter
+            plt.plot(Q_sorted, Y_sorted, linestyle='', marker=m, color=c, label=label)
+            # Trendline
+            x_line, y_line = get_trendline(Q_sorted, Y_sorted)
+            plt.plot(x_line, y_line, linestyle='-', color=c)
+
+        plt.xlabel("Volumetric Flow Rate ($m^3/s$)")
+        plt.ylabel("Power (Watts)")
+        plt.grid(True, linestyle='--', alpha=0.6)
+        plt.legend()
         plt.tight_layout()
-        
-        # Save each figure uniquely by RPM
         plt.savefig(f"graphs/Pages_3_to_5_Power_vs_Flow_{rpm}RPM.png", bbox_inches='tight')
-        plt.show()
+        plt.close()
 
 # ==========================================
-# PAGE 6: Efficiency vs Flow (2 Graphs)
+# PAGE 6: Efficiency vs Flow (2 Graphs Separated)
 # ==========================================
 def plot_efficiency(lab_data):
-    """
-    Generates 2 plots: One for Radial, One for Backward.
-    Each plot contains curves for all 5 speeds.
-    """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    impellers = [('radial', 'Radial'), ('backwards', 'Backward')]
     
-    impellers = [('radial', ax1, 'Radial'), ('backwards', ax2, 'Backward')]
-    
-    for key, ax, title in impellers:
+    for key, title in impellers:
         if key not in lab_data: continue
         
-        for rpm in sorted(lab_data[key].keys()):
-            df = augment_data(lab_data[key][rpm].copy(), rpm)
+        plt.figure(figsize=(8, 6))
+        for idx, rpm in enumerate(sorted(lab_data[key].keys())):
+            df = augment_data(lab_data[key][rpm].copy(), rpm, key)
             Q = df[[c for c in df.columns if "Volumetric" in c][0]]
             
-            ax.plot(Q, df['Efficiency_Calc'], marker='.', label=f'{rpm} RPM')
+            sort_idx = np.argsort(Q)
+            Q_sorted = Q.iloc[sort_idx]
+            E_sorted = df['Efficiency_Calc'].iloc[sort_idx]
             
-        #ax.set_title(f"{title} Impeller Efficiency")
-        ax.set_xlabel("Volumetric Flow Rate ($m^3/s$)")
-        ax.set_ylabel("Efficiency (%)")
-        ax.set_ylim(0, 100)
-        ax.grid(True)
-        ax.legend()
-        
-    plt.tight_layout()
-    # Save the figure to the graphs folder
-    plt.savefig("graphs/Page_6_Efficiency_vs_Flow.png", bbox_inches='tight')
-    plt.show()
+            c = COLORS[idx % len(COLORS)]
+            m = MARKERS[idx % len(MARKERS)]
+            
+            # Scatter
+            plt.plot(Q_sorted, E_sorted, linestyle='', marker=m, color=c, label=f'{rpm} RPM')
+            # Trendline
+            x_line, y_line = get_trendline(Q_sorted, E_sorted)
+            plt.plot(x_line, y_line, linestyle='-', color=c)
+            
+        plt.xlabel("Volumetric Flow Rate ($m^3/s$)")
+        plt.ylabel("Efficiency (%)")
+        plt.ylim(0, 100)
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(f"graphs/Page_6_Efficiency_vs_Flow_{title}.png", bbox_inches='tight')
+        plt.close()
 
 # ==========================================
-# PAGE 7: Dimensionless Curves (2 Graphs)
+# PAGE 7: Dimensionless Curves (2 Graphs Separated)
 # ==========================================
 def plot_nondimensional_curves(lab_data):
-    """
-    Generates 2 plots: Cp and Ch vs Cq.
-    Collapses all speeds onto single universal curves.
-    """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-    impellers = [('radial', ax1, 'Radial'), ('backwards', ax2, 'Backward')]
+    impellers = [('radial', 'Radial'), ('backwards', 'Backward')]
     
-    for key, ax, title in impellers:
+    for key, title in impellers:
         if key not in lab_data: continue
         
+        plt.figure(figsize=(8, 6))
         all_Cq, all_Ch, all_Cp = [], [], []
         
         for rpm in lab_data[key]:
-            df = augment_data(lab_data[key][rpm].copy(), rpm)
+            df = augment_data(lab_data[key][rpm].copy(), rpm, key)
             all_Cq.extend(df['Cq'])
             all_Ch.extend(df['Ch'])
             all_Cp.extend(df['Cp'])
             
-        ax.scatter(all_Cq, all_Ch, c='blue', label='$C_H$ (Head Coeff)')
-        ax.scatter(all_Cq, all_Cp, c='red', marker='x', label='$C_P$ (Power Coeff)')
+        # Convert to arrays for sorting/fitting
+        all_Cq = np.array(all_Cq)
+        all_Ch = np.array(all_Ch)
+        all_Cp = np.array(all_Cp)
         
-        #ax.set_title(f"{title} Non-Dimensional Performance")
-        ax.set_xlabel("Flow Coefficient ($C_Q$)")
-        ax.set_ylabel("Coefficient Value")
-        ax.grid(True)
-        ax.legend()
+        sort_idx = np.argsort(all_Cq)
+        all_Cq = all_Cq[sort_idx]
+        all_Ch = all_Ch[sort_idx]
+        all_Cp = all_Cp[sort_idx]
+
+        # Scatter Ch
+        plt.plot(all_Cq, all_Ch, linestyle='', marker=MARKERS[0], color=COLORS[0], label='$C_H$ (Head Coeff)')
+        x_line_h, y_line_h = get_trendline(all_Cq, all_Ch)
+        plt.plot(x_line_h, y_line_h, linestyle='-', color=COLORS[0])
         
-    plt.tight_layout()
-    # Save the figure to the graphs folder
-    plt.savefig("graphs/Page_7_Nondimensional_Curves.png", bbox_inches='tight')
-    plt.show()
+        # Scatter Cp
+        plt.plot(all_Cq, all_Cp, linestyle='', marker=MARKERS[1], color=COLORS[1], label='$C_P$ (Power Coeff)')
+        x_line_p, y_line_p = get_trendline(all_Cq, all_Cp)
+        plt.plot(x_line_p, y_line_p, linestyle='-', color=COLORS[1])
+        
+        plt.xlabel("Flow Coefficient ($C_Q$)")
+        plt.ylabel("Coefficient Value")
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(f"graphs/Page_7_Nondimensional_Curves_{title}.png", bbox_inches='tight')
+        plt.close()
 
 # ==========================================
 # PAGE 8: Annual Cost Calculation
@@ -242,7 +258,7 @@ def calculate_annual_cost(lab_data):
         return
 
     for rpm in sorted(lab_data['backwards'].keys()):
-        df = augment_data(lab_data['backwards'][rpm].copy(), rpm)
+        df = augment_data(lab_data['backwards'][rpm].copy(), rpm, 'backwards')
         Q_col = [c for c in df.columns if "Volumetric" in c][0]
         max_flow_idx = df[Q_col].idxmax()
         
@@ -275,7 +291,7 @@ def generate_data_tables(lab_data):
     
     for impeller in lab_data:
         for rpm in lab_data[impeller]:
-            df = augment_data(lab_data[impeller][rpm].copy(), rpm)
+            df = augment_data(lab_data[impeller][rpm].copy(), rpm, impeller)
             cols_to_show = [c for c in target_cols if c in df.columns or c in ['Mech_Loss_W', 'Efficiency_Calc']]
             print(f"\nTable: {impeller.capitalize()} Impeller - {rpm} RPM")
             print(df[cols_to_show].round(3).to_string()) 
@@ -327,3 +343,37 @@ plot_nondimensional_curves(lab_data)
 calculate_annual_cost(lab_data)
 generate_sample_calculations(lab_data)
 # generate_data_tables(lab_data) # Uncomment to print large tables
+
+# ==========================================
+# DEBUGGING: Cp Scatter Analysis
+# ==========================================
+def debug_cp_scatter(lab_data):
+    print("\n=== DEBUGGING Cp SCATTER (Radial Impeller, 100% Valve) ===")
+    print(f"{'RPM':<6} | {'n (rev/s)':<10} | {'Raw P (W)':<10} | {'Loss (W)':<9} | {'BHP (W)':<8} | {'Cp':<10} | {'n^3 Factor':<10}")
+    print("-" * 75)
+    
+    if 'radial' not in lab_data:
+        print("No radial data found.")
+        return
+
+    for rpm in sorted(lab_data['radial'].keys()):
+        df = augment_data(lab_data['radial'][rpm].copy(), rpm, 'radial')
+        
+        # Grab the row with the maximum flow rate (100% open valve)
+        Q_col = [c for c in df.columns if "Volumetric" in c][0]
+        max_flow_idx = df[Q_col].idxmax()
+        row = df.loc[max_flow_idx]
+        
+        # Extract variables used in Cp
+        n = rpm / 60.0
+        n3 = n**3
+        raw_p = row[[c for c in df.columns if "Power" in c and "Mechanical" not in c][0]]
+        p_loss = MECH_LOSS_MAP.get(rpm, 0)
+        bhp = row['BHP_W']
+        cp = row['Cp']
+        
+        print(f"{rpm:<6} | {n:<10.2f} | {raw_p:<10.2f} | {p_loss:<9} | {bhp:<8.2f} | {cp:<10.4f} | {n3:<10.2f}")
+    print("=" * 75 + "\n")
+
+# Run the debug function
+debug_cp_scatter(lab_data)
