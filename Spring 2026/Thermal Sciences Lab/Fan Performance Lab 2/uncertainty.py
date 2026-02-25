@@ -10,8 +10,11 @@ import rss
 os.makedirs("graphs", exist_ok=True)
 
 # Impeller diameter measurements (in mm)
-backwards_impeller_vals = [154.84, 154.90, 154.42, 154.67, 154.40]
-forwards_impeller_vals = [153.42, 153.67, 153.76, 153.54, 153.75]
+backwards_impeller_vals = [154.84, 154.90, 154.42, 154.67, 154.40] #keep
+forwards_impeller_vals = [153.42, 153.67, 153.76, 153.54, 153.75] #keep
+
+backwards_impeller_vals = [250]
+forwards_impeller_vals = [250]
 
 # Average the measurements and convert mm to meters
 D_BACKWARDS = np.mean(backwards_impeller_vals) / 1000.0
@@ -304,34 +307,62 @@ def generate_sample_calculations(lab_data):
     
     try:
         df = lab_data['radial'][2000]
-        row = df.iloc[len(df)//2] 
+        
+        # Find the row where the valve is fully open (max volumetric flow)
+        Q_col = [c for c in df.columns if "Volumetric" in c][0]
+        max_flow_idx = df[Q_col].idxmax()
+        row = df.loc[max_flow_idx]
         
         N = row[[c for c in df.columns if "Speed" in c][0]]
         T = row[[c for c in df.columns if "Torque" in c][0]]
         P_tot = row[[c for c in df.columns if "Power" in c and "Mech" not in c][0]]
-        Q = row[[c for c in df.columns if "Volumetric" in c][0]]
+        Q = row[Q_col]
         dP = row[[c for c in df.columns if "Total Pressure" in c][0]]
         P_loss = MECH_LOSS_MAP[2000]
         
-        print(f"Data Point: Radial Impeller, Nominal 2000 RPM, Mid-Valve Position")
+        print(f"Data Point: Radial Impeller, Nominal 2000 RPM, Fully Open Valve (100%)")
         print(f"Measured Speed (N): {N:.1f} RPM")
         print(f"Measured Torque (T): {T:.3f} Nm")
         print(f"Measured Flow (Q): {Q:.4f} m^3/s")
         print(f"Measured Head (dP): {dP:.1f} Pa")
         print(f"Total Power Displayed: {P_tot:.1f} W")
         print(f"Mechanical Loss @ 2000 RPM: {P_loss} W")
+        print(f"Impeller Diameter (D): {D_RADIAL:.3f} m")
+        print(f"Air Density (rho): {RHO_AIR} kg/m^3")
         
         print("\n1. Brake Horsepower (BHP):")
         print(f"   BHP = P_total - P_mech_loss")
-        print(f"   BHP = {P_tot} - {P_loss} = {P_tot - P_loss:.2f} W")
+        bhp = P_tot - P_loss
+        print(f"   BHP = {P_tot:.2f} - {P_loss} = {bhp:.2f} W")
         
         print("\n2. Water Horsepower (WHP):")
         print(f"   WHP = Q * dP_total")
-        print(f"   WHP = {Q:.4f} * {dP:.1f} = {Q*dP:.2f} W")
+        whp = Q * dP
+        print(f"   WHP = {Q:.4f} * {dP:.1f} = {whp:.2f} W")
         
         print("\n3. Fan Efficiency:")
         print(f"   Eta = (WHP / BHP) * 100")
-        print(f"   Eta = ({Q*dP:.2f} / {P_tot - P_loss:.2f}) * 100 = {(Q*dP)/(P_tot-P_loss)*100:.1f} %")
+        eta = (whp / bhp) * 100
+        print(f"   Eta = ({whp:.2f} / {bhp:.2f}) * 100 = {eta:.1f} %")
+
+        # --- COEFFICIENT CALCULATIONS ---
+        n = N / 60.0
+        cq = Q / (n * D_RADIAL**3)
+        ch = dP / (RHO_AIR * (n**2) * (D_RADIAL**2))
+        cp = bhp / (RHO_AIR * (n**3) * (D_RADIAL**5))
+
+        print("\n4. Flow Coefficient (C_Q):")
+        print(f"   n = N / 60 = {N:.1f} / 60 = {n:.2f} rev/s")
+        print(f"   C_Q = Q / (n * D^3)")
+        print(f"   C_Q = {Q:.4f} / ({n:.2f} * {D_RADIAL:.3f}^3) = {cq:.4f}")
+
+        print("\n5. Head Coefficient (C_H):")
+        print(f"   C_H = dP / (rho * n^2 * D^2)")
+        print(f"   C_H = {dP:.1f} / ({RHO_AIR} * {n:.2f}^2 * {D_RADIAL:.3f}^2) = {ch:.4f}")
+
+        print("\n6. Power Coefficient (C_P):")
+        print(f"   C_P = BHP / (rho * n^3 * D^5)")
+        print(f"   C_P = {bhp:.2f} / ({RHO_AIR} * {n:.2f}^3 * {D_RADIAL:.3f}^5) = {cp:.4f}")
         
     except Exception as e:
         print(f"Could not generate sample calc: {e}")
