@@ -1,0 +1,1 @@
+/usr/bin/clang++ -g -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/Clue.dir/src/game.cpp.o CMakeFiles/Clue.dir/src/main.cpp.o CMakeFiles/Clue.dir/src/player.cpp.o -o Clue

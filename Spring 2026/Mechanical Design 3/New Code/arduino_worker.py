@@ -40,6 +40,12 @@ class ArduinoWorker(QObject):
             except: pass
         self.disconnected.emit(self._target_sn or "Unknown")
 
+    def e_stop(self):
+        """Emergency stop: Clear queue and stops all processes but keeps serial open."""
+        # Find a way to have the arduino stop immediately
+        self._cmd_q.queue.clear()  # Clear pending commands
+        self.stop()  # Then stop the thread and serial connection
+
     def _detect_port(self) -> str | None:
         """
         Smart detection:
@@ -57,31 +63,29 @@ class ArduinoWorker(QObject):
                 if p.serial_number == self._target_sn:
                     return p.device
             return None
-            
-        # Method B: Fallback (Just grab the first Arduino found - risky with multiple!)
-        for p in ports:
-            if "Arduino" in p.description or "usbmodem" in p.device:
-                return p.device
         
         return None
 
     def _open_serial(self):
-        port = self._detect_port()
-        if not port:
-            # Only emit error occasionally to avoid spamming logs if device is unplugged
-            time.sleep(2) 
-            return
+            port = self._detect_port()
+            if not port:
+                # Emit disconnected to update the GUI to "Missing"
+                self.disconnected.emit(self._target_sn or "Unknown")
+                print(f"CRITICAL: Arduino with SN '{self._target_sn}' not found! Retrying...")
+                time.sleep(2) 
+                return
 
-        try:
-            self._ser = serial.Serial(port=port, baudrate=self._baud, timeout=0.2)
-            self.connected.emit(port)
-            self.log.emit(f"Connected to {port} (SN: {self._target_sn})")
-            time.sleep(2.0)  # Critical: Wait for Arduino Auto-Reset
-            self._ser.reset_input_buffer()
-        except Exception as e:
-            self.error.emit(f"Serial open failed: {e}")
-            self._ser = None
-            time.sleep(2) # Don't retry instantly
+            try:
+                self._ser = serial.Serial(port=port, baudrate=self._baud, timeout=0.2)
+                self.connected.emit(port) # Tells GUI we connected
+                self.log.emit(f"Connected to {port} (SN: {self._target_sn})")
+                time.sleep(2.0)  # Critical: Wait for Arduino Auto-Reset
+                self._ser.reset_input_buffer()
+            except Exception as e:
+                self.error.emit(f"Serial open failed: {e}")
+                self.disconnected.emit(self._target_sn or "Unknown") # Also update GUI on crash
+                self._ser = None
+                time.sleep(2)
 
     def _pump(self):
         """The main loop running in a background thread."""
@@ -95,6 +99,18 @@ class ArduinoWorker(QObject):
                 try:
                     cmd = self._cmd_q.get(timeout=0.1)
                 except queue.Empty:
+                    # --- NEW: IDLE DISCONNECT CHECK ---
+                    # Gently check the OS buffer. If the cable was pulled, this throws an error.
+                    try:
+                        _ = self._ser.in_waiting
+                    except Exception:
+                        self.log.emit(f"Device unplugged: {self._target_sn}")
+                        self.disconnected.emit(self._target_sn or "Unknown")
+                        
+                        # Clean up the broken connection and reset
+                        try: self._ser.close()
+                        except: pass
+                        self._ser = None
                     continue
 
                 # 2. Write Command
@@ -123,6 +139,8 @@ class ArduinoWorker(QObject):
 
             except Exception as e:
                 self.error.emit(f"IO Error: {e}")
+                # Also catch disconnects that happen exactly while writing
+                self.disconnected.emit(self._target_sn or "Unknown")
                 try: self._ser.close()
                 except: pass
                 self._ser = None

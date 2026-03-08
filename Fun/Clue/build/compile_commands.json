@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/Users/noahtouchton/School_Git/School/Fun/Clue/build",
+  "command": "/usr/bin/clang++  -I/Users/noahtouchton/School_Git/School/Fun/Clue/include -g -arch arm64 -o CMakeFiles/Clue.dir/src/game.cpp.o -c /Users/noahtouchton/School_Git/School/Fun/Clue/src/game.cpp",
+  "file": "/Users/noahtouchton/School_Git/School/Fun/Clue/src/game.cpp",
+  "output": "CMakeFiles/Clue.dir/src/game.cpp.o"
+},
+{
+  "directory": "/Users/noahtouchton/School_Git/School/Fun/Clue/build",
+  "command": "/usr/bin/clang++  -I/Users/noahtouchton/School_Git/School/Fun/Clue/include -g -arch arm64 -o CMakeFiles/Clue.dir/src/main.cpp.o -c /Users/noahtouchton/School_Git/School/Fun/Clue/src/main.cpp",
+  "file": "/Users/noahtouchton/School_Git/School/Fun/Clue/src/main.cpp",
+  "output": "CMakeFiles/Clue.dir/src/main.cpp.o"
+},
+{
+  "directory": "/Users/noahtouchton/School_Git/School/Fun/Clue/build",
+  "command": "/usr/bin/clang++  -I/Users/noahtouchton/School_Git/School/Fun/Clue/include -g -arch arm64 -o CMakeFiles/Clue.dir/src/player.cpp.o -c /Users/noahtouchton/School_Git/School/Fun/Clue/src/player.cpp",
+  "file": "/Users/noahtouchton/School_Git/School/Fun/Clue/src/player.cpp",
+  "output": "CMakeFiles/Clue.dir/src/player.cpp.o"
+}
+]

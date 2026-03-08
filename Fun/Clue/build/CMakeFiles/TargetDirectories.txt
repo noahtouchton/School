@@ -1,0 +1,3 @@
+/Users/noahtouchton/School_Git/School/Fun/Clue/build/CMakeFiles/Clue.dir
+/Users/noahtouchton/School_Git/School/Fun/Clue/build/CMakeFiles/edit_cache.dir
+/Users/noahtouchton/School_Git/School/Fun/Clue/build/CMakeFiles/rebuild_cache.dir
