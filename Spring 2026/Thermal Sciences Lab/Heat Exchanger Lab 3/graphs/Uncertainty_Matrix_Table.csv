@@ -1,0 +1,9 @@
+Uncertainty,Counter Flow (Equal Flowrates),Counter Flow (Unequal Flowrates),Parallel Flow (Equal Flowrates),Parallel Flow (Unequal Flowrates)
+UA_e (W/K),12.23,19.65,12.29,20.15
+LMTD (°C),0.02,0.02,0.03,0.02
+Flowrate (m^3/s),6.65e-06,6.64e-06,6.81e-06,6.73e-06
+Specific Heat Capacity (J/kgK),4.217,4.217,4.217,4.217
+Th_in (°C),0.04,0.03,0.04,0.02
+Th_out (°C),0.01,0.01,0.02,0.02
+Tc_in (°C),0.00,0.01,0.00,0.01
+Tc_out (°C),0.02,0.01,0.03,0.01

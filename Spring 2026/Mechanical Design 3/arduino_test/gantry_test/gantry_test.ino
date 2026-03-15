@@ -5,7 +5,7 @@
  * 3. Sends "Finished" to release the Python lock
  */
 
-const int BAUD_RATE = 115200; // Must match your Python code
+const int BAUD_RATE = 9600; // Must match your Python code
 const int LED_PIN = LED_BUILTIN; // Visual feedback
 
 

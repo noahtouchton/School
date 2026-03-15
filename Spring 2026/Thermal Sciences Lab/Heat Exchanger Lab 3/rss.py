@@ -29,53 +29,126 @@ class Data:
 def RSS(name, function, data_list):
     """
     Propagates uncertainty using symbolic differentiation (Root Sum Square).
-    
-    Args:
-        name (str): Name of the output variable (e.g., "Fan Efficiency").
-        function (str): Equation string (e.g., "eta = P_out / P_in").
-        data_list (list): List of Data objects used in the equation.
-        
-    Returns:
-        Data: A new Data object with the calculated value and propagated uncertainty.
+    Forced numerical evaluation to prevent 'Mul' and 'log' type errors.
     """
-    # Clean string
     function = function.replace(" ", "")
-    if "=" not in function:
-        raise ValueError(f"Equation must contain '='. Got: {function}")
-        
     lhs, rhs = function.split("=", 1)
 
-    # Map variable names to SymPy symbols and values
     sym_map = {}
     vals = {}
+    
     for d in data_list:
         s = sp.Symbol(str(d.var))
         sym_map[str(d.var)] = s
-        vals[s] = d.value
+        
+        # --- THE ULTIMATE FIX ---
+        # Sometimes d.value is a SymPy 'Mul' or 'Float' object from a previous RSS call.
+        # We use sp.N() to evaluate it and then cast to a standard python float.
+        try:
+            vals[s] = float(sp.N(d.value))
+        except:
+            vals[s] = float(d.value)
 
-    # SymPy expression
+    # Use locals=sym_map to ensure SymPy doesn't use its own internal 'V' or 'Q'
     expr = sp.sympify(rhs, locals=sym_map)
     ordered_syms = list(sym_map.values())
+    float_inputs = [vals[s] for s in ordered_syms]
 
-    # Calculate Nominal Value
-    f_nominal = sp.lambdify(ordered_syms, expr, modules="numpy")
-    nominal_val = f_nominal(*[vals[s] for s in ordered_syms])
+    # Use 'numpy' for speed, but 'math' as a fallback for scalar log/sqrt issues
+    f_nominal = sp.lambdify(ordered_syms, expr, modules=["numpy", "math"])
+    
+    for s in ordered_syms:
+        # If we are doing LMTD, dT values MUST be positive
+        if "dT" in name and vals[s] <= 0:
+            vals[s] = 0.001 # Set to a tiny positive floor to prevent crash
+            
+    float_inputs = [vals[s] for s in ordered_syms]
 
-    # Calculate Uncertainty (RSS)
+    try:
+        # We pass the unpacked list of raw floats
+        nominal_val = float(f_nominal(*float_inputs))
+    except (ZeroDivisionError, ValueError, TypeError):
+        # Fallback to pure SymPy evaluation if lambdify trips on types
+        nominal_val = float(expr.subs(vals).evalf())
+
     rss_sq = 0.0
     for d in data_list:
         s = sym_map[str(d.var)]
-        # Partial derivative with respect to this variable
         dfdx = sp.diff(expr, s)
-        dfdx_f = sp.lambdify(ordered_syms, dfdx, modules="numpy")
-        sensitivity = dfdx_f(*[vals[sym] for sym in ordered_syms])
+        dfdx_f = sp.lambdify(ordered_syms, dfdx, modules=["numpy", "math"])
         
-        # Add (sensitivity * uncertainty)^2 to sum
-        rss_sq += (sensitivity * d.uncertainty) ** 2
+        try:
+            sensitivity = float(dfdx_f(*float_inputs))
+        except (ZeroDivisionError, ValueError, TypeError):
+            sensitivity = float(dfdx.subs(vals).evalf())
+        
+        # Ensure uncertainty is also a float
+        u_val = float(sp.N(d.uncertainty))
+        rss_sq += (sensitivity * u_val) ** 2
 
     total_unc = np.sqrt(rss_sq)
     
-    return Data(name, lhs, float(nominal_val), float(total_unc))
+    # Return as a clean Data object with raw floats
+    return Data(name, lhs, nominal_val, total_unc)
+
+
+
+def quadratic_monte_carlo(data_x: Data, data_y: Data, num_samples=100_000):
+
+    xv = np.asarray(data_x.value, dtype=float).ravel()
+    yv = np.asarray(data_y.value, dtype=float).ravel()
+
+    if xv.size != yv.size:
+        raise ValueError("x and y must have the same number of points.")
+    if xv.size < 2:
+        raise ValueError("Need at least two (x, y) points to fit a line.")
+    
+    sx = np.asarray(data_x.uncertainty, dtype=float).ravel()
+    sy = np.asarray(data_y.uncertainty, dtype=float).ravel()
+
+    rand_x = np.random.normal(loc=xv, scale=sx, size=(num_samples, xv.size))
+    rand_y = np.random.normal(loc=yv, scale=sy, size=(num_samples, yv.size))
+
+    S0 = float(xv.size)
+    S1 = np.sum(rand_x, axis=1)
+    S2 = np.sum(rand_x**2, axis=1)
+    S3 = np.sum(rand_x**3, axis=1)
+    S4 = np.sum(rand_x**4, axis=1)
+
+    T0 = np.sum(rand_y, axis=1)
+    T1 = np.sum(rand_x * rand_y, axis=1)
+    T2 = np.sum(rand_x**2 * rand_y, axis=1)
+
+    # Build the A matrix (shape: num_samples, 3, 3)
+    A = np.empty((num_samples, 3, 3))
+    A[:, 0, 0] = S4; A[:, 0, 1] = S3; A[:, 0, 2] = S2
+    A[:, 1, 0] = S3; A[:, 1, 1] = S2; A[:, 1, 2] = S1
+    A[:, 2, 0] = S2; A[:, 2, 1] = S1; A[:, 2, 2] = S0
+
+    # Build the B matrix with an extra dimension (shape: num_samples, 3, 1)
+    B = np.empty((num_samples, 3, 1))
+    B[:, 0, 0] = T2
+    B[:, 1, 0] = T1
+    B[:, 2, 0] = T0
+
+    # Solve! coeffs will initially be shape (num_samples, 3, 1)
+    coeffs = np.linalg.solve(A, B)
+
+    # Squeeze out that extra dimension so coeffs is back to (num_samples, 3)
+    coeffs = coeffs.squeeze(axis=-1)
+
+    # Now you can slice it exactly as before
+    a_std = np.std(coeffs[:, 0])
+    b_std = np.std(coeffs[:, 1])
+    c_std = np.std(coeffs[:, 2])
+
+    nom_a, nom_b, nom_c = np.polyfit(xv, yv, 2)
+
+    data_a = Data("Quadratic Coefficient", "a", nom_a, a_std * 2)
+    data_b = Data("Linear Coefficient", "b", nom_b, b_std * 2)
+    data_c = Data("Constant Term", "c", nom_c, c_std * 2)
+    return data_a, data_b, data_c
+
 
 
 def load_cal_data(file_path, header_row=4):
@@ -114,7 +187,7 @@ def average_column(df, column_number):
     return df[col_name].mean(), df[col_name].std()
 
 
-def load_all_lab_runs(base_folder='Calibration Data'):
+def load_all_lab_runs(base_folder='/Users/noahtouchton/School_Git/School/Spring 2026/Thermal Sciences Lab/Heat Exchanger Lab 3/Calibration Data'):
 
     temps = ['cold', 'hot']
     rotations = range(1,8)
@@ -143,11 +216,13 @@ def load_all_lab_runs(base_folder='Calibration Data'):
                     df = load_cal_data(file_path)
                     print(f"[OK] Loaded {file_name} with shape {df.shape}")
 
-                    t = times[rot-1]   # Assuming 2 samples per second
-                    df = keep_last_n_rows(df, 2*t)
+                    t_val = times[rot-1]   # Assuming 2 samples per second
+                    df = keep_last_n_rows(df, 2*t_val)
 
-                    vol = cold_volumes[rot-1] if temp == 'cold' else hot_volumes[rot-1]
-                    flow_rate = 60 * vol / t
+                    vol_val = cold_volumes[rot-1] if temp == 'cold' else hot_volumes[rot-1]
+                    vol = Data("Volume", "V", vol_val, 0.05)
+                    t = Data("Time", "t", t_val, 0.0)
+                    flow_rate = RSS("Flow Rate", "Q = 60 * V / t", [vol, t])
 
                     if temp == 'cold':
                         voltage, voltage_std = average_column(df, 4)
@@ -156,7 +231,7 @@ def load_all_lab_runs(base_folder='Calibration Data'):
 
                     data = [
                         Data("Voltage", "V", voltage, voltage_std),
-                        Data("Flow Rate", "Q", flow_rate, 0.0)
+                        flow_rate
                     ]
 
                     lab_data[temp][rot+1] = data

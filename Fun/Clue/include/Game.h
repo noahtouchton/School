@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Constants.h"
 #include "Board.h"
+#include "Log.h"
 
 
 class Game {
@@ -16,6 +17,7 @@ class Game {
         Player* players;
         // Game State Variables
         int round;
+        int turn;
         int currentPlayer;
         bool gameOver;
         Board board;
@@ -27,12 +29,12 @@ class Game {
 
 
     public:
+        Logger logger;
         // Constructor declaration
         Game(int players, int comPlayers);
 
         // Method declaration
         void loop();
 
-        void takeTurn();
 
 };

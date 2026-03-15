@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "LinkedList.h"
 #include <iostream>
+#include "Log.h"
 
 
 
@@ -24,12 +25,15 @@ class Player {
         LinkedList* loadList(int len);
 
     public:
+        Logger logger;
         // Constructor declaration
         Player();
-        Player(std::string playerName, bool computer);
+        Player(std::string playerName, bool computer, LogLevel logLevel);
 
         // Method declaration
         void takeTurn();
         void learnCard(int card);
         void addCard(int card);
+
+        std::string getName();
 };

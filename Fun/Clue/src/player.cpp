@@ -1,5 +1,6 @@
 // player.cpp
 #include "Player.h"
+#include "Log.h"
 
 // Constructor Implementation
 Player::Player() : name(""), isComputer(false), position(5), numCards(0) {
@@ -8,9 +9,9 @@ Player::Player() : name(""), isComputer(false), position(5), numCards(0) {
     susWeapons = nullptr;
     susRooms = nullptr;
 }
-Player::Player(std::string playerName, bool computer) 
-    : name(playerName), isComputer(computer), position(5), numCards(0) {
-    cards = nullptr;
+Player::Player(std::string playerName, bool computer, LogLevel logLevel)
+    : name(playerName), isComputer(computer), position(5), numCards(0), logger(logLevel) {
+    cards = new LinkedList();
     susPeople = loadList(ClueData::SUSPECTS.size());
     susWeapons = loadList(ClueData::WEAPONS.size());
     susRooms = loadList(ClueData::ROOMS.size());
@@ -56,7 +57,19 @@ LinkedList* Player::loadList(int len) {
 
 // Gameplay Method Implementations
 void Player::takeTurn() {
-    std::cout << "Player's turn!" << std::endl;
+    LogLevel playerLevel = isComputer ? LogLevel::COM : LogLevel::Player;
+
+    int roll = rand() % 3 + 1;
+    logger.print(playerLevel, std::format("{} rolled a {}", name, roll));
+    //Get new room position
+
+    if (isComputer) {
+        //COM logic for moving and suggesting
+    } else {
+        //Player logic for moving and suggesting
+        //add board into player
+    }
+
 }
 
 void Player::learnCard(int card) {
@@ -73,4 +86,8 @@ void Player::addCard(int card) {
     cards->add(card);
     learnCard(card);
     numCards++;
+}
+
+std::string Player::getName() {
+    return name;
 }

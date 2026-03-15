@@ -1,4 +1,5 @@
 #include <iostream>
+#include <format>
 #include "../include/Game.h"
 #include "../include/Board.h"
 
@@ -7,8 +8,8 @@
 // 2. Ask the user how many COM (total players must be between 1 and 6, inclusive)
 
 
-Game::Game(int players, int comPlayers) : numPlayers(players), numCOMPlayers(comPlayers), currentPlayer(0), gameOver(false), round(1) {
-    board = Board(numPlayers + numCOMPlayers, LogLevel::Game);
+Game::Game(int players, int comPlayers) 
+: numPlayers(players), numCOMPlayers(comPlayers), currentPlayer(0), gameOver(false), round(1), board(players + comPlayers, LogLevel::Game), logger(LogLevel::COM) {
     // Run the logic to randomly select the secret suspect, weapon, and room
     selectSecretCards();
     initGame();
@@ -22,11 +23,11 @@ void Game::initGame() {
     players = new Player[numPlayers+numCOMPlayers];
     for (int i = 0; i < numPlayers; i++) {
         std::string name = "Player " + std::to_string(i+1);
-        players[i] = Player(name, false);
+        players[i] = Player(name, false, LogLevel::COM); //find a way to have a universal log level later
     }
     for (int i = numPlayers; i < numPlayers + numCOMPlayers; i++) {
         std::string name = "COM " + std::to_string(i - numPlayers + 1);
-        players[i] = Player(name, true);
+        players[i] = Player(name, true, LogLevel::COM);
     }
 }
 
@@ -74,9 +75,13 @@ void Game::dealCards() {
 
 void Game::loop() {
     // Main game loop that continues until the game is over
+    logger.print(LogLevel::Game, "Welcome to Clue!");
+    board.printBoard();
+
+    while (!gameOver) {
+        logger.print(LogLevel::Game, std::format("Round {}: {}'s turn", round, players[currentPlayer].getName()));
+        break;
+    }
 
 }
 
-void Game::takeTurn() {
-
-}
