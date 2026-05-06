@@ -62,8 +62,8 @@ class Board {
             logger.printBoard(board); 
         }
 
-        void printValidBoard(int roll, int currentPlayer) {
-            int isPossible[9] = {0};
+        int* printValidBoard(int roll, int currentPlayer) {
+            int* isPossible = new int[9]{0};
             int k=0;
 
             int current_x = positions[currentPlayer] / 3;
@@ -74,15 +74,17 @@ class Board {
                     double dis = sqrt(pow(current_x - i, 2) + pow(current_y - j, 2));
                     if (dis <= double(roll)) {
                         isPossible[k] = 1;
+                        //std::cout << "This is a vlid Move" << k << "\n";
                     }
                     k++;
+                }
             }
 
-            isPossible[positions[currentPlayer]] = 0; // Can't stay in the same place
+            isPossible[positions[currentPlayer]] = -1; // Can't stay in the same place
 
             logger.printColoredBoard(isPossible);
+            return isPossible;
 
-        }
     }
 };
 

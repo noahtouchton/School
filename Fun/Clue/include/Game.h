@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "Board.h"
 #include "Log.h"
+#include "Types.h"
 
 
 class Game {

@@ -1,5 +1,7 @@
 // player.cpp
 #include "Player.h"
+#include "Game.h"
+#include "Board.h"
 #include "Log.h"
 
 // Constructor Implementation
@@ -56,19 +58,18 @@ LinkedList* Player::loadList(int len) {
 
 
 // Gameplay Method Implementations
-void Player::takeTurn() {
+void Player::takeTurn(Game& game, Board& board, int currentPlayer) {
     LogLevel playerLevel = isComputer ? LogLevel::COM : LogLevel::Player;
 
     int roll = rand() % 3 + 1;
-    logger.print(playerLevel, std::format("{} rolled a {}", name, roll));
+    logger.print(playerLevel, name + " rolled a " + std::to_string(roll));
     //Get new room position
 
-    if (isComputer) {
-        //COM logic for moving and suggesting
-    } else {
-        //Player logic for moving and suggesting
-        //add board into player
-    }
+    movePlayer(roll, board, currentPlayer);
+
+    Suggestion suggestion;
+
+
 
 }
 
@@ -90,4 +91,40 @@ void Player::addCard(int card) {
 
 std::string Player::getName() {
     return name;
+}
+
+void Player::movePlayer(int roll, Board& board, int currentPlayer) {
+    if (!isComputer) {
+        bool ValidMove = false;
+        while (!ValidMove) {
+            int* validMoves = board.printValidBoard(roll, currentPlayer);
+            // get user input
+            logger.print(LogLevel::Player, "What room would you like to move to?");
+            int move;
+            std::cin >> move;
+            // The user sees rooms 1-9, but the validMoves array is indexed 0-8.
+            if (move > 0 && move <= 9 && validMoves[move - 1] == 1) {
+                ValidMove = true;
+                board.movePlayer(currentPlayer, move - 1);
+            } else {
+                logger.print(LogLevel::Player, "That is not a valid move, please type in a room highlighed in Green.");
+                logger.print(LogLevel::Player, name + " rolled a " + std::to_string(roll));
+            }
+            
+            delete[] validMoves; // Clean up the dynamically allocated array
+        }
+    } else {
+        //COM logic for moving
+    }
+    board.printBoard();
+}
+
+Suggestion Player::makeSuggestion() {
+    Suggestion suggestion;
+    if (!isComputer) {
+        //player input for making a suggestion
+    } else {
+        //COM logic for making a suggestion
+    }
+    return suggestion;
 }

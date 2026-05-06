@@ -17,6 +17,7 @@ class Logger {
 
     public:
         // Constructor
+        Logger(): level(LogLevel::Warn) {}
         Logger(LogLevel logLevel) : level(logLevel) {}
 
         // Change the log level mid-game if needed
@@ -72,27 +73,41 @@ class Logger {
         }
 
         void printColoredBoard(int* isPossible){
-                for(int i=0; i<3; i++) {
-                    for(int j=0; j<3; j++) {
-                        int pos = i*3 +j;
-                        if(isPossible[pos]) {
-                            std::cout << "\033[1;32m O \033[0m"; // Green O for possible moves
-                        } else {
-                            std::cout << " * "; // Regular * for impossible moves
+            for(int i = 0; i < 9; i++) {
+                for(int j = 0; j < 9; j++) {
+                    int x = j/3;
+                    int y = i/3;
+                    int pos = y*3 + x;
+                    if ( ((i-1)%3 == 0) && ((j-1)%3 == 0)) {
+                        if (isPossible[pos] == 1) {
+                            std::cout << "\033[1;32m " << pos+1  <<  " \033[0m"; // Green O for possible moves
+                        } else if(isPossible[pos] == 0) {
+                            std::cout << " "<< pos+1 << " "; // Regular * for impossible moves
+                        } else if(isPossible[pos] == -1) {
+                            std::cout << "\033[1;31m "<< pos+1 << " \033[0m";
                         }
-                        
-                        // Vertical pipes
-                        if (j == 2) {
-                            std::cout << "|";
-                        }
-                    }
-                    
-                    // Horizontal lines
-                    if (i == 2) {
-                        std::cout << "\n-----------------------------\n";
+
                     } else {
-                        std::cout << std::endl;
+                        if (isPossible[pos] == 1) {
+                            std::cout << "\033[1;32m O \033[0m"; // Green O for possible moves
+                        } else if(isPossible[pos] == 0) {
+                            std::cout << " * "; // Regular * for impossible moves
+                        } else if(isPossible[pos] == -1) {
+                            std::cout << "\033[1;31m O \033[0m";
+                        }
+                    }               
+                    // Vertical pipes
+                    if (j == 2 || j == 5) {
+                        std::cout << "|";
                     }
                 }
+                
+                // Horizontal lines
+                if (i == 2 || i == 5) {
+                    std::cout << "\n-----------------------------\n";
+                } else {
+                    std::cout << std::endl;
+                }
+            }
         }
 };

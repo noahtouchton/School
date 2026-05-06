@@ -5,7 +5,8 @@
 #include <iostream>
 #include "Log.h"
 
-
+class Game;
+class Board;
 
 class Player {
     private:
@@ -31,9 +32,12 @@ class Player {
         Player(std::string playerName, bool computer, LogLevel logLevel);
 
         // Method declaration
-        void takeTurn();
+        void takeTurn(Game& game, Board& board, int currentPlayer);
         void learnCard(int card);
         void addCard(int card);
+
+        void movePlayer(int roll, Board& board, int currentPlayer);
+        Suggestion makeSuggestion();
 
         std::string getName();
 };

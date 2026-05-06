@@ -79,7 +79,8 @@ void Game::loop() {
     board.printBoard();
 
     while (!gameOver) {
-        logger.print(LogLevel::Game, std::format("Round {}: {}'s turn", round, players[currentPlayer].getName()));
+        logger.print(LogLevel::Game, "Round " + std::to_string(round) + ": " + players[currentPlayer].getName() + "'s turn");
+        players[currentPlayer].takeTurn(*this, board, currentPlayer);
         break;
     }
 
