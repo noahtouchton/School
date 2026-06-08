@@ -110,4 +110,15 @@ class Logger {
                 }
             }
         }
+        void clearScreen() {
+            // Add a bunch of lines to simulate clearing the screen. This is a simple approach that works in most terminals.
+            for (int i = 0; i < 100; i++) {
+                std::cout << std::endl;
+            }
+        }
+
+        void holdScreen() {
+            std::cout << "Press Enter to continue...";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
 };

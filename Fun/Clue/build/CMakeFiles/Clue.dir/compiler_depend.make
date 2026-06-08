@@ -807,7 +807,8 @@ CMakeFiles/Clue.dir/src/game.cpp.o: /Users/noahtouchton/School_Git/School/Fun/Cl
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/Game.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/LinkedList.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/Log.h \
-  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Player.h
+  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Player.h \
+  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Types.h
 
 CMakeFiles/Clue.dir/src/main.cpp.o: /Users/noahtouchton/School_Git/School/Fun/Clue/src/main.cpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/Availability.h \
@@ -1615,7 +1616,8 @@ CMakeFiles/Clue.dir/src/main.cpp.o: /Users/noahtouchton/School_Git/School/Fun/Cl
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/Game.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/LinkedList.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/Log.h \
-  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Player.h
+  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Player.h \
+  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Types.h
 
 CMakeFiles/Clue.dir/src/player.cpp.o: /Users/noahtouchton/School_Git/School/Fun/Clue/src/player.cpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/Availability.h \
@@ -2423,10 +2425,13 @@ CMakeFiles/Clue.dir/src/player.cpp.o: /Users/noahtouchton/School_Git/School/Fun/
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/Game.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/LinkedList.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/include/Log.h \
-  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Player.h
+  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Player.h \
+  /Users/noahtouchton/School_Git/School/Fun/Clue/include/Types.h
 
 
 /Users/noahtouchton/School_Git/School/Fun/Clue/src/player.cpp:
+
+/Users/noahtouchton/School_Git/School/Fun/Clue/include/Types.h:
 
 /Users/noahtouchton/School_Git/School/Fun/Clue/include/Player.h:
 

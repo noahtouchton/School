@@ -1,43 +1,61 @@
 #pragma once
-#include <string>
 #include "Constants.h"
 #include "LinkedList.h"
-#include <iostream>
 #include "Log.h"
+#include "Types.h"
+#include <iostream>
+#include <string>
 
 class Game;
 class Board;
 
 class Player {
-    private:
-        int position;
-        bool isComputer;
-        int numCards;
-        std::string name;
-        LinkedList* cards;
+private:
+  int position;
+  bool isComputer;
+  int numCards;
+  bool active;
+  int playerIndex;
+  int numPlayers;
+  std::string name;
+  LinkedList<int> *cards;
 
-        LinkedList* susPeople;
-        LinkedList* susWeapons;
-        LinkedList* susRooms;
+  LinkedList<int> *susPeople;
+  LinkedList<int> *susWeapons;
+  LinkedList<int> *susRooms;
 
-        
-        int cardToNum(std::string card, int type);
-        std::string numToCard(int num, int type);
-        LinkedList* loadList(int len);
+  LinkedList<int> *loadList(int len);
 
-    public:
-        Logger logger;
-        // Constructor declaration
-        Player();
-        Player(std::string playerName, bool computer, LogLevel logLevel);
+public:
+  Logger logger;
+  LinkedList<PlayerData *> *playerData;
+  LinkedList<PlayerData *> *loadPlayerData();
+  // Constructor declaration
+  Player();
+  Player(int playerIndex, bool computer, LogLevel logLevel, int numPlayers);
 
-        // Method declaration
-        void takeTurn(Game& game, Board& board, int currentPlayer);
-        void learnCard(int card);
-        void addCard(int card);
+  // Method declaration
+  Suggestion takeTurn(Game &game, Board &board, int currentPlayer);
+  void learnCard(int card);
+  void addCard(int card);
 
-        void movePlayer(int roll, Board& board, int currentPlayer);
-        Suggestion makeSuggestion();
+  int cardToNum(std::string card, int type);
+  std::string numToCard(int num, int type);
 
-        std::string getName();
+  void movePlayer(int roll, Board &board, int currentPlayer);
+  Suggestion makeSuggestion();
+
+  std::string getName();
+
+  int getNumberOfCards();
+
+  LinkedList<int> *checkHandForCard(Suggestion suggestion);
+
+  bool isComputerPlayer();
+
+  bool isActive() { return active; }
+  void setInactive() { active = false; }
+
+  void learnFromSuggestions();
+  int checkWhereCardIs(int card);
 };

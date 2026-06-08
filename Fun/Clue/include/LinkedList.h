@@ -1,27 +1,39 @@
+// include/LinkedList.h
 #pragma once
 #include <string>
+#include <stdexcept>
 
+// 1. Make the Node generic
+template <typename T>
 struct Node {
-    int data;
+    T data;
     Node* next;
 
-    Node(int value) : data(value), next(nullptr) {}
+    Node(T value) : data(value), next(nullptr) {}
 };
 
+// 2. Make the LinkedList generic
+template <typename T>
 class LinkedList {
     private:
-        Node* head;
+        Node<T>* head;
         int size;
 
     public:
         LinkedList() : head(nullptr), size(0) {}
 
-        void add(int value) {
-            Node* newNode = new Node(value);
+        ~LinkedList() {
+            while (head) {
+                pop();
+            }
+        }
+
+        void add(T value) {
+            Node<T>* newNode = new Node<T>(value);
             if (!head) {
                 head = newNode;
             } else {
-                Node* current = head;
+                Node<T>* current = head;
                 while (current->next) {
                     current = current->next;
                 }
@@ -30,42 +42,42 @@ class LinkedList {
             size++;
         }
 
-        void remove(int value) {
+        void remove(T value) {
             if (!head) return;
 
             if (head->data == value) {
-                Node* temp = head;
+                Node<T>* temp = head;
                 head = head->next;
                 delete temp;
                 size--;
                 return;
             }
 
-            Node* current = head;
+            Node<T>* current = head;
             while (current->next && current->next->data != value) {
                 current = current->next;
             }
 
             if (current->next) {
-                Node* temp = current->next;
+                Node<T>* temp = current->next;
                 current->next = current->next->next;
                 delete temp;
                 size--;
             }
         }
 
-        int pop() {
+        T pop() {
             if (!head) throw std::runtime_error("List is empty");
-            Node* temp = head;
-            int value = head->data;
+            Node<T>* temp = head;
+            T value = head->data;
             head = head->next;
             delete temp;
             size--;
             return value;
         }
 
-        bool contains(int value) {
-            Node* current = head;
+        bool contains(T value) {
+            Node<T>* current = head;
             while (current) {
                 if (current->data == value) return true;
                 current = current->next;
@@ -80,21 +92,18 @@ class LinkedList {
         void shuffle() {
             if (size < 2) return;
 
-            // Convert linked list to array for easy shuffling
-            int* arr = new int[size];
-            Node* current = head;
+            T* arr = new T[size];
+            Node<T>* current = head;
             for (int i = 0; i < size; i++) {
                 arr[i] = current->data;
                 current = current->next;
             }
 
-            // Shuffle the array using Fisher-Yates algorithm
             for (int i = size - 1; i > 0; i--) {
                 int j = rand() % (i + 1);
                 std::swap(arr[i], arr[j]);
             }
 
-            // Convert back to linked list
             current = head;
             for (int i = 0; i < size; i++) {
                 current->data = arr[i];
@@ -102,5 +111,16 @@ class LinkedList {
             }
 
             delete[] arr;
+        }
+
+        T get(int index) {
+            if (index < 0 || index >= size) {
+                throw std::out_of_range("Index out of bounds");
+            }
+            Node<T>* current = head;
+            for (int i = 0; i < index; i++) {
+                current = current->next;
+            }
+            return current->data;
         }
 };

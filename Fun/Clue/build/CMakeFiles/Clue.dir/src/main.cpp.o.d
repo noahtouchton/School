@@ -801,8 +801,9 @@ CMakeFiles/Clue.dir/src/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/print \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Game.h \
-  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Player.h \
-  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Constants.h \
-  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/LinkedList.h \
+  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Board.h \
   /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Log.h \
-  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Board.h
+  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Constants.h \
+  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Player.h \
+  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/LinkedList.h \
+  /Users/noahtouchton/School_Git/School/Fun/Clue/src/../include/Types.h
