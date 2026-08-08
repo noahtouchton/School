@@ -1,6 +1,7 @@
 #pragma once
 #include "Log.h"
 #include <cmath>
+#include <vector>
 
 
 class Board {
@@ -36,7 +37,7 @@ class Board {
             }
         }
 
-        void printBoard() {
+        void printBoard(const std::vector<bool>& possessedRooms = std::vector<bool>(9, false)) {
             logger.print(LogLevel::Game, "Player Positions:");
 
             char board[9][9];
@@ -59,10 +60,10 @@ class Board {
                     }
                 }
             }
-            logger.printBoard(board); 
+            logger.printBoard(board, possessedRooms); 
         }
 
-        int* printValidBoard(int roll, int currentPlayer) {
+        int* printValidBoard(int roll, int currentPlayer, bool print, const std::vector<bool>& possessedRooms = std::vector<bool>(9, false)) {
             int* isPossible = new int[9]{0};
             int k=0;
 
@@ -82,10 +83,11 @@ class Board {
 
             isPossible[positions[currentPlayer]] = -1; // Can't stay in the same place
 
-            logger.printColoredBoard(isPossible);
+            if(print){
+                logger.printColoredBoard(isPossible, possessedRooms);
+            }
             return isPossible;
-
-    }
+        }
 };
 
 // ***|***|***

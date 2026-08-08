@@ -1,0 +1,23 @@
+How the COM players should think:
+
+If you have already shown a player a card you should show them that card again if possible
+Dont guess cards you know other players have
+Guess cards that are less likely to have based on when they show cards
+
+Guess your own cards to learn more about what others have
+
+Its ok to guess cards you know other people have if you are trying to disprove that people between you and them have that card
+
+
+Give each suspect, weapon, and room a weight based on how likely it is that they are the secret card
+
+Things that make a card less likely to be the secret card:
+- You know a player has shown this card (the further away the player to your left the more useful this can be)
+- A player has shown a card when this card was asked for but you are not sure if it was this one
+- The card is in your hand (this can be very useful)
+
+Things that make a card more likely to be the secret card:
+- Several players have said no to this card. 
+
+Use for other players cards
+Card Score = (c1*Number of Players who said no to this card + baseline)*(Distance between owner of card and you / total number of players || 1 if you dont know who has it)

@@ -290,7 +290,8 @@ class EvolutionaryTrainer:
             "early_rb_limit", "early_qb_limit", "early_rb_minimum",
             "rookie_boost", "age_penalty_threshold", "age_penalty_factor",
             "waiver_min_improvement", "waiver_max_faab_pct", "trade_min_gain",
-            "young_player_trade_boost", "matchup_adjustment"
+            "young_player_trade_boost", "trade_future_discount",
+            "matchup_adjustment", "qb_wr_stack_boost", "faab_urgency_factor"
         ]
         
         # Determine frozen constraints for this playstyle
@@ -343,7 +344,10 @@ class EvolutionaryTrainer:
         mutated.waiver_max_faab_pct = perturb("waiver_max_faab_pct", mutated.waiver_max_faab_pct, 0.0, 0.5)
         mutated.trade_min_gain = perturb("trade_min_gain", mutated.trade_min_gain, 0.0, 5.0)
         mutated.young_player_trade_boost = perturb("young_player_trade_boost", mutated.young_player_trade_boost, 0.0, 0.5)
+        mutated.trade_future_discount = perturb("trade_future_discount", mutated.trade_future_discount, 0.5, 1.0)
         mutated.matchup_adjustment = perturb("matchup_adjustment", mutated.matchup_adjustment, 0.0, 1.0)
+        mutated.qb_wr_stack_boost = perturb("qb_wr_stack_boost", mutated.qb_wr_stack_boost, 0.8, 1.5)
+        mutated.faab_urgency_factor = perturb("faab_urgency_factor", mutated.faab_urgency_factor, 0.5, 2.0)
         
         return mutated
 

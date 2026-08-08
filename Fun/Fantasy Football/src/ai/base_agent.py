@@ -33,9 +33,13 @@ class AgentParameters:
     # Trade parameters
     trade_min_gain: float = 1.0   # minimum starting points gained to accept/propose
     young_player_trade_boost: float = 0.0 # multiplier boost for acquiring young players (<= 24)
+    trade_future_discount: float = 0.90   # discount factor for aging/future trade assets
     
-    # Lineup / Matchup parameters
+    # Lineup / Matchup / Stacking parameters
     matchup_adjustment: float = 0.0 # 0.0 (none) to 1.0 (full weight to opposing team defensive points allowed)
+    qb_wr_stack_boost: float = 1.0  # multiplier for drafting WR/TE on the same NFL team as drafted QB
+    faab_urgency_factor: float = 1.0 # scaling factor for late-season FAAB aggressiveness
+
 
 
 class BaseAgent:
@@ -147,15 +151,26 @@ class BaseAgent:
                 age_excess = p.age - self.params.age_penalty_threshold
                 penalty *= max(0.2, 1.0 - (age_excess * self.params.age_penalty_factor))
                 
+            # QB-WR/TE Stack Boost
+            if self.params.qb_wr_stack_boost != 1.0 and p.nfl_team:
+                if pos_str in ["WR", "TE"] and any((rp.position == "QB" or (hasattr(rp.position, "value") and rp.position.value == "QB")) and rp.nfl_team == p.nfl_team for rp in roster_players):
+                    penalty *= self.params.qb_wr_stack_boost
+                elif pos_str == "QB" and any((rp.position in ["WR", "TE"] or (hasattr(rp.position, "value") and rp.position.value in ["WR", "TE"])) and rp.nfl_team == p.nfl_team for rp in roster_players):
+                    penalty *= self.params.qb_wr_stack_boost
+
             # Force K and DST to late rounds
             total_rounds = self.settings.roster.total_roster_spots()
             if pos_str in ["K", "DST"] and current_round < total_rounds - 2:
                 p_vorp = -100.0
-                
-            adjusted_vorp[p.id] = p_vorp * penalty
+
+            # Live dynamic math calculation variance (+/- 3% live math evaluation)
+            live_math_variance = random.gauss(1.0, 0.03)
+            adjusted_vorp[p.id] = (p_vorp * penalty) * live_math_variance
+
 
         sorted_by_vorp = sorted(available_players, key=lambda p: adjusted_vorp.get(p.id, -999.0), reverse=True)
         return sorted_by_vorp[0]
+
 
     def _get_matchup_adjusted_projections(self, roster: Roster, projections: Dict[str, float]) -> Dict[str, float]:
         """Helper to compute projections adjusted for matchup strength if parameter is set."""
@@ -214,8 +229,9 @@ class BaseAgent:
                     adj_fa_proj *= self.params.rookie_boost
                     
                 if adj_fa_proj - bench_proj > self.params.waiver_min_improvement:
-                    # Calculate bid using waiver_max_faab_pct
-                    max_bid = int(self.settings.faab_budget * self.params.waiver_max_faab_pct)
+                    # Calculate bid using waiver_max_faab_pct and faab_urgency_factor
+                    urgency_mult = 1.0 + ((current_week / 14.0) * (self.params.faab_urgency_factor - 1.0))
+                    max_bid = int(self.settings.faab_budget * self.params.waiver_max_faab_pct * urgency_mult)
                     bid = 0
                     if team.faab_balance > 0 and max_bid > 0:
                         bid = random.randint(1, min(max_bid, team.faab_balance))

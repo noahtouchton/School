@@ -13,9 +13,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 from src.config import LeagueSettings, ScoringRules, RosterSettings
 from src.models import Team, Roster, Player, Position
 from src.engine.sandbox import LeagueSandbox
-from src.ai.personas import get_agent_by_persona
 from src.ai.base_agent import BaseAgent
-from src.ai.evolutionary import EvolutionaryTrainer
+from src.ai.best_agent import ProAIEngine, get_pro_ai_agent
+from src.espn.espn_client import ESPNClient
+from src.espn.advisor import ESPNStrategyAdvisor
+from src.engine.inseason_app import InSeasonLeagueEngine
 from src.data import db
 
 # Set page config for SEO and layout
@@ -23,71 +25,55 @@ st.set_page_config(
     page_title="Antigravity Fantasy Football AI Simulator",
     page_icon="🏈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Custom Premium Styling
+# Custom Ultra-Compact Styling
 st.markdown("""
 <style>
-    /* Main container styling */
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Outfit', sans-serif;
     }
     
-    /* Sleek gradient background header */
-    .header-container {
-        background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
-        padding: 2.5rem;
-        border-radius: 16px;
+    /* Ultra-Compact Layout for Clean Screen Fit */
+    .block-container {
+        padding-top: 0.3rem !important;
+        padding-bottom: 0.3rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 98% !important;
+    }
+    
+    .nav-header {
+        background: linear-gradient(90deg, #1e1b4b, #312e81, #4338ca);
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
         color: white;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     
-    .header-container h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin: 0;
-    }
-    
-    .header-container p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin-top: 0.5rem;
-    }
-    
-    /* Glassmorphism Cards */
     .card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
     }
     
-    .card:hover {
-        transform: translateY(-2px);
-    }
-    
-    /* Position Badges */
     .badge {
         display: inline-block;
-        padding: 0.25em 0.6em;
-        font-size: 75%;
+        padding: 0.15em 0.45em;
+        font-size: 70%;
         font-weight: 700;
-        line-height: 1;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: baseline;
-        border-radius: 0.375rem;
+        border-radius: 0.3rem;
         color: white;
-        margin-right: 0.5rem;
+        margin-right: 0.3rem;
     }
     
     .badge-qb { background-color: #2e62ff; }
@@ -96,9 +82,34 @@ st.markdown("""
     .badge-te { background-color: #ff7700; }
     .badge-k { background-color: #ff3377; }
     .badge-dst { background-color: #6c757d; }
-    
+
+    /* Compact metric spacing */
+    [data-testid="stMetricValue"] {
+        font-size: 1.3rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
+
+# Main compact navbar title
+st.markdown("""
+<div class="nav-header">
+    <div style="font-weight: 800; font-size: 1.3rem;">🏈 Antigravity Fantasy Football AI Platform</div>
+    <div style="font-size: 0.85rem; opacity: 0.85;">⚡ Powered by Pro AI Engine</div>
+</div>
+""", unsafe_allow_html=True)
+
+# AI Player News & Predictions Ticker
+try:
+    from src.ai.predictions import AINewsPredictionEngine
+    news_engine = AINewsPredictionEngine()
+    news_items = news_engine.get_all_news_highlights()
+    with st.expander("📰 **AI Player News, Team Roster Updates & 2026 Forecasts**", expanded=False):
+        n_cols = st.columns(3)
+        for idx, item in enumerate(news_items[:6]):
+            with n_cols[idx % 3]:
+                st.markdown(f"**{item['player_name']}** (`{item['team']}`)\n\n{item['news']}\n\n*🔮 AI Forecast:* {item['forecast']}")
+except Exception:
+    pass
 
 # Helper to fetch players and projections once
 @st.cache_data
@@ -109,14 +120,6 @@ def get_cached_players():
 @st.cache_data
 def get_cached_projs(year, week):
     return {p.player_id: p.projected_points for p in db.get_weekly_projections(year, week)}
-
-# Main app title
-st.markdown("""
-<div class="header-container" id="main-header">
-    <h1>🏈 Fantasy Football AI Simulator</h1>
-    <p>Sandbox Testing, Custom Strategy Draft Rooms & Evolutionary AI Training Grounds</p>
-</div>
-""", unsafe_allow_html=True)
 
 # Sidebar settings
 st.sidebar.markdown("## ⚙️ League Presets")
@@ -149,11 +152,12 @@ settings = LeagueSettings(
     faab_budget=100
 )
 
-# App Navigation tabs
-tab_sandbox, tab_draft, tab_training, tab_stats = st.tabs([
+# App Navigation tabs (Training Grounds removed as requested)
+tab_espn, tab_draft, tab_inseason, tab_sandbox, tab_stats = st.tabs([
+    "⚡ ESPN AI League Advisor",
+    "🎯 Live 10-AI Spectator Draft",
+    "🎮 Interactive In-Season App",
     "🏆 Sandbox Season Simulator",
-    "🎯 Live AI Draft Room",
-    "🧠 AI Training Grounds",
     "📊 Player Database"
 ])
 
@@ -162,465 +166,356 @@ if "sandbox" not in st.session_state:
     st.session_state.sandbox = None
 if "draft_room" not in st.session_state:
     st.session_state.draft_room = None
+if "espn_client" not in st.session_state:
+    st.session_state.espn_client = None
+if "inseason_engine" not in st.session_state:
+    st.session_state.inseason_engine = None
 
 # ==============================================================================
-# TAB 1: Sandbox Season Simulator
+# TAB 1: ESPN AI League Advisor
+# ==============================================================================
+with tab_espn:
+    st.subheader("⚡ ESPN AI League Advisor")
+    col_espn_inputs, col_espn_output = st.columns([1, 2])
+    
+    with col_espn_inputs:
+        st.write("### 🔗 ESPN League Connection")
+        espn_id_input = st.number_input("ESPN League ID (Enter '0' for Demo League)", min_value=0, value=0, step=1)
+        espn_year_input = st.selectbox("Season Year", [2025, 2024, 2023, 2022], index=0, key="espn_year_sel")
+        
+        with st.expander("🔑 Private League Cookies (Optional)"):
+            espn_s2_input = st.text_input("espn_s2 Cookie", "", type="password")
+            swid_input = st.text_input("swid Cookie", "")
+            
+        btn_connect_espn = st.button("⚡ Connect & Generate AI Advice")
+        
+        if btn_connect_espn:
+            client = ESPNClient(
+                league_id=int(espn_id_input),
+                year=int(espn_year_input),
+                espn_s2=espn_s2_input.strip(),
+                swid=swid_input.strip()
+            )
+            with st.spinner("Connecting to ESPN..."):
+                client.connect()
+                st.session_state.espn_client = client
+                st.success("Connected to ESPN League!" if not client.is_mock else "Connected using Demo mode!")
+                st.rerun()
+
+    with col_espn_output:
+        if st.session_state.espn_client is None:
+            st.info("👈 Enter your ESPN League ID on the left and click 'Connect & Generate AI Advice' to view strategy recommendations.")
+        else:
+            client = st.session_state.espn_client
+            agent = ProAIEngine("user_espn_agent", settings)
+            advisor = ESPNStrategyAdvisor(agent)
+            
+            teams = client.get_teams_internal()
+            if not teams:
+                st.error("No teams found in ESPN league.")
+            else:
+                user_team = teams[0]
+                st.markdown(f"### 🏈 **{user_team.name}**")
+                st.caption(f"Driven by **Pro AI Engine** | Record: **{user_team.record_str}** | FAAB: **${user_team.faab_balance}**")
+                
+                projs = get_cached_projs(sim_year, 1)
+                free_agents = client.get_free_agents_internal(week=1)
+                
+                adv_tab_start, adv_tab_waiver, adv_tab_trade, adv_tab_draft = st.tabs([
+                    "📌 Start / Sit",
+                    "🌊 Waiver Wire",
+                    "🤝 Trade Offers",
+                    "🎯 Draft Helper"
+                ])
+                
+                with adv_tab_start:
+                    res = advisor.analyze_start_sit(user_team, projs)
+                    c_cur, c_opt, c_gain = st.columns(3)
+                    c_cur.metric("Current Projected", f"{res['current_projected']} pts")
+                    c_opt.metric("Optimal Lineup", f"{res['optimal_projected']} pts")
+                    c_gain.metric("Potential Gain", f"+{res['potential_gain']} pts")
+                    
+                    if not res["recommended_swaps"]:
+                        st.success("✅ Current lineup is optimal!")
+                    else:
+                        for swap in res["recommended_swaps"]:
+                            p_start = swap["start_player"]
+                            p_bench = swap["bench_player"]
+                            st.info(f"🟢 **START** {p_start.name} ({swap['start_proj']} pts) ➔ 🔴 **BENCH** {p_bench.name} ({swap['bench_proj']} pts) | **+{swap['point_gain']} pts**")
+                            
+                with adv_tab_waiver:
+                    waiver_recs = advisor.analyze_waivers(user_team, free_agents, projs, week=1)
+                    if not waiver_recs:
+                        st.info("No waiver additions recommended.")
+                    else:
+                        for rec in waiver_recs:
+                            st.success(f"➕ **Add:** {rec['add_player'].name} ({rec['add_proj']} pts/wk) | ➖ **Drop:** {rec['drop_player'].name if rec['drop_player'] else 'None'} | 💰 **Bid:** **${rec['bid_amount']}**")
+
+                with adv_tab_trade:
+                    trades = advisor.analyze_trades(user_team, teams, projs)
+                    if not trades:
+                        st.info("No trade offers meet the AI score threshold.")
+                    else:
+                        for tr in trades:
+                            st.warning(f"🤝 **Trade Offer ({tr['target_team']})**: {tr['summary']}")
+
+                with adv_tab_draft:
+                    draft_recs = advisor.analyze_draft_picks(free_agents, projs, None, top_n=5)
+                    draft_df = [{"Player": r["player"].name, "Pos": r["position"], "Team": r["player"].nfl_team, "Proj": r["projected_points"], "VORP": r["vorp"]} for r in draft_recs]
+                    st.dataframe(pd.DataFrame(draft_df), height=200)
+
+# ==============================================================================
+# TAB 2: Live 10-AI Spectator Draft
+# ==============================================================================
+with tab_draft:
+    st.subheader("🎯 Live 10-AI Spectator Draft Room & Season Simulator")
+    
+    if "spectator_engine" not in st.session_state:
+        st.session_state.spectator_engine = None
+        
+    col_spec_ctrl, col_spec_view = st.columns([1, 2])
+    
+    with col_spec_ctrl:
+        btn_init_spec = st.button("🚀 Initialize 10 Pro-AI Draft")
+        if btn_init_spec or st.session_state.spectator_engine is None:
+            from src.engine.spectator_draft import SpectatorDraftEngine
+            s_engine = SpectatorDraftEngine(settings, year=sim_year)
+            s_engine.initialize_draft()
+            st.session_state.spectator_engine = s_engine
+            st.rerun()
+            
+        s_engine = st.session_state.spectator_engine
+        
+        if s_engine:
+            ds = s_engine.sandbox.draft_state
+            total_picks = s_engine.settings.roster.total_roster_spots() * len(s_engine.sandbox.teams)
+            st.write(f"**Picks Completed:** {len(ds.picks)} / {total_picks}")
+            st.progress(len(ds.picks) / total_picks)
+            
+            if not s_engine.is_complete:
+                c1, c2 = st.columns(2)
+                with c1:
+                    btn_step = st.button("▶️ Next Pick")
+                    if btn_step:
+                        s_engine.step_next_pick()
+                        st.rerun()
+                with c2:
+                    btn_fast = st.button("⏭️ Complete Draft")
+                    if btn_fast:
+                        s_engine.auto_complete_draft()
+                        st.rerun()
+            else:
+                st.success("🎉 Draft Complete!")
+                btn_sim_season = st.button("🚀 Play Full Season & Playoffs")
+                if btn_sim_season:
+                    for wk in range(1, 15):
+                        weekly_projs = get_cached_projs(sim_year, wk)
+                        for t_id, team in s_engine.sandbox.teams.items():
+                            agent = s_engine.agents[t_id]
+                            starters, bench = agent.optimize_weekly_lineup(team.roster, weekly_projs)
+                            s_engine.sandbox.set_lineup(t_id, starters, bench, [])
+                        s_engine.sandbox.simulate_week()
+                    st.session_state.spectator_completed = True
+                    st.rerun()
+                    
+    with col_spec_view:
+        if s_engine:
+            if not s_engine.pick_logs:
+                st.info("Draft initialized with Pro AI Engines. Click '▶️ Next Pick' or '⏭️ Complete Draft'.")
+            else:
+                latest_pick = s_engine.pick_logs[-1]
+                p = latest_pick["player"]
+                st.markdown(f"""
+                <div class="card">
+                    <b>Round {latest_pick['round']}, Pick {latest_pick['pick_number']}: {latest_pick['team_name']}</b><br/>
+                    Selected <strong>{p.name}</strong> ({latest_pick['position']} - {p.nfl_team}) &nbsp;|&nbsp; <em>{latest_pick['reasoning']}</em>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                log_df = [{"Pick": log["pick_number"], "Round": log["round"], "Franchise": log["team_name"], "Player": log["player"].name, "Pos": log["position"], "VORP": f"+{log['vorp']}"} for log in reversed(s_engine.pick_logs)]
+                st.dataframe(pd.DataFrame(log_df).set_index("Pick"), height=220)
+
+            if getattr(st.session_state, "spectator_completed", False):
+                standings = s_engine.sandbox.get_standings()
+                st.success(f"🏆 Champion: **{standings[0].name}** ({standings[0].record_str}) - {standings[0].points_for} pts")
+                s_data = [{"Rank": idx + 1, "Franchise": t.name, "Record": t.record_str, "Points For": t.points_for, "FAAB": f"${t.faab_balance}"} for idx, t in enumerate(standings)]
+                st.table(pd.DataFrame(s_data).set_index("Rank"))
+
+            # Team Roster Inspector Widget
+            st.write("---")
+            st.markdown("#### 📋 View Franchise Roster & Drafted Players")
+            all_teams = list(s_engine.sandbox.teams.values())
+            selected_team = st.selectbox("Select Franchise to Inspect Roster:", all_teams, format_func=lambda t: t.name, key="spec_roster_select")
+            if selected_team:
+                r_players = selected_team.roster.all_players()
+                if not r_players:
+                    st.caption("No players drafted yet for this team.")
+                else:
+                    projs = s_engine.projections
+                    r_data = []
+                    for p in r_players:
+                        pos_str = p.position.value if hasattr(p.position, "value") else str(p.position)
+                        r_data.append({
+                            "Position": pos_str,
+                            "Player Name": p.name,
+                            "NFL Team": p.nfl_team,
+                            "Projected Pts/Wk": projs.get(p.id, 0.0)
+                        })
+                    st.dataframe(pd.DataFrame(r_data), height=180)
+
+
+# ==============================================================================
+# TAB 3: Interactive In-Season App
+# ==============================================================================
+with tab_inseason:
+    st.subheader("🎮 Interactive In-Season League App")
+    
+    if st.session_state.inseason_engine is None:
+        col_name, col_btn = st.columns([3, 1])
+        with col_name:
+            user_fname = st.text_input("Franchise Name", "My Championship Team", key="inseason_fname_input")
+        with col_btn:
+            btn_start_inseason = st.button("🏁 Start Season", key="btn_start_inseason_key")
+            
+        if btn_start_inseason:
+            engine = InSeasonLeagueEngine(settings, year=sim_year)
+            with st.spinner("Initializing league against 9 Pro AI Opponents..."):
+                engine.initialize_season(user_team_name=user_fname)
+                st.session_state.inseason_engine = engine
+                st.rerun()
+    else:
+        engine = st.session_state.inseason_engine
+        user_team = engine.user_team
+        wk = engine.current_week
+        
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Week", f"Week {wk if wk <= 14 else 'Complete'}")
+        m2.metric("Record", user_team.record_str)
+        m3.metric("FAAB", f"${user_team.faab_balance}")
+        m4.metric("AI Opponents", "9 Pro AI Engines")
+        
+        if engine.ai_reaction_logs:
+            for log in engine.ai_reaction_logs:
+                st.info(f"⚡ **AI Reaction**: {log}")
+                
+        in_tab_roster, in_tab_waiver, in_tab_sync, in_tab_standings = st.tabs([
+            "🏃 Lineup Editor",
+            "🌊 Waiver Console",
+            "🏈 Play Weekend",
+            "📊 Standings"
+        ])
+        
+        projs = get_cached_projs(sim_year, wk if wk <= 14 else 14)
+        
+        with in_tab_roster:
+            c_starters, c_bench = st.columns(2)
+            with c_starters:
+                starter_to_bench = st.selectbox("Starter to Bench", user_team.roster.starters, format_func=lambda p: f"{p.name} ({p.position.value if hasattr(p.position, 'value') else p.position}) - {projs.get(p.id, 0.0)} pts", key="s_swap")
+            with c_bench:
+                bench_to_start = st.selectbox("Bench to Starter", user_team.roster.bench, format_func=lambda p: f"{p.name} ({p.position.value if hasattr(p.position, 'value') else p.position}) - {projs.get(p.id, 0.0)} pts", key="b_swap")
+                
+            btn_swap = st.button("🔄 Execute Swap & Trigger AI Reactions")
+            if btn_swap and starter_to_bench and bench_to_start:
+                new_starters = [p for p in user_team.roster.starters if p.id != starter_to_bench.id] + [bench_to_start]
+                new_bench = [p for p in user_team.roster.bench if p.id != bench_to_start.id] + [starter_to_bench]
+                engine.update_user_lineup(new_starters, new_bench)
+                st.rerun()
+
+        with in_tab_waiver:
+            all_players = get_cached_players()
+            drafted_ids = {p.id for t in engine.sandbox.teams.values() for p in t.roster.all_players()}
+            free_agents = [p for p in all_players if p.id not in drafted_ids]
+            
+            col_fa_add, col_fa_drop, col_fa_bid = st.columns([2, 2, 1])
+            with col_fa_add:
+                fa_add = st.selectbox("Add Free Agent", free_agents[:50], format_func=lambda p: f"{p.name} ({p.position.value if hasattr(p.position, 'value') else p.position}) - {projs.get(p.id, 0.0)} pts", key="in_fa_add")
+            with col_fa_drop:
+                fa_drop = st.selectbox("Drop Player", user_team.roster.bench, format_func=lambda p: f"{p.name} ({p.position.value if hasattr(p.position, 'value') else p.position})", key="in_fa_drop")
+            with col_fa_bid:
+                fa_bid = st.number_input("FAAB Bid ($)", min_value=0, max_value=user_team.faab_balance, value=5, step=1, key="in_fa_bid")
+                
+            btn_claim = st.button("💰 Submit Claim & Alert Pro AIs")
+            if btn_claim and fa_add:
+                engine.submit_user_waiver_claim(fa_add, fa_drop, int(fa_bid))
+                st.rerun()
+
+        with in_tab_sync:
+            if wk > 14:
+                st.success("🎉 Season completed!")
+            else:
+                btn_play_weekend = st.button(f"🏈 Play Week {wk} Weekend Games")
+                if btn_play_weekend:
+                    engine.simulate_weekend_games()
+                    st.rerun()
+
+        with in_tab_standings:
+            standings = engine.sandbox.get_standings()
+            s_data = [{"Rank": idx + 1, "Franchise": t.name, "Record": t.record_str, "Points For": t.points_for, "FAAB": f"${t.faab_balance}"} for idx, t in enumerate(standings)]
+            st.table(pd.DataFrame(s_data).set_index("Rank"))
+
+# ==============================================================================
+# TAB 4: Sandbox Season Simulator
 # ==============================================================================
 with tab_sandbox:
-    st.header("🏆 League Sandbox Season Playback")
-    st.write("Run a full week-by-week fantasy football season and watch 8 distinct AI personas draft, trade, bid FAAB on waivers, and optimize starting lineups.")
-    
+    st.subheader("🏆 League Sandbox Season Playback")
     sb = st.session_state.sandbox
-    col_act, col_sett = st.columns([1, 3])
+    col_act, col_sett = st.columns([1, 2])
     
     with col_act:
-        # Load available personas (defaults + custom models)
-        default_personas = [
-            "balanced", "free_agent_demon", "trade_demon", "matchup_all_star",
-            "conservative", "zero_rb", "hero_rb", "high_risk", "late_round_qb", "robust_rb"
-        ]
-        saved_models = db.get_all_trained_models()
-        available_styles = default_personas + saved_models
-
         if st.session_state.sandbox is None:
-            st.write("### 🛠️ Customize Sandbox League")
-            st.info("Set up team names and playstyle personas. When ready, click 'Draft Teams & Start Season' to begin.")
-            
-            team_configs = []
-            for i in range(league_size):
-                col_name, col_style = st.columns([2, 1])
-                with col_name:
-                    t_name = st.text_input(f"Team {i+1} Name", f"Team {i+1} (AI)" if i > 0 else "My Franchise", key=f"tname_key_{i}")
-                with col_style:
-                    # Select playstyle
-                    default_style_idx = i % len(default_personas)
-                    t_style = st.selectbox(
-                        f"Owner {i+1} Playstyle", 
-                        available_styles, 
-                        index=default_style_idx if default_style_idx < len(available_styles) else 0,
-                        key=f"tstyle_key_{i}"
-                    )
-                team_configs.append((t_name, t_style))
-                
-            btn_start_sim = st.button("🚀 Draft Teams & Start Season", use_container_width=True)
-            
+            btn_start_sim = st.button("🚀 Draft 10 Pro AI Teams & Start Season")
             if btn_start_sim:
-                # Create sandbox
                 sb = LeagueSandbox(settings, year=sim_year)
-                
-                teams = []
-                for i, (t_name, t_style) in enumerate(team_configs):
-                    teams.append(Team(
-                        id=f"team_{i+1}",
-                        name=t_name,
-                        owner_persona=t_style,
-                        roster=Roster(),
-                        faab_balance=100
-                    ))
+                teams = [Team(id=f"team_{i+1}", name=f"Pro AI Team {i+1}", owner_persona="Pro AI Engine", roster=Roster(), faab_balance=100) for i in range(league_size)]
                 sb.initialize_league(teams)
-                
-                # Run draft
                 sb.start_draft()
                 sb.auto_draft_fill()
-                
                 st.session_state.sandbox = sb
-                st.session_state.sb_week = 1
-                st.success("Draft completed and sandbox initialized!")
                 st.rerun()
         else:
             sb = st.session_state.sandbox
-            st.write("### Simulation Controls")
             st.write(f"**Current Week:** {sb.current_week if sb.current_week <= 14 else 'Complete'}")
-            
             if sb.current_week <= 14:
-                btn_next_week = st.button("🏈 Play Week Matchups", use_container_width=True)
+                btn_next_week = st.button("🏈 Play Week Matchups")
                 if btn_next_week:
-                    # Lineup optimization, waivers, trades
-                    all_players = get_cached_players()
                     projs = get_cached_projs(sim_year, sb.current_week)
-                    
-                    # Instantiate agents
-                    agents = {t.id: get_agent_by_persona(t.owner_persona, t.id, settings) for t in sb.teams.values()}
-                    
-                    # Lineups
+                    agents = {t.id: ProAIEngine(t.id, settings) for t in sb.teams.values()}
                     for t_id, team in sb.teams.items():
-                        agent = agents[t_id]
-                        starters, bench = agent.optimize_weekly_lineup(team.roster, projs)
+                        starters, bench = agents[t_id].optimize_weekly_lineup(team.roster, projs)
                         sb.set_lineup(t_id, starters, bench, [])
-                        
-                    # Waivers
-                    free_agents = [p for p in all_players if p.id not in sb.draft_state.drafted_player_ids]
-                    all_claims = []
-                    for t_id, team in sb.teams.items():
-                        agent = agents[t_id]
-                        claims = agent.get_waiver_claims(team, free_agents[:50], projs, current_week=sb.current_week)
-                        all_claims.extend(claims)
-                    sb.process_waiver_claims(all_claims)
-                    
-                    # Trades
-                    trade_proposals = []
-                    for t_id, team in sb.teams.items():
-                        agent = agents[t_id]
-                        if hasattr(agent, "generate_trade_proposals"):
-                            proposals = agent.generate_trade_proposals(team, list(sb.teams.values()), projs)
-                            trade_proposals.extend(proposals)
-                    for proposal in trade_proposals:
-                        recv_agent = agents[proposal.receiver_team_id]
-                        recv_team = sb.teams[proposal.receiver_team_id]
-                        if recv_agent.evaluate_trade_proposal(recv_team, proposal, projs):
-                            sb.execute_trade(proposal)
-                            
-                    # Matchups
                     sb.simulate_week()
                     st.rerun()
             else:
-                st.success("🎉 The season is complete!")
-                
-            btn_reset_sim = st.button("🔄 Reset Season & Reconfigure Teams", use_container_width=True)
+                st.success("🎉 Season complete!")
+            btn_reset_sim = st.button("🔄 Reset Sandbox")
             if btn_reset_sim:
                 st.session_state.sandbox = None
                 st.rerun()
 
     with col_sett:
         if sb:
-            tab_standings, tab_rosters, tab_transactions = st.tabs(["📊 Standings", "🏃 Rosters", "🗞️ Waiver/Trade Logs"])
-            
-            with tab_standings:
-                st.write("### Current Standings")
-                standings = sb.get_standings()
-                standings_data = []
-                for idx, team in enumerate(standings):
-                    standings_data.append({
-                        "Rank": idx + 1,
-                        "Franchise": team.name,
-                        "Persona Style": team.owner_persona.replace("_", " ").title(),
-                        "Record": team.record_str,
-                        "Points For": team.points_for,
-                        "Points Against": team.points_against,
-                        "FAAB Balance": f"${team.faab_balance}"
-                    })
-                st.table(pd.DataFrame(standings_data).set_index("Rank"))
-                
-                # Matchups
-                st.write("### Matchup Scores")
-                week_to_show = max(1, sb.current_week - 1)
-                st.markdown(f"**Week {week_to_show} Matchups:**")
-                for matchup in sb.schedule.get(week_to_show, []):
-                    team_a = sb.teams[matchup.team_a_id].name
-                    team_b = sb.teams[matchup.team_b_id].name
-                    st.write(f"- {team_a} (**{matchup.team_a_score}**) vs {team_b} (**{matchup.team_b_score}**)")
-                    
-            with tab_rosters:
-                team_to_view = st.selectbox("Select Team to Inspect", list(sb.teams.keys()), format_func=lambda x: sb.teams[x].name)
-                t = sb.teams[team_to_view]
-                st.write(f"### Roster for {t.name}")
-                st.write(f"**Owner Persona:** {t.owner_persona.replace('_', ' ').title()}")
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.write("#### Starters")
-                    for p in t.roster.starters:
-                        pos = p.position.value if hasattr(p.position, "value") else str(p.position)
-                        st.markdown(f"<span class='badge badge-{pos.lower()}'>{pos}</span> **{p.name}** ({p.nfl_team})", unsafe_allow_html=True)
-                with col2:
-                    st.write("#### Bench")
-                    for p in t.roster.bench:
-                        pos = p.position.value if hasattr(p.position, "value") else str(p.position)
-                        st.markdown(f"<span class='badge badge-{pos.lower()}'>{pos}</span> **{p.name}** ({p.nfl_team})", unsafe_allow_html=True)
-                        
-            with tab_transactions:
-                st.write("### Transaction Log")
-                if not sb.transaction_history:
-                    st.info("No waiver claims, drafts, or trades processed yet.")
-                else:
-                    for txn in reversed(sb.transaction_history):
-                        st.markdown(f"**[{txn['type']} - Week {txn['week']}]** {txn['team_name']}: {txn['player_name']} - *{txn['details']}*")
-
-        else:
-            st.markdown("""
-            <div class="card" style="text-align: center; padding: 3rem;">
-                <h2 style="margin: 0; color: #d76d77;">🏈 Sandbox League is Ready!</h2>
-                <p style="opacity: 0.8; font-size: 1.1rem; margin-top: 1rem;">
-                    Configure your team names and AI personas on the left side of the dashboard, 
-                    then click the draft button to build your rosters and unlock the standings, rosters, and trade logs tabs.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
+            standings = sb.get_standings()
+            s_data = [{"Rank": idx + 1, "Franchise": t.name, "Record": t.record_str, "Points For": t.points_for, "FAAB": f"${t.faab_balance}"} for idx, t in enumerate(standings)]
+            st.table(pd.DataFrame(s_data).set_index("Rank"))
 
 # ==============================================================================
-# TAB 2: Live AI Draft Room
-# ==============================================================================
-with tab_draft:
-    st.header("🎯 Live AI Draft Room")
-    st.write("Create a league, join the draft room as the human owner, and draft your roster in real-time. Watch the remaining teams employ distinct drafting philosophies (Zero-RB, Hero-RB, Risk-Averse).")
-    
-    btn_start_draft = st.button("🏁 Start Draft Session")
-    
-    if btn_start_draft or st.session_state.draft_room is None:
-        # Create draft room sandbox
-        ds = LeagueSandbox(settings, year=sim_year)
-        
-        # Build teams: Team 1 is human, rest are AI
-        teams = [Team(id="team_1", name="My Franchise (Human)", owner_persona="human", roster=Roster(), faab_balance=100)]
-        personas = ["zero_rb", "hero_rb", "high_risk", "conservative", "free_agent_demon", "trade_demon", "balanced", "late_round_qb", "robust_rb"]
-        # Prioritize custom saved trained models as draft opponents
-        saved_models = db.get_all_trained_models()
-        opponent_pool = saved_models + personas
-        
-        # fill
-        while len(teams) < league_size:
-            p = opponent_pool[(len(teams) - 1) % len(opponent_pool)]
-            teams.append(Team(
-                id=f"team_{len(teams)+1}",
-                name=f"Team {p.replace('_', ' ').title()} (AI)",
-                owner_persona=p,
-                roster=Roster()
-            ))
-            
-        ds.initialize_league(teams)
-        # Fixed draft order: Human drafts first
-        ds.start_draft()
-        # Ensure draft order starts with human for first pick
-        ds.draft_state.draft_order = [t.id for t in teams]
-        st.session_state.draft_room = ds
-        
-    ds = st.session_state.draft_room
-    
-    if ds and ds.draft_state:
-        dstate = ds.draft_state
-        total_picks = dstate.rounds * len(ds.teams)
-        
-        if len(dstate.picks) >= total_picks:
-            st.success("🎉 The draft is complete!")
-        else:
-            current_team_id = dstate.get_current_team_id()
-            current_team = ds.teams[current_team_id]
-            
-            st.write(f"### Current Turn: **{current_team.name}**")
-            st.write(f"Round **{dstate.current_round}**, Pick **{len(dstate.picks)+1}** of {total_picks}")
-            
-            # Load projections for draft decisions
-            projs = get_cached_projs(sim_year, 1)
-            all_players = get_cached_players()
-            undrafted = [p for p in all_players if p.id not in dstate.drafted_player_ids]
-            
-            # Sort undrafted by projection
-            undrafted_sorted = sorted(undrafted, key=lambda p: projs.get(p.id, 0.0), reverse=True)
-            
-            if current_team.owner_persona == "human":
-                st.write("👉 **Your turn to pick! Select a player below:**")
-                
-                # Allow search/filter by position
-                filter_pos = st.selectbox("Filter Position", ["ALL", "QB", "RB", "WR", "TE", "K", "DST"])
-                filtered_players = undrafted_sorted
-                if filter_pos != "ALL":
-                    filtered_players = [p for p in undrafted_sorted if p.position.value if hasattr(p.position, "value") and p.position.value == filter_pos or str(p.position) == filter_pos]
-                    
-                selected_draft_player = st.selectbox(
-                    "Select Player",
-                    filtered_players[:100],
-                    format_func=lambda p: f"{p.name} ({p.position.value if hasattr(p.position, 'value') else p.position} - {p.nfl_team}) - Proj: {projs.get(p.id, 0.0)} pts"
-                )
-                
-                btn_draft = st.button("🏈 Submit Draft Selection")
-                if btn_draft:
-                    ds.execute_draft_pick(selected_draft_player)
-                    st.rerun()
-            else:
-                st.write("🤖 AI is deciding...")
-                btn_ai_pick = st.button("▶️ Let AI Make Pick", use_container_width=True)
-                if btn_ai_pick:
-                    # Instantiate the agent
-                    agent = get_agent_by_persona(current_team.owner_persona, current_team_id, settings)
-                    selected_player = agent.draft_pick(dstate, undrafted, projs)
-                    ds.execute_draft_pick(selected_player)
-                    st.rerun()
-                    
-        # Show Draft Board
-        col_board, col_my_team = st.columns([2, 1])
-        with col_board:
-            st.write("### Draft Board (Recent Picks)")
-            if not dstate.picks:
-                st.info("Draft board is empty.")
-            else:
-                board_df = []
-                for p in reversed(dstate.picks):
-                    player = p["player"]
-                    board_df.append({
-                        "Pick": p["pick_number"],
-                        "Round": p["round"],
-                        "Franchise": ds.teams[p["team_id"]].name,
-                        "Player": player.name,
-                        "Pos": player.position.value if hasattr(player.position, "value") else player.position,
-                        "NFL Team": player.nfl_team
-                    })
-                st.dataframe(pd.DataFrame(board_df).set_index("Pick").head(20))
-                
-        with col_my_team:
-            st.write("### My Franchise Roster")
-            my_team = ds.teams["team_1"]
-            for idx, p in enumerate(my_team.roster.all_players()):
-                pos = p.position.value if hasattr(p.position, "value") else str(p.position)
-                st.markdown(f"{idx+1}. <span class='badge badge-{pos.lower()}'>{pos}</span> **{p.name}** ({p.nfl_team})", unsafe_allow_html=True)
-
-# ==============================================================================
-# TAB 3: AI Training Grounds
-# ==============================================================================
-# ==============================================================================
-# TAB 3: AI Training Grounds
-# ==============================================================================
-with tab_training:
-    st.header("🧠 AI Training Grounds")
-    st.write("Train and perfect custom fantasy football playstyles or evolve a Super Expert hybrid manager. Training runs seasons in parallel in the background, shuffling draft positions and reference years (2022–2025) while keeping specific strategy constraints intact.")
-    
-    col_ga_controls, col_ga_results = st.columns([1, 2])
-    
-    # Check if a background training run is active by reading the progress file
-    PROGRESS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "training_progress.json")
-    
-    progress_data = None
-    if os.path.exists(PROGRESS_FILE):
-        try:
-            with open(PROGRESS_FILE, "r") as f:
-                progress_data = json.load(f)
-        except Exception:
-            pass
-            
-    is_training_active = bool(progress_data and progress_data.get("status") == "running")
-    
-    with col_ga_controls:
-        st.write("### New Training Settings")
-        
-        # 10 playstyles list + hybrid
-        styles_list = [
-            "hybrid", "balanced", "free_agent_demon", "trade_demon", "matchup_all_star",
-            "conservative", "zero_rb", "hero_rb", "high_risk", "late_round_qb", "robust_rb"
-        ]
-        
-        train_style = st.selectbox(
-            "Target playstyle to train/perfect",
-            styles_list,
-            format_func=lambda x: "Super Expert (Hybrid)" if x == "hybrid" else f"Perfecting: {x.replace('_', ' ').title()}",
-            disabled=is_training_active
-        )
-        
-        ga_generations = st.slider("Generations (Training epochs)", 1, 50, 5, disabled=is_training_active)
-        ga_pop_size = st.selectbox("Population Size (Multiples of 10)", [10, 20, 30, 40], index=1, disabled=is_training_active)
-        ga_seasons = st.slider("Simulated Seasons per Eval (Avg sample size)", 1, 20, 5, disabled=is_training_active)
-        
-        btn_train_ga = st.button("🧬 Launch Background Training", use_container_width=True, disabled=is_training_active)
-        
-        if btn_train_ga:
-            import subprocess
-            # Launch train_daemon.py in background
-            cmd = [
-                sys.executable,
-                os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ai", "train_daemon.py"),
-                "--playstyle", train_style,
-                "--generations", str(ga_generations),
-                "--seasons", str(ga_seasons),
-                "--pop-size", str(ga_pop_size)
-            ]
-            
-            # Start process without waiting (background daemon)
-            subprocess.Popen(cmd)
-            st.success("🧬 Evolutionary training launched in the background! Progress will display on the right.")
-            st.rerun()
-            
-        if is_training_active:
-            st.info("⏳ A training run is currently active. Settings are locked.")
-            btn_kill_train = st.button("🛑 Force Stop Training Run", use_container_width=True)
-            if btn_kill_train:
-                with open(PROGRESS_FILE, "w") as f:
-                    json.dump({"status": "failed", "playstyle": progress_data.get("playstyle"), "current_generation": 0, "total_generations": 0, "error": "Forced stop by user"}, f)
-                st.warning("Training stopped.")
-                st.rerun()
-
-    with col_ga_results:
-        st.write("### Training Status & Results")
-        
-        if not progress_data:
-            st.info("No training history found. Launch a training run on the left.")
-        else:
-            status = progress_data.get("status")
-            style = progress_data.get("playstyle", "unknown")
-            gen = progress_data.get("current_generation", 0)
-            total_gens = progress_data.get("total_generations", 1)
-            
-            if status == "running":
-                st.markdown(f"#### ⚡ Active Job: Perfecting **{style.replace('_', ' ').title()}**")
-                # Progress Bar
-                progress_val = min(1.0, max(0.0, gen / total_gens))
-                st.progress(progress_val)
-                st.write(f"Evaluating generation **{gen} of {total_gens}**...")
-                st.write(f"Current Generation Top Fitness: **{progress_data.get('top_fitness', 0.0):.2f}**")
-                st.write(f"Current Generation Avg Fitness: **{progress_data.get('avg_fitness', 0.0):.2f}**")
-                
-                # Dynamic update page refresh button
-                st.button("🔄 Refresh Progress Output", use_container_width=True)
-                
-            elif status == "completed":
-                st.success(f"🎉 Training Completed successfully! Perfected model for **{style.replace('_', ' ').title()}** is saved permanently to SQLite.")
-                
-                best_model = progress_data.get("best_model")
-                if best_model:
-                    st.write("#### Evolved Parameter Configuration:")
-                    params_df = pd.DataFrame([
-                        {"Parameter Field": k, "Evolved Weight": f"{v:.4f}" if isinstance(v, float) else str(v)}
-                        for k, v in best_model.items()
-                    ])
-                    st.dataframe(params_df, use_container_width=True)
-                    
-            elif status == "failed":
-                st.error("❌ The training run failed or was stopped.")
-                st.write(f"Error Log: {progress_data.get('error')}")
-                
-            if status == "running" and progress_data.get("best_model"):
-                with st.expander("🔍 View Best Model Parameters So Far"):
-                    best_model = progress_data.get("best_model")
-                    params_df = pd.DataFrame([
-                        {"Parameter Field": k, "Evolved Weight": f"{v:.4f}" if isinstance(v, float) else str(v)}
-                        for k, v in best_model.items()
-                    ])
-                    st.dataframe(params_df, use_container_width=True)
-
-# ==============================================================================
-# TAB 4: Player Database & Stats
+# TAB 5: Player Database & Stats
 # ==============================================================================
 with tab_stats:
-    st.header("📊 Player Database & Stats")
-    st.write("Browse through the NFL players saved in the local cache, view their core status, positions, and weekly stats for the 2024 season.")
-    
+    st.subheader("📊 Player Database")
     players = get_cached_players()
-    
-    if not players:
-        st.warning("Database contains no players. Run a simulation first to fetch rosters.")
-    else:
-        st.write(f"Total Cached Players: **{len(players)}**")
-        
+    if players:
         col_search, col_pos = st.columns([3, 1])
         with col_search:
-            search_query = st.text_input("🔍 Search Player by Name", "")
+            search_query = st.text_input("🔍 Search Player", "")
         with col_pos:
-            pos_filter = st.selectbox("Position Group", ["ALL", "QB", "RB", "WR", "TE", "K", "DST"])
+            pos_filter = st.selectbox("Position", ["ALL", "QB", "RB", "WR", "TE", "K", "DST"])
             
-        # Filter
         filtered_p = players
         if search_query:
             filtered_p = [p for p in filtered_p if search_query.lower() in p.name.lower()]
         if pos_filter != "ALL":
             filtered_p = [p for p in filtered_p if p.position.value if hasattr(p.position, "value") and p.position.value == pos_filter or str(p.position) == pos_filter]
             
-        # Display as a dataframe
-        players_data = []
-        for p in filtered_p[:100]: # limit to top 100 for performance
-            players_data.append({
-                "Player Name": p.name,
-                "Position": p.position.value if hasattr(p.position, "value") else p.position,
-                "NFL Team": p.nfl_team,
-                "Age": p.age if p.age else "N/A",
-                "Exp": p.experience if p.experience else 0,
-                "Status": p.status
-            })
-            
-        st.dataframe(pd.DataFrame(players_data), use_container_width=True)
+        players_data = [{"Name": p.name, "Position": p.position.value if hasattr(p.position, "value") else p.position, "Team": p.nfl_team, "Age": p.age if p.age else "N/A", "Exp": p.experience if p.experience else 0} for p in filtered_p[:100]]
+        st.dataframe(pd.DataFrame(players_data), height=240)

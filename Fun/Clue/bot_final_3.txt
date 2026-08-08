@@ -1,0 +1,5960 @@
+Welcome to Clue!
+Enable COM debugging mode? (1 for yes, 0 for no): Enter the number of human players (0-6): Enter the number of computer players (0-5): Starting game with 1 human players and 2 computer players.
+Welcome to Clue!
+Player Positions:
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | 1  2  3 | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] Please pass the device to: Player 1
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Here are your cards: 
+[Player]  - Candlestick
+[Player]  - Hall
+[Player]  - Rope
+[Player]  - Revolver
+[Player]  - Kitchen
+[Player]  - Miss Scarlett
+[Player] Please pass the device to the next player.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[COM] Player COM 2 is checking their cards.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[COM] Player COM 3 is checking their cards.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Round 1: Player 1's turn
+[Player] Please pass the device to Player 1.
+[Player] Player 1 is taking their turn.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Player 1 rolled a 2
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 1 [0m[1;32m O [0m|[1;32m O [0m[1;32m 2 [0m[1;32m O [0m|[1;32m O [0m[1;32m 3 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 4 [0m[1;32m O [0m|[1;31m O [0m[1;31m 5 [0m[1;31m O [0m|[1;32m O [0m[1;32m 6 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 7 [0m[1;32m O [0m|[1;32m O [0m[1;32m 8 [0m[1;32m O [0m|[1;32m O [0m[1;32m 9 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] What room would you like to move to?[BOT SENDING] Room: 1
+
+Player 1 moved to Hall
+
+========================================
+Your Hand: Candlestick, Hall, Rope, Revolver, Kitchen, Miss Scarlett
+Suspects : Col. Mustard | Prof. Plum | Mr. Green | Mrs. Peacock | [1;32mMiss Scarlett[0m | Mrs. White
+Weapons  : Knife | [1;32mCandlestick[0m | [1;32mRevolver[0m | [1;32mRope[0m | Lead Pipe | Wrench
+Room     : [1;32mHall[0m
+========================================
+
+[Player] Enter a suspect to suggest:[BOT SENDING] Suspect Suggestion: Mr. Green
+
+[Player] Enter a weapon to suggest:[BOT SENDING] Weapon Suggestion: Wrench
+
+Player Positions:
+ 1  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | 2  3  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+Please show the device to everyone.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 suggested: Mr. Green with the Wrench in the Hall
+
+Press Enter to continue...COM 2 is checking the suggestion...
+COM 2 can disprove the suggestion.
+COM 2 disproved the suggestion.
+Press Enter to continue...[Player] Please pass the device to Player 1 to reveal the card that disproves the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] COM 2 showed you the card: Mr. Green
+Press Enter to continue...
+[BOT THOUGHT] Learned card: Mr. Green. Remaining: 4 3 7
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Are you ready to make an accusation? (1 for yes, 0 for no, 9 to toggle COM Debug Mode)
+Round 1: COM 2's turn
+
+COM 2 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=34.626437%, Player 1=33.045977%, Player 2=0.000000%, Player 3=32.327586%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=19.109195%, Player 1=38.505747%, Player 2=0.000000%, Player 3=42.385057%
+[COM] Miss Scarlett: Envelope=15.373563%, Player 1=40.804598%, Player 2=0.000000%, Player 3=43.821839%
+[COM] Mrs. White: Envelope=30.890805%, Player 1=35.775862%, Player 2=0.000000%, Player 3=33.333333%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=31.752874%, Player 1=35.919540%, Player 2=0.000000%, Player 3=32.327586%
+[COM] Revolver: Envelope=22.844828%, Player 1=36.063218%, Player 2=0.000000%, Player 3=41.091954%
+[COM] Rope: Envelope=15.517241%, Player 1=43.534483%, Player 2=0.000000%, Player 3=40.948276%
+[COM] Lead Pipe: Envelope=8.477011%, Player 1=45.833333%, Player 2=0.000000%, Player 3=45.689655%
+[COM] Wrench: Envelope=21.408046%, Player 1=41.379310%, Player 2=0.000000%, Player 3=37.212644%
+[COM] Hall: Envelope=33.189655%, Player 1=31.896552%, Player 2=0.000000%, Player 3=34.913793%
+[COM] Lounge: Envelope=25.862069%, Player 1=38.649425%, Player 2=0.000000%, Player 3=35.488506%
+[COM] Dining Room: Envelope=18.678161%, Player 1=37.356322%, Player 2=0.000000%, Player 3=43.965517%
+[COM] Kitchen: Envelope=10.488506%, Player 1=44.827586%, Player 2=0.000000%, Player 3=44.683908%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=6.609195%, Player 1=46.551724%, Player 2=0.000000%, Player 3=46.839080%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=5.172414%, Player 1=49.856322%, Player 2=0.000000%, Player 3=44.971264%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+COM 2 moved to Hall
+Player Positions:
+ 1  2  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | 3  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 2 suggested: Col. Mustard with the Candlestick in the Hall
+
+Press Enter to continue...COM 3 is checking the suggestion...
+COM 3 can disprove the suggestion.
+COM 3 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=34.770115%, Player 1=33.045977%, Player 2=0.000000%, Player 3=32.183908%
+[COM] Miss Scarlett: Envelope=22.557471%, Player 1=41.666667%, Player 2=0.000000%, Player 3=35.775862%
+[COM] Mrs. White: Envelope=42.672414%, Player 1=28.304598%, Player 2=0.000000%, Player 3=29.022989%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=32.183908%, Player 1=34.913793%, Player 2=0.000000%, Player 3=32.902299%
+[COM] Revolver: Envelope=20.689655%, Player 1=42.528736%, Player 2=0.000000%, Player 3=36.781609%
+[COM] Rope: Envelope=14.942529%, Player 1=41.522989%, Player 2=0.000000%, Player 3=43.534483%
+[COM] Lead Pipe: Envelope=11.206897%, Player 1=45.258621%, Player 2=0.000000%, Player 3=43.534483%
+[COM] Wrench: Envelope=20.977011%, Player 1=42.241379%, Player 2=0.000000%, Player 3=36.781609%
+[COM] Hall: Envelope=35.488506%, Player 1=35.632184%, Player 2=0.000000%, Player 3=28.879310%
+[COM] Lounge: Envelope=25.574713%, Player 1=42.672414%, Player 2=0.000000%, Player 3=31.752874%
+[COM] Dining Room: Envelope=15.229885%, Player 1=46.982759%, Player 2=0.000000%, Player 3=37.787356%
+[COM] Kitchen: Envelope=10.057471%, Player 1=53.735632%, Player 2=0.000000%, Player 3=36.206897%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=6.321839%, Player 1=57.327586%, Player 2=0.000000%, Player 3=36.350575%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=7.327586%, Player 1=54.166667%, Player 2=0.000000%, Player 3=38.505747%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+Round 1: COM 3's turn
+
+COM 3 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=33.045977%, Player 1=33.189655%, Player 2=33.764368%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=15.086207%, Player 1=24.425287%, Player 2=60.488506%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=19.396552%, Player 1=38.649425%, Player 2=41.954023%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=32.471264%, Player 1=34.482759%, Player 2=33.045977%, Player 3=0.000000%
+[COM] Knife: Envelope=35.057471%, Player 1=32.327586%, Player 2=32.614943%, Player 3=0.000000%
+[COM] Candlestick: Envelope=20.402299%, Player 1=41.091954%, Player 2=38.505747%, Player 3=0.000000%
+[COM] Revolver: Envelope=13.505747%, Player 1=43.534483%, Player 2=42.959770%, Player 3=0.000000%
+[COM] Rope: Envelope=20.689655%, Player 1=40.517241%, Player 2=38.793103%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=10.344828%, Player 1=30.172414%, Player 2=59.482759%, Player 3=0.000000%
+[COM] Hall: Envelope=23.563218%, Player 1=24.281609%, Player 2=52.155172%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=30.172414%, Player 1=41.666667%, Player 2=28.160920%, Player 3=0.000000%
+[COM] Kitchen: Envelope=16.954023%, Player 1=47.844828%, Player 2=35.201149%, Player 3=0.000000%
+[COM] Ballroom: Envelope=12.787356%, Player 1=52.873563%, Player 2=34.339080%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=7.902299%, Player 1=57.327586%, Player 2=34.770115%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=8.620690%, Player 1=57.614943%, Player 2=33.764368%, Player 3=0.000000%
+COM 3 moved to Dining Room
+Player Positions:
+ 1  2  * | *  *  * | 3  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 3 suggested: Prof. Plum with the Knife in the Dining Room
+
+Press Enter to continue...Player 1 is checking the suggestion...
+Player 1 cannot disprove the suggestion.
+COM 2 is checking the suggestion...
+COM 2 can disprove the suggestion.
+COM 2 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=50.000000%, Player 1=0.000000%, Player 2=50.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=12.787356%, Player 1=30.890805%, Player 2=56.321839%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=12.068966%, Player 1=40.660920%, Player 2=47.270115%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=25.143678%, Player 1=39.798851%, Player 2=35.057471%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=32.902299%, Player 1=33.908046%, Player 2=33.189655%, Player 3=0.000000%
+[COM] Revolver: Envelope=22.701149%, Player 1=39.224138%, Player 2=38.074713%, Player 3=0.000000%
+[COM] Rope: Envelope=22.844828%, Player 1=37.643678%, Player 2=39.511494%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=21.551724%, Player 1=34.913793%, Player 2=43.534483%, Player 3=0.000000%
+[COM] Hall: Envelope=22.701149%, Player 1=35.919540%, Player 2=41.379310%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=54.885057%, Player 1=0.000000%, Player 2=45.114943%, Player 3=0.000000%
+[COM] Kitchen: Envelope=8.045977%, Player 1=68.390805%, Player 2=23.563218%, Player 3=0.000000%
+[COM] Ballroom: Envelope=6.465517%, Player 1=77.442529%, Player 2=16.091954%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=3.448276%, Player 1=81.321839%, Player 2=15.229885%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=4.454023%, Player 1=79.885057%, Player 2=15.660920%, Player 3=0.000000%
+Round 2: Player 1's turn
+[Player] Please pass the device to Player 1.
+[Player] Player 1 is taking their turn.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Player 1 rolled a 2
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;31m O [0m[1;31m 1 [0m[1;31m O [0m|[1;32m O [0m[1;32m 2 [0m[1;32m O [0m|[1;32m O [0m[1;32m 3 [0m[1;32m O [0m
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+[1;32m O [0m[1;32m 4 [0m[1;32m O [0m|[1;32m O [0m[1;32m 5 [0m[1;32m O [0m| *  6  * 
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+[1;32m O [0m[1;32m 7 [0m[1;32m O [0m| *  8  * | *  9  * 
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] What room would you like to move to?[BOT SENDING] Room: 1
+
+[Player] That is not a valid move[BOT SENDING] Fallback Room: 2
+, please type in a room highlighed in Green.
+[Player] Player 1 rolled a 2
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;31m O [0m[1;31m 1 [0m[1;31m O [0m|[1;32m O [0m[1;32m 2 [0m[1;32m O [0m|[1;32m O [0m[1;32m 3 [0m[1;32m O [0m
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+[1;32m O [0m[1;32m 4 [0m[1;32m O [0m|[1;32m O [0m[1;32m 5 [0m[1;32m O [0m| *  6  * 
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+[1;32m O [0m[1;32m 7 [0m[1;32m O [0m| *  8  * | *  9  * 
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] What room would you like to move to?
+Player 1 moved to Lounge
+
+========================================
+Your Hand: Candlestick, Hall, Rope, Revolver, Kitchen, Miss Scarlett
+Suspects : Col. Mustard | Prof. Plum | Mr. Green | Mrs. Peacock | [1;32mMiss Scarlett[0m | Mrs. White
+Weapons  : Knife | [1;32mCandlestick[0m | [1;32mRevolver[0m | [1;32mRope[0m | Lead Pipe | Wrench
+Room     : Lounge
+========================================
+
+[Player] Enter a suspect to suggest:[BOT SENDING] Suspect Suggestion: Mrs. White
+
+[Player] Enter a weapon to suggest:[BOT SENDING] Weapon Suggestion: Wrench
+
+Player Positions:
+ 2  *  * | 1  *  * | 3  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+Please show the device to everyone.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 suggested: Mrs. White with the Wrench in the Lounge
+
+Press Enter to continue...COM 2 is checking the suggestion...
+COM 2 cannot disprove the suggestion.
+COM 3 is checking the suggestion...
+COM 3 can disprove the suggestion.
+COM 3 disproved the suggestion.
+Press Enter to continue...[Player] Please pass the device to Player 1 to reveal the card that disproves the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] COM 3 showed you the card: Lounge
+Press Enter to continue...
+[BOT THOUGHT] Learned card: Lounge. Remaining: 4 3 6
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Are you ready to make an accusation? (1 for yes, 0 for no, 9 to toggle COM Debug Mode)
+Round 2: COM 2's turn
+
+COM 2 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=34.626437%, Player 1=33.477011%, Player 2=0.000000%, Player 3=31.896552%
+[COM] Miss Scarlett: Envelope=36.925287%, Player 1=30.028736%, Player 2=0.000000%, Player 3=33.045977%
+[COM] Mrs. White: Envelope=28.448276%, Player 1=18.390805%, Player 2=0.000000%, Player 3=53.160920%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=34.626437%, Player 1=32.327586%, Player 2=0.000000%, Player 3=33.045977%
+[COM] Revolver: Envelope=23.275862%, Player 1=40.804598%, Player 2=0.000000%, Player 3=35.919540%
+[COM] Rope: Envelope=14.224138%, Player 1=42.385057%, Player 2=0.000000%, Player 3=43.390805%
+[COM] Lead Pipe: Envelope=14.655172%, Player 1=45.545977%, Player 2=0.000000%, Player 3=39.798851%
+[COM] Wrench: Envelope=13.218391%, Player 1=33.045977%, Player 2=0.000000%, Player 3=53.735632%
+[COM] Hall: Envelope=23.994253%, Player 1=50.143678%, Player 2=0.000000%, Player 3=25.862069%
+[COM] Lounge: Envelope=8.908046%, Player 1=39.942529%, Player 2=0.000000%, Player 3=51.149425%
+[COM] Dining Room: Envelope=53.448276%, Player 1=0.000000%, Player 2=0.000000%, Player 3=46.551724%
+[COM] Kitchen: Envelope=7.040230%, Player 1=76.149425%, Player 2=0.000000%, Player 3=16.810345%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=4.166667%, Player 1=76.724138%, Player 2=0.000000%, Player 3=19.109195%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=2.442529%, Player 1=81.034483%, Player 2=0.000000%, Player 3=16.522989%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+COM 2 moved to Dining Room
+Player Positions:
+ *  *  * | 1  *  * | 2  3  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 2 suggested: Miss Scarlett with the Candlestick in the Dining Room
+
+Press Enter to continue...COM 3 is checking the suggestion...
+COM 3 cannot disprove the suggestion.
+Player 1 is checking the suggestion...
+Player 1 can disprove the suggestion.
+[Player] Please pass the device to Player 1 to reveal a card that disproves the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Choose a card to show:
+[Player] Card 1: Candlestick
+[Player] Card 2: Miss Scarlett
+[Player] Enter the number of the card you want to show (1-2):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=31.178161%, Player 1=33.620690%, Player 2=0.000000%, Player 3=35.201149%
+[COM] Miss Scarlett: Envelope=46.120690%, Player 1=53.879310%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=22.701149%, Player 1=22.844828%, Player 2=0.000000%, Player 3=54.454023%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Revolver: Envelope=33.908046%, Player 1=33.045977%, Player 2=0.000000%, Player 3=33.045977%
+[COM] Rope: Envelope=22.413793%, Player 1=41.235632%, Player 2=0.000000%, Player 3=36.350575%
+[COM] Lead Pipe: Envelope=23.419540%, Player 1=39.367816%, Player 2=0.000000%, Player 3=37.212644%
+[COM] Wrench: Envelope=20.258621%, Player 1=21.982759%, Player 2=0.000000%, Player 3=57.758621%
+[COM] Hall: Envelope=0.000000%, Player 1=53.304598%, Player 2=0.000000%, Player 3=46.695402%
+[COM] Lounge: Envelope=0.000000%, Player 1=35.488506%, Player 2=0.000000%, Player 3=64.511494%
+[COM] Dining Room: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Kitchen: Envelope=0.000000%, Player 1=52.011494%, Player 2=0.000000%, Player 3=47.988506%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=56.178161%, Player 2=0.000000%, Player 3=43.821839%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=57.040230%, Player 2=0.000000%, Player 3=42.959770%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+Round 2: COM 3's turn
+
+COM 3 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=47.270115%, Player 1=0.000000%, Player 2=52.729885%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=7.614943%, Player 1=24.712644%, Player 2=67.672414%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=10.057471%, Player 1=66.379310%, Player 2=23.563218%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=35.057471%, Player 1=64.942529%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=14.655172%, Player 1=67.816092%, Player 2=17.528736%, Player 3=0.000000%
+[COM] Revolver: Envelope=26.293103%, Player 1=40.229885%, Player 2=33.477011%, Player 3=0.000000%
+[COM] Rope: Envelope=18.247126%, Player 1=40.086207%, Player 2=41.666667%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=40.804598%, Player 1=59.195402%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=17.816092%, Player 1=16.954023%, Player 2=65.229885%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=43.965517%, Player 1=0.000000%, Player 2=56.034483%, Player 3=0.000000%
+[COM] Kitchen: Envelope=14.942529%, Player 1=47.557471%, Player 2=37.500000%, Player 3=0.000000%
+[COM] Ballroom: Envelope=10.632184%, Player 1=53.879310%, Player 2=35.488506%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=6.609195%, Player 1=58.477011%, Player 2=34.913793%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=6.034483%, Player 1=59.770115%, Player 2=34.195402%, Player 3=0.000000%
+COM 3 moved to Lounge
+Player Positions:
+ *  *  * | 1  3  * | 2  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 3 suggested: Prof. Plum with the Revolver in the Lounge
+
+Press Enter to continue...Player 1 is checking the suggestion...
+Player 1 can disprove the suggestion.
+[Player] Please pass the device to Player 1 to reveal a card that disproves the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Choose a card to show:
+[Player] Card 1: Revolver
+[Player] Enter the number of the card you want to show (1-1):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=48.850575%, Player 1=0.000000%, Player 2=51.149425%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=15.660920%, Player 1=35.344828%, Player 2=48.994253%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=6.752874%, Player 1=70.689655%, Player 2=22.557471%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=28.735632%, Player 1=71.264368%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=15.086207%, Player 1=67.097701%, Player 2=17.816092%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Rope: Envelope=26.724138%, Player 1=35.488506%, Player 2=37.787356%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=58.189655%, Player 1=41.810345%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=30.603448%, Player 1=30.459770%, Player 2=38.936782%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=36.063218%, Player 1=0.000000%, Player 2=63.936782%, Player 3=0.000000%
+[COM] Kitchen: Envelope=13.218391%, Player 1=39.080460%, Player 2=47.701149%, Player 3=0.000000%
+[COM] Ballroom: Envelope=8.764368%, Player 1=37.068966%, Player 2=54.166667%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=5.890805%, Player 1=35.775862%, Player 2=58.333333%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=5.459770%, Player 1=35.919540%, Player 2=58.620690%, Player 3=0.000000%
+Round 3: Player 1's turn
+[Player] Please pass the device to Player 1.
+[Player] Player 1 is taking their turn.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Player 1 rolled a 3
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 1 [0m[1;32m O [0m|[1;31m O [0m[1;31m 2 [0m[1;31m O [0m|[1;32m O [0m[1;32m 3 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 4 [0m[1;32m O [0m|[1;32m O [0m[1;32m 5 [0m[1;32m O [0m|[1;32m O [0m[1;32m 6 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 7 [0m[1;32m O [0m|[1;32m O [0m[1;32m 8 [0m[1;32m O [0m|[1;32m O [0m[1;32m 9 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] What room would you like to move to?[BOT SENDING] Room: 1
+
+Player 1 moved to Hall
+
+========================================
+Your Hand: Candlestick, Hall, Rope, Revolver, Kitchen, Miss Scarlett
+Suspects : Col. Mustard | Prof. Plum | Mr. Green | Mrs. Peacock | [1;32mMiss Scarlett[0m | Mrs. White
+Weapons  : Knife | [1;32mCandlestick[0m | [1;32mRevolver[0m | [1;32mRope[0m | Lead Pipe | Wrench
+Room     : [1;32mHall[0m
+========================================
+
+[Player] Enter a suspect to suggest:[BOT SENDING] Suspect Suggestion: Mrs. White
+
+[Player] Enter a weapon to suggest:[BOT SENDING] Weapon Suggestion: Wrench
+
+Player Positions:
+ 1  *  * | 3  *  * | 2  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+Please show the device to everyone.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 suggested: Mrs. White with the Wrench in the Hall
+
+Press Enter to continue...COM 2 is checking the suggestion...
+COM 2 cannot disprove the suggestion.
+COM 3 is checking the suggestion...
+COM 3 cannot disprove the suggestion.
+No one was able to disprove the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Are you ready to make an accusation? (1 for yes, 0 for no, 9 to toggle COM Debug Mode)
+Round 3: COM 2's turn
+
+COM 2 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=33.764368%, Player 1=32.614943%, Player 2=0.000000%, Player 3=33.620690%
+[COM] Miss Scarlett: Envelope=32.614943%, Player 1=67.385057%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=33.620690%, Player 1=66.379310%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Revolver: Envelope=30.028736%, Player 1=35.919540%, Player 2=0.000000%, Player 3=34.051724%
+[COM] Rope: Envelope=24.425287%, Player 1=39.367816%, Player 2=0.000000%, Player 3=36.206897%
+[COM] Lead Pipe: Envelope=12.643678%, Player 1=29.741379%, Player 2=0.000000%, Player 3=57.614943%
+[COM] Wrench: Envelope=32.902299%, Player 1=67.097701%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Deduction: Learnt Hall is held by Player 1
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=19.971264%, Player 2=0.000000%, Player 3=80.028736%
+[COM] Dining Room: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Kitchen: Envelope=0.000000%, Player 1=16.235632%, Player 2=0.000000%, Player 3=83.764368%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=14.367816%, Player 2=0.000000%, Player 3=85.632184%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=10.919540%, Player 2=0.000000%, Player 3=89.080460%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+COM 2 moved to Lounge
+Player Positions:
+ 1  *  * | 2  3  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 2 suggested: Mrs. Peacock with the Revolver in the Lounge
+
+Press Enter to continue...COM 3 is checking the suggestion...
+COM 3 can disprove the suggestion.
+COM 3 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=33.764368%, Player 1=31.752874%, Player 2=0.000000%, Player 3=34.482759%
+[COM] Miss Scarlett: Envelope=30.459770%, Player 1=69.540230%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=35.775862%, Player 1=64.224138%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Revolver: Envelope=29.310345%, Player 1=40.948276%, Player 2=0.000000%, Player 3=29.741379%
+[COM] Rope: Envelope=21.264368%, Player 1=38.074713%, Player 2=0.000000%, Player 3=40.660920%
+[COM] Lead Pipe: Envelope=11.925287%, Player 1=31.321839%, Player 2=0.000000%, Player 3=56.752874%
+[COM] Wrench: Envelope=37.500000%, Player 1=62.500000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Kitchen: Envelope=0.000000%, Player 1=24.568966%, Player 2=0.000000%, Player 3=75.431034%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=18.821839%, Player 2=0.000000%, Player 3=81.178161%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=18.247126%, Player 2=0.000000%, Player 3=81.752874%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+Round 3: COM 3's turn
+
+COM 3 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=49.281609%, Player 1=0.000000%, Player 2=50.718391%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=10.919540%, Player 1=32.614943%, Player 2=56.465517%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=7.902299%, Player 1=69.109195%, Player 2=22.988506%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=31.896552%, Player 1=68.103448%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=12.356322%, Player 1=68.678161%, Player 2=18.965517%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Rope: Envelope=31.178161%, Player 1=33.045977%, Player 2=35.775862%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=56.465517%, Player 1=43.534483%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=51.867816%, Player 1=48.132184%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=23.850575%, Player 1=0.000000%, Player 2=76.149425%, Player 3=0.000000%
+[COM] Kitchen: Envelope=8.764368%, Player 1=35.632184%, Player 2=55.603448%, Player 3=0.000000%
+[COM] Ballroom: Envelope=7.040230%, Player 1=34.626437%, Player 2=58.333333%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=4.310345%, Player 1=34.195402%, Player 2=61.494253%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=4.166667%, Player 1=32.327586%, Player 2=63.505747%, Player 3=0.000000%
+COM 3 moved to Hall
+Player Positions:
+ 1  3  * | 2  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 3 suggested: Prof. Plum with the Wrench in the Hall
+
+Press Enter to continue...Player 1 is checking the suggestion...
+Player 1 can disprove the suggestion.
+[Player] Please pass the device to Player 1 to reveal a card that disproves the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Choose a card to show:
+[Player] Card 1: Hall
+[Player] Enter the number of the card you want to show (1-1):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=48.706897%, Player 1=0.000000%, Player 2=51.293103%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.287356%, Player 1=0.718391%, Player 2=98.994253%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=11.781609%, Player 1=56.609195%, Player 2=31.609195%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=39.224138%, Player 1=60.775862%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=26.293103%, Player 1=51.436782%, Player 2=22.270115%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Rope: Envelope=19.252874%, Player 1=40.948276%, Player 2=39.798851%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=54.454023%, Player 1=45.545977%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=50.431034%, Player 1=0.000000%, Player 2=49.568966%, Player 3=0.000000%
+[COM] Kitchen: Envelope=19.109195%, Player 1=37.787356%, Player 2=43.103448%, Player 3=0.000000%
+[COM] Ballroom: Envelope=13.218391%, Player 1=35.488506%, Player 2=51.293103%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=9.195402%, Player 1=35.057471%, Player 2=55.747126%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=8.045977%, Player 1=35.632184%, Player 2=56.321839%, Player 3=0.000000%
+Round 4: Player 1's turn
+[Player] Please pass the device to Player 1.
+[Player] Player 1 is taking their turn.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Player 1 rolled a 1
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+[1;31m O [0m[1;31m 1 [0m[1;31m O [0m|[1;32m O [0m[1;32m 2 [0m[1;32m O [0m| *  3  * 
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+[1;32m O [0m[1;32m 4 [0m[1;32m O [0m| *  5  * | *  6  * 
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  7  * | *  8  * | *  9  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] What room would you like to move to?[BOT SENDING] Room: 1
+
+[Player] That is not a valid move[BOT SENDING] Fallback Room: 2
+, please type in a room highlighed in Green.
+[Player] Player 1 rolled a 1
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+[1;31m O [0m[1;31m 1 [0m[1;31m O [0m|[1;32m O [0m[1;32m 2 [0m[1;32m O [0m| *  3  * 
+[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * 
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+[1;32m O [0m[1;32m 4 [0m[1;32m O [0m| *  5  * | *  6  * 
+[1;32m O [0m[1;32m O [0m[1;32m O [0m| *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  7  * | *  8  * | *  9  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] What room would you like to move to?
+Player 1 moved to Lounge
+
+========================================
+Your Hand: Candlestick, Hall, Rope, Revolver, Kitchen, Miss Scarlett
+Suspects : Col. Mustard | Prof. Plum | Mr. Green | Mrs. Peacock | [1;32mMiss Scarlett[0m | Mrs. White
+Weapons  : Knife | [1;32mCandlestick[0m | [1;32mRevolver[0m | [1;32mRope[0m | Lead Pipe | Wrench
+Room     : Lounge
+========================================
+
+[Player] Enter a suspect to suggest:[BOT SENDING] Suspect Suggestion: Mrs. White
+
+[Player] Enter a weapon to suggest:[BOT SENDING] Weapon Suggestion: Wrench
+
+Player Positions:
+ 3  *  * | 1  2  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+Please show the device to everyone.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 suggested: Mrs. White with the Wrench in the Lounge
+
+Press Enter to continue...COM 2 is checking the suggestion...
+COM 2 cannot disprove the suggestion.
+COM 3 is checking the suggestion...
+COM 3 can disprove the suggestion.
+COM 3 disproved the suggestion.
+Press Enter to continue...[Player] Please pass the device to Player 1 to reveal the card that disproves the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] COM 3 showed you the card: Lounge
+Press Enter to continue...
+[BOT THOUGHT] Learned card: Lounge. Remaining: 4 3 6
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Are you ready to make an accusation? (1 for yes, 0 for no, 9 to toggle COM Debug Mode)
+Round 4: COM 2's turn
+
+COM 2 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=34.626437%, Player 1=32.327586%, Player 2=0.000000%, Player 3=33.045977%
+[COM] Miss Scarlett: Envelope=29.310345%, Player 1=70.689655%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=36.063218%, Player 1=63.936782%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Revolver: Envelope=30.172414%, Player 1=36.063218%, Player 2=0.000000%, Player 3=33.764368%
+[COM] Rope: Envelope=23.132184%, Player 1=40.086207%, Player 2=0.000000%, Player 3=36.781609%
+[COM] Lead Pipe: Envelope=12.212644%, Player 1=28.879310%, Player 2=0.000000%, Player 3=58.908046%
+[COM] Wrench: Envelope=34.482759%, Player 1=65.517241%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Kitchen: Envelope=0.000000%, Player 1=25.862069%, Player 2=0.000000%, Player 3=74.137931%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=18.678161%, Player 2=0.000000%, Player 3=81.321839%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=17.959770%, Player 2=0.000000%, Player 3=82.040230%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+COM 2 moved to Ballroom
+Player Positions:
+ 3  *  * | 1  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | 2  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 2 suggested: Mrs. Peacock with the Revolver in the Ballroom
+
+Press Enter to continue...COM 3 is checking the suggestion...
+COM 3 can disprove the suggestion.
+COM 3 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=48.563218%, Player 1=51.436782%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=51.436782%, Player 1=48.563218%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.143678%, Player 1=99.712644%, Player 2=0.000000%, Player 3=0.143678%
+[COM] Rope: Envelope=34.482759%, Player 1=32.327586%, Player 2=0.000000%, Player 3=33.189655%
+[COM] Lead Pipe: Envelope=23.419540%, Player 1=37.787356%, Player 2=0.000000%, Player 3=38.793103%
+[COM] Wrench: Envelope=41.954023%, Player 1=58.045977%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Kitchen: Envelope=0.000000%, Player 1=27.873563%, Player 2=0.000000%, Player 3=72.126437%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=22.988506%, Player 2=0.000000%, Player 3=77.011494%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=21.264368%, Player 2=0.000000%, Player 3=78.735632%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+Round 4: COM 3's turn
+
+COM 3 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=45.258621%, Player 1=0.000000%, Player 2=54.741379%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=14.224138%, Player 1=29.741379%, Player 2=56.034483%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=9.626437%, Player 1=58.764368%, Player 2=31.609195%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=30.890805%, Player 1=69.109195%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=22.413793%, Player 1=55.890805%, Player 2=21.695402%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Rope: Envelope=21.695402%, Player 1=34.482759%, Player 2=43.821839%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=55.890805%, Player 1=44.109195%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=50.143678%, Player 1=0.000000%, Player 2=49.856322%, Player 3=0.000000%
+[COM] Kitchen: Envelope=20.689655%, Player 1=31.034483%, Player 2=48.275862%, Player 3=0.000000%
+[COM] Ballroom: Envelope=13.074713%, Player 1=26.436782%, Player 2=60.488506%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=8.620690%, Player 1=23.419540%, Player 2=67.959770%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=7.471264%, Player 1=27.011494%, Player 2=65.517241%, Player 3=0.000000%
+COM 3 moved to Dining Room
+Player Positions:
+ *  *  * | 1  *  * | 3  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | 2  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 3 suggested: Prof. Plum with the Wrench in the Dining Room
+
+Press Enter to continue...Player 1 is checking the suggestion...
+Player 1 cannot disprove the suggestion.
+COM 2 is checking the suggestion...
+COM 2 can disprove the suggestion.
+COM 2 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.287356%, Player 1=0.718391%, Player 2=98.994253%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=29.597701%, Player 1=42.959770%, Player 2=27.442529%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=70.114943%, Player 1=29.885057%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=57.614943%, Player 2=42.385057%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Rope: Envelope=0.000000%, Player 1=46.264368%, Player 2=53.735632%, Player 3=0.000000%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Wrench: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=52.586207%, Player 1=0.000000%, Player 2=47.413793%, Player 3=0.000000%
+[COM] Kitchen: Envelope=18.534483%, Player 1=50.862069%, Player 2=30.603448%, Player 3=0.000000%
+[COM] Ballroom: Envelope=13.793103%, Player 1=52.298851%, Player 2=33.908046%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Billiard Room: Envelope=7.902299%, Player 1=59.626437%, Player 2=32.471264%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Study: Envelope=7.183908%, Player 1=59.770115%, Player 2=33.045977%, Player 3=0.000000%
+Round 5: Player 1's turn
+[Player] Please pass the device to Player 1.
+[Player] Player 1 is taking their turn.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Player 1 rolled a 3
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 1 [0m[1;32m O [0m|[1;31m O [0m[1;31m 2 [0m[1;31m O [0m|[1;32m O [0m[1;32m 3 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;31m O [0m[1;31m O [0m[1;31m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 4 [0m[1;32m O [0m|[1;32m O [0m[1;32m 5 [0m[1;32m O [0m|[1;32m O [0m[1;32m 6 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+-----------------------------
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+[1;32m O [0m[1;32m 7 [0m[1;32m O [0m|[1;32m O [0m[1;32m 8 [0m[1;32m O [0m|[1;32m O [0m[1;32m 9 [0m[1;32m O [0m
+[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m|[1;32m O [0m[1;32m O [0m[1;32m O [0m
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+[Player] What room would you like to move to?[BOT SENDING] Room: 1
+
+Player 1 moved to Hall
+
+========================================
+Your Hand: Candlestick, Hall, Rope, Revolver, Kitchen, Miss Scarlett
+Suspects : Col. Mustard | Prof. Plum | Mr. Green | Mrs. Peacock | [1;32mMiss Scarlett[0m | Mrs. White
+Weapons  : Knife | [1;32mCandlestick[0m | [1;32mRevolver[0m | [1;32mRope[0m | Lead Pipe | Wrench
+Room     : [1;32mHall[0m
+========================================
+
+[Player] Enter a suspect to suggest:[BOT SENDING] Suspect Suggestion: Mrs. White
+
+[Player] Enter a weapon to suggest:[BOT SENDING] Weapon Suggestion: Wrench
+
+Player Positions:
+ 1  *  * | *  *  * | 3  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | 2  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: [1;32mHall[0m | 2: Lounge | 3: Dining Room
+       4: [1;32mKitchen[0m | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+Please show the device to everyone.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 suggested: Mrs. White with the Wrench in the Hall
+
+Press Enter to continue...COM 2 is checking the suggestion...
+COM 2 cannot disprove the suggestion.
+COM 3 is checking the suggestion...
+COM 3 cannot disprove the suggestion.
+No one was able to disprove the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Are you ready to make an accusation? (1 for yes, 0 for no, 9 to toggle COM Debug Mode)
+Round 5: COM 2's turn
+
+COM 2 is taking their turn...
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=50.431034%, Player 1=49.568966%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=49.568966%, Player 1=50.431034%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.000000%, Player 1=99.712644%, Player 2=0.000000%, Player 3=0.287356%
+[COM] Rope: Envelope=0.000000%, Player 1=51.436782%, Player 2=0.000000%, Player 3=48.563218%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=51.724138%, Player 2=0.000000%, Player 3=48.275862%
+[COM] Wrench: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Kitchen: Envelope=0.000000%, Player 1=33.908046%, Player 2=0.000000%, Player 3=66.091954%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=30.747126%, Player 2=0.000000%, Player 3=69.252874%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=32.471264%, Player 2=0.000000%, Player 3=67.528736%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+COM 2 moved to Billiard Room
+Player Positions:
+ 1  *  * | *  *  * | 3  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+-----------------------------
+ 2  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+ *  *  * | *  *  * | *  *  * 
+
+Rooms: 1: Hall | 2: Lounge | 3: Dining Room
+       4: Kitchen | 5: Ballroom | 6: Conservatory
+       7: Billiard Room | 8: Library | 9: Study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COM 2 suggested: Miss Scarlett with the Knife in the Billiard Room
+
+Press Enter to continue...COM 3 is checking the suggestion...
+COM 3 cannot disprove the suggestion.
+Player 1 is checking the suggestion...
+Player 1 can disprove the suggestion.
+[Player] Please pass the device to Player 1 to reveal a card that disproves the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Player] Choose a card to show:
+[Player] Card 1: Miss Scarlett
+[Player] Enter the number of the card you want to show (1-1):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Player 1 disproved the suggestion.
+Press Enter to continue...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Monte Carlo] Simulating 700 iterations...
+  Progress: 24%...
+  Progress: 48%...
+  Progress: 72%...
+  Progress: 96%...
+[COM] 
+--- Monte Carlo Card Probabilities (696 successful runs) ---
+[COM] Col. Mustard: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Prof. Plum: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mr. Green: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Mrs. Peacock: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Miss Scarlett: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Mrs. White: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Knife: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Candlestick: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Revolver: Envelope=0.000000%, Player 1=99.712644%, Player 2=0.000000%, Player 3=0.287356%
+[COM] Rope: Envelope=0.000000%, Player 1=49.712644%, Player 2=0.000000%, Player 3=50.287356%
+[COM] Lead Pipe: Envelope=0.000000%, Player 1=48.275862%, Player 2=0.000000%, Player 3=51.724138%
+[COM] Wrench: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Hall: Envelope=0.000000%, Player 1=100.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Lounge: Envelope=0.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=100.000000%
+[COM] Dining Room: Envelope=100.000000%, Player 1=0.000000%, Player 2=0.000000%, Player 3=0.000000%
+[COM] Kitchen: Envelope=0.000000%, Player 1=41.522989%, Player 2=0.000000%, Player 3=58.477011%
+[COM] Ballroom: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Conservatory: Envelope=0.000000%, Player 1=31.321839%, Player 2=0.000000%, Player 3=68.678161%
+[COM] Billiard Room: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Library: Envelope=0.000000%, Player 1=29.454023%, Player 2=0.000000%, Player 3=70.545977%
+[COM] Study: Envelope=0.000000%, Player 1=0.000000%, Player 2=100.000000%, Player 3=0.000000%
+[COM] Congratulations! Your accusation is correct. You win!
+[COM] 
+Number of rounds: 5
+
+
+
+[BOT] Clue process exited with code: 0

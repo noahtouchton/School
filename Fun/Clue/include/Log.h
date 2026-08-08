@@ -2,8 +2,12 @@
 #include <iostream>
 #include <string>
 #include <format>
+#include <vector>
+#include "Constants.h"
 
 // The hierarchy: Game (0) < Player (1) < COM (2) < Warn (3)
+extern bool globalAutoSkip;
+
 enum class LogLevel {
     Game,   
     Player, 
@@ -49,7 +53,7 @@ class Logger {
         }
 
         // Board printer (Treated as Game level info)
-        void printBoard(const char board[9][9]) {
+        void printBoard(const char board[9][9], const std::vector<bool>& possessedRooms = std::vector<bool>(9, false)) {
             // Mute the board too if the logger is somehow set below Game level
             if (LogLevel::Game > level) return; 
 
@@ -70,9 +74,25 @@ class Logger {
                     std::cout << std::endl;
                 }
             }
+            std::cout << "\nRooms: ";
+            for (size_t i = 0; i < ClueData::ROOMS.size(); i++) {
+                if (i > 0 && i % 3 == 0) {
+                    std::cout << "\n       ";
+                }
+                std::cout << std::to_string(i + 1) << ": ";
+                if (i < possessedRooms.size() && possessedRooms[i]) {
+                    std::cout << "\033[1;32m" << ClueData::ROOMS[i] << "\033[0m"; // Highlight in green
+                } else {
+                    std::cout << ClueData::ROOMS[i];
+                }
+                if (i != ClueData::ROOMS.size() - 1 && i % 3 != 2) {
+                    std::cout << " | ";
+                }
+            }
+            std::cout << "\n" << std::endl;
         }
 
-        void printColoredBoard(int* isPossible){
+        void printColoredBoard(int* isPossible, const std::vector<bool>& possessedRooms = std::vector<bool>(9, false)){
             for(int i = 0; i < 9; i++) {
                 for(int j = 0; j < 9; j++) {
                     int x = j/3;
@@ -109,6 +129,22 @@ class Logger {
                     std::cout << std::endl;
                 }
             }
+            std::cout << "\nRooms: ";
+            for (size_t i = 0; i < ClueData::ROOMS.size(); i++) {
+                if (i > 0 && i % 3 == 0) {
+                    std::cout << "\n       ";
+                }
+                std::cout << std::to_string(i + 1) << ": ";
+                if (i < possessedRooms.size() && possessedRooms[i]) {
+                    std::cout << "\033[1;32m" << ClueData::ROOMS[i] << "\033[0m"; // Highlight in green
+                } else {
+                    std::cout << ClueData::ROOMS[i];
+                }
+                if (i != ClueData::ROOMS.size() - 1 && i % 3 != 2) {
+                    std::cout << " | ";
+                }
+            }
+            std::cout << "\n" << std::endl;
         }
         void clearScreen() {
             // Add a bunch of lines to simulate clearing the screen. This is a simple approach that works in most terminals.
@@ -118,6 +154,7 @@ class Logger {
         }
 
         void holdScreen() {
+            if (globalAutoSkip) return;
             std::cout << "Press Enter to continue...";
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }

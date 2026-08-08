@@ -75,7 +75,26 @@ def init_db():
             )
         """)
         
+        # Seed pre-trained robust AI models out-of-the-box
+        try:
+            from ..ai.pretrained import PRETRAINED_MODELS
+            for m_name, m_params in PRETRAINED_MODELS.items():
+                cursor.execute("""
+                    INSERT OR IGNORE INTO trained_models (name, params_json)
+                    VALUES (?, ?)
+                """, (m_name, json.dumps(m_params)))
+        except Exception as e:
+            print(f"Pre-trained model seeding note: {e}")
+            
+        # Ensure updated roster assignments
+        try:
+            cursor.execute("UPDATE players SET nfl_team = 'SF' WHERE LOWER(name) = 'mike evans'")
+        except Exception:
+            pass
+
         conn.commit()
+
+
 
 # --- Trained Models CRUD operations ---
 

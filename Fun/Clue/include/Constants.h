@@ -16,4 +16,6 @@ namespace ClueData {
     const std::vector<std::string> SUSPECTS = {
         "Col. Mustard", "Prof. Plum", "Mr. Green", "Mrs. Peacock", "Miss Scarlett",  "Mrs. White"
     };
+
+    const int MONTE_CARLO_ITERATIONS = 700; // Default iteration count for COM player simulation
 }

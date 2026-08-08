@@ -30,6 +30,7 @@ public:
   Logger logger;
   LinkedList<PlayerData *> *playerData;
   LinkedList<PlayerData *> *loadPlayerData();
+  std::vector<int> timesShown;
   // Constructor declaration
   Player();
   Player(int playerIndex, bool computer, LogLevel logLevel, int numPlayers);
@@ -42,7 +43,7 @@ public:
   int cardToNum(std::string card, int type);
   std::string numToCard(int num, int type);
 
-  void movePlayer(int roll, Board &board, int currentPlayer);
+  Suggestion movePlayer(int roll, Board &board, int currentPlayer);
   Suggestion makeSuggestion();
 
   std::string getName();
@@ -58,4 +59,22 @@ public:
 
   void learnFromSuggestions();
   int checkWhereCardIs(int card);
+
+  std::vector<std::vector<float>> cardMonteCarlo(int numIterations);
+  bool generateCardDist(std::vector<int> &cardAssignments,
+                        std::vector<int> &playerCards,
+                        const std::vector<int> &maxCards,
+                        const std::vector<std::vector<bool>> &antiCardsLookup,
+                        LinkedList<playerSuggestion> *suggestions);
+  bool backtrackSolve(int suggestionIndex, std::vector<int> &cardAssignments,
+                    std::vector<int> &playerCards, const std::vector<int> &maxCards,
+                    const std::vector<std::vector<bool>> &antiCardsLookup,
+                    LinkedList<playerSuggestion> *suggestions);
+  Suggestion getNextGuess(std::vector<std::vector<float>> &cardFrequencies, std::vector<int> &possibleRooms);
+
+  float calculateBoardEntropy(const std::vector<std::vector<float>> &matrix);
+  bool checkAccusationReady(Suggestion &accusation);
+  void showHand();
 };
+
+extern bool comDebugMode;

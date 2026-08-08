@@ -31,6 +31,8 @@ public:
   // Constructor declaration
   Game(int players, int comPlayers);
 
+  void showPlayersCards();
+
   // Method declaration
   void loop();
 

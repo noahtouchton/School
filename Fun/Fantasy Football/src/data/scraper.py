@@ -71,8 +71,17 @@ def scrape_and_cache_season(year: int, force: bool = False):
             status="Active"
         ))
         
+    # Apply latest updated NFL team assignments & news
+    try:
+        from ..ai.predictions import AINewsPredictionEngine
+        engine = AINewsPredictionEngine()
+        players = engine.apply_updated_rosters_and_news(players)
+    except Exception as e:
+        print(f"Roster news update note: {e}")
+
     print(f"Saving {len(players)} players to database...")
     db.save_players(players)
+
     db.mark_year_cached(year, "rosters")
 
     # 2. Fetch weekly statistics

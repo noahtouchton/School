@@ -1,0 +1,208 @@
+"""Feature engineering for the weekly fantasy-points projection models.
+
+The old app's "projection" was a rolling average of past points and nothing else -- it had no
+way to react to a team change, opponent strength, or anything besides recent box scores. This
+module builds a richer, leakage-free feature set:
+
+- rolling_avg_3 / rolling_avg_8: the player's own recent scoring, computed only from games
+  strictly before the target row (chronological, across season boundaries).
+- games_played_prior: how much history we have for this player (a natural stand-in for
+  experience/rookie uncertainty without needing precise historical age/experience-at-the-time,
+  which nfl_data_py doesn't cleanly expose per season).
+- opp_def_allowed: a rolling estimate of how many fantasy points the upcoming opponent has
+  allowed to this position, computed only from that season's prior weeks.
+- new_team: 1 if the player's team this season differs from last season (see
+  ingestion/season_teams.py) -- directly targets the "didn't know about team changes" bug.
+
+Team assignment is season-level (see PlayerSeasonTeam), not week-level, so in-season trades are
+attributed to the pre-trade team for the whole season. That's a known simplification -- in-season
+trades are rare relative to full-season team stability, and the season-level signal still catches
+the far more common case (free agency / offseason trades), which was the user-reported failure.
+"""
+
+from __future__ import annotations
+
+import numpy as np
+import pandas as pd
+import nfl_data_py as nfl
+from sqlalchemy.orm import Session
+
+from app.core.scoring import calculate_fantasy_points
+from app.db.models import Player, PlayerSeasonTeam, PlayerWeeklyStat
+
+BASELINE_COLUMN = "rolling_avg_8"
+
+# The model predicts a *residual* on top of BASELINE_COLUMN (a strong rolling-average predictor
+# on its own) rather than the raw point total -- see ml/train.py for why: predicting points
+# directly let a modest feature set land at or below the naive baseline for some positions,
+# while residual-on-baseline reliably matches-or-beats it (worst case the model just learns to
+# predict ~0 residual).
+FEATURE_COLUMNS = [
+    "rolling_avg_8",
+    "trend",
+    "last_game_points",
+    "games_played_prior",
+    "opp_def_allowed",
+    "implied_total",
+    "new_team",
+]
+
+POSITIONS = ["QB", "RB", "WR", "TE"]
+
+
+def _load_base_frame(db: Session, start_season: int, end_season: int) -> pd.DataFrame:
+    stats_rows = (
+        db.query(PlayerWeeklyStat)
+        .filter(PlayerWeeklyStat.season >= start_season, PlayerWeeklyStat.season <= end_season)
+        .all()
+    )
+    players = {p.id: p for p in db.query(Player).all()}
+
+    records = []
+    for row in stats_rows:
+        player = players.get(row.player_id)
+        if player is None or player.position not in POSITIONS:
+            continue
+        records.append(
+            {
+                "player_id": row.player_id,
+                "position": player.position,
+                "season": row.season,
+                "week": row.week,
+                "points": calculate_fantasy_points(row.stats),
+            }
+        )
+    return pd.DataFrame.from_records(records)
+
+
+def _load_season_team_map(db: Session) -> dict[tuple[str, int], str]:
+    rows = db.query(PlayerSeasonTeam).all()
+    return {(r.player_id, r.season): r.nfl_team for r in rows}
+
+
+def _add_new_team_flag(df: pd.DataFrame, season_team: dict[tuple[str, int], str]) -> pd.DataFrame:
+    def flag(row):
+        this_team = season_team.get((row.player_id, row.season))
+        last_team = season_team.get((row.player_id, row.season - 1))
+        if this_team is None or last_team is None:
+            return 0
+        return int(this_team != last_team)
+
+    df["new_team"] = df.apply(flag, axis=1)
+    return df
+
+
+def _add_rolling_player_features(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.sort_values(["player_id", "season", "week"]).reset_index(drop=True)
+
+    def per_player(group: pd.DataFrame) -> pd.DataFrame:
+        points = group["points"].to_numpy()
+        n = len(points)
+        roll3 = np.zeros(n)
+        roll8 = np.zeros(n)
+        last_game = np.full(n, np.nan)
+        prior_count = np.zeros(n, dtype=int)
+        for i in range(n):
+            prior = points[max(0, i - 8) : i]
+            prior3 = points[max(0, i - 3) : i]
+            roll8[i] = prior.mean() if len(prior) else np.nan
+            roll3[i] = prior3.mean() if len(prior3) else np.nan
+            if i > 0:
+                last_game[i] = points[i - 1]
+            prior_count[i] = i
+        group = group.copy()
+        group["rolling_avg_3"] = roll3
+        group["rolling_avg_8"] = roll8
+        group["last_game_points"] = last_game
+        group["games_played_prior"] = prior_count
+        return group
+
+    original = df
+    df = df.groupby("player_id", group_keys=False).apply(per_player)
+    # pandas excludes the grouping column from the result; restore it via index alignment
+    # (group_keys=False preserves the original row index).
+    df["player_id"] = original.loc[df.index, "player_id"]
+
+    position_baseline = df.groupby("position")["points"].transform("mean")
+    df["rolling_avg_3"] = df["rolling_avg_3"].fillna(position_baseline)
+    df["rolling_avg_8"] = df["rolling_avg_8"].fillna(position_baseline)
+    # last_game_points has no meaningful value for a player's first-ever game -- use their
+    # rolling_avg_3 fallback (which is already position-baseline-filled) rather than a second
+    # independent fallback.
+    df["last_game_points"] = df["last_game_points"].fillna(df["rolling_avg_3"])
+    return df
+
+
+def _team_schedule_map(start_season: int, end_season: int) -> pd.DataFrame:
+    """Team-per-row schedule with the game's Vegas-implied team point total attached.
+
+    implied_total is derived from the closing spread/total lines nfl_data_py already carries
+    (spread_line is the home team's line; negative means home favored) -- a live, market-driven
+    "game script" signal: a team implied for 27+ points is expected to be productive on offense
+    regardless of what any individual player did earlier this season, and it reacts to real-time
+    news (injuries, weather, etc.) that the box-score-based features can't see yet.
+    """
+    schedules = nfl.import_schedules(list(range(start_season, end_season + 1)))
+    schedules = schedules.copy()
+    schedules["home_implied_total"] = schedules["total_line"] / 2 - schedules["spread_line"] / 2
+    schedules["away_implied_total"] = schedules["total_line"] / 2 + schedules["spread_line"] / 2
+
+    home = schedules[["season", "week", "home_team", "away_team", "home_implied_total"]].rename(
+        columns={"home_team": "team", "away_team": "opponent", "home_implied_total": "implied_total"}
+    )
+    away = schedules[["season", "week", "away_team", "home_team", "away_implied_total"]].rename(
+        columns={"away_team": "team", "home_team": "opponent", "away_implied_total": "implied_total"}
+    )
+    return pd.concat([home, away], ignore_index=True)
+
+
+def _add_opponent_defense_feature(
+    df: pd.DataFrame, season_team: dict[tuple[str, int], str], start_season: int, end_season: int
+) -> pd.DataFrame:
+    df = df.copy()
+    df["team"] = df.apply(lambda r: season_team.get((r.player_id, r.season)), axis=1)
+
+    schedule = _team_schedule_map(start_season, end_season)
+    df = df.merge(schedule, on=["season", "week", "team"], how="left")
+
+    # Points allowed by (season, week, opponent-as-defense, position) = points scored by
+    # players of that position who played the opponent that week.
+    allowed = (
+        df.dropna(subset=["opponent"])
+        .groupby(["season", "week", "opponent", "position"])["points"]
+        .mean()
+        .reset_index()
+        .rename(columns={"opponent": "def_team", "points": "allowed"})
+    )
+
+    position_baseline = df.groupby("position")["points"].mean().to_dict()
+
+    def rolling_allowed(row) -> float:
+        if pd.isna(row.opponent):
+            return position_baseline.get(row.position, 10.0)
+        prior = allowed[
+            (allowed.def_team == row.opponent)
+            & (allowed.position == row.position)
+            & (allowed.season == row.season)
+            & (allowed.week < row.week)
+        ]
+        if prior.empty:
+            return position_baseline.get(row.position, 10.0)
+        return prior["allowed"].mean()
+
+    df["opp_def_allowed"] = df.apply(rolling_allowed, axis=1)
+    df["implied_total"] = df["implied_total"].fillna(df["implied_total"].mean())
+    return df
+
+
+def build_training_frame(db: Session, start_season: int, end_season: int) -> pd.DataFrame:
+    df = _load_base_frame(db, start_season, end_season)
+    if df.empty:
+        return df
+
+    season_team = _load_season_team_map(db)
+    df = _add_new_team_flag(df, season_team)
+    df = _add_rolling_player_features(df)
+    df = _add_opponent_defense_feature(df, season_team, start_season, end_season)
+    df["trend"] = df["rolling_avg_3"] - df["rolling_avg_8"]
+    return df
