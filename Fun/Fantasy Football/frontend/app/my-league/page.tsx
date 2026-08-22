@@ -1,17 +1,7 @@
-import { ComingSoon } from "@/components/coming-soon";
+import { redirect } from "next/navigation";
 
+// Phase 6 shipped as the ESPN integration, so this route is a duplicate. Kept as
+// a redirect rather than deleted because it was the linked-to name for a while.
 export default function MyLeaguePage() {
-  return (
-    <ComingSoon
-      title="My League"
-      phase="Phase 6"
-      description="Link your real ESPN fantasy league and get advice grounded in your own models."
-      bullets={[
-        "Link a public or private ESPN league (league ID, year, optional espn_s2/SWID)",
-        "Pull your real roster, matchup, and free-agent pool",
-        "Start/sit recommendations from your own trained projections",
-        "Waiver-wire suggestions ranked by projected value added",
-      ]}
-    />
-  );
+  redirect("/espn");
 }

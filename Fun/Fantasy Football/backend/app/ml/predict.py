@@ -19,9 +19,11 @@ from app.core.scoring import calculate_fantasy_points
 from app.db.models import Player, PlayerSeasonTeam, PlayerWeeklyProjection, PlayerWeeklyStat
 from app.ml.features import (
     BASELINE_COLUMN,
-    FEATURE_COLUMNS,
     POSITIONS,
+    USAGE_STATS,
     _team_schedule_map,
+    features_for,
+    finalize_usage_columns,
 )
 from app.ml.train import MODEL_DIR, MODEL_VERSION
 
@@ -35,32 +37,41 @@ def _load_full_history(db: Session, through_season: int) -> pd.DataFrame:
         player = players.get(row.player_id)
         if player is None or player.position not in POSITIONS:
             continue
+        stats = row.stats or {}
         records.append(
             {
                 "player_id": row.player_id,
                 "position": player.position,
                 "season": row.season,
                 "week": row.week,
-                "points": calculate_fantasy_points(row.stats),
+                "points": calculate_fantasy_points(stats),
+                **{stat: float(stats.get(stat, 0.0) or 0.0) for stat in USAGE_STATS},
             }
         )
     return pd.DataFrame.from_records(records)
 
 
 def _player_current_rolling_stats(history: pd.DataFrame) -> pd.DataFrame:
-    """For each player, the rolling stats *as of right now* (i.e. including all real games played)."""
+    """For each player, the rolling stats *as of right now* (i.e. including all real games played).
+
+    Mirrors _add_rolling_player_features in ml/features.py -- the same windows over
+    the same columns -- so inference-time features match the training distribution.
+    """
     history = history.sort_values(["player_id", "season", "week"])
 
     def summarize(group: pd.DataFrame) -> pd.Series:
         points = group["points"].to_numpy()
-        return pd.Series(
-            {
-                "rolling_avg_8": points[-8:].mean() if len(points) else np.nan,
-                "rolling_avg_3": points[-3:].mean() if len(points) else np.nan,
-                "last_game_points": points[-1] if len(points) else np.nan,
-                "games_played_prior": len(points),
-            }
-        )
+        out = {
+            "rolling_avg_8": points[-8:].mean() if len(points) else np.nan,
+            "rolling_avg_3": points[-3:].mean() if len(points) else np.nan,
+            "last_game_points": points[-1] if len(points) else np.nan,
+            "games_played_prior": len(points),
+        }
+        for stat in USAGE_STATS:
+            values = group[stat].to_numpy(dtype=float)
+            out[f"{stat}_8"] = values[-8:].mean() if len(values) else 0.0
+            out[f"{stat}_3"] = values[-3:].mean() if len(values) else 0.0
+        return pd.Series(out)
 
     return history.groupby("player_id").apply(summarize, include_groups=False).reset_index()
 
@@ -121,6 +132,9 @@ def build_current_feature_frame(db: Session, target_season: int, target_week: in
     df["last_game_points"] = df["last_game_points"].fillna(df["rolling_avg_3"])
     df["games_played_prior"] = df["games_played_prior"].fillna(0)
     df["trend"] = df["rolling_avg_3"] - df["rolling_avg_8"]
+    # Same derived usage columns the training frame gets, from the same function,
+    # so a player with no history lands on identical values in both paths.
+    df = finalize_usage_columns(df)
 
     season_team_rows = db.query(PlayerSeasonTeam).filter(PlayerSeasonTeam.season >= target_season - 1).all()
     season_team = {(r.player_id, r.season): r.nfl_team for r in season_team_rows}
@@ -234,14 +248,17 @@ def generate_projections(db: Session, target_season: int, target_week: int) -> d
     projected_by_player: dict[str, float] = {}
     valid_rows = []
     for position in POSITIONS:
-        pos_df = df[df.position == position].dropna(subset=FEATURE_COLUMNS)
+        # Per-position feature list -- must match what this position's model was
+        # trained on (see ml/features.py:features_for).
+        features = features_for(position)
+        pos_df = df[df.position == position].dropna(subset=features)
         if pos_df.empty:
             continue
         valid_rows.append(pos_df)
 
         baseline = pos_df[BASELINE_COLUMN]
         model = models.get(position)
-        residual = model.predict(pos_df[FEATURE_COLUMNS]) if model is not None else np.zeros(len(pos_df))
+        residual = model.predict(pos_df[features]) if model is not None else np.zeros(len(pos_df))
 
         blend = blend_weights.get(position, 0.0)
         projected = (baseline + blend * residual).clip(lower=0.0)

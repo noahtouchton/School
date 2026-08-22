@@ -14,3 +14,6 @@ frontend/out/
 data/*.db
 data/*.db-journal
 data/*.joblib
+
+# Yahoo OAuth tokens (secrets)
+data/yahoo_tokens.json

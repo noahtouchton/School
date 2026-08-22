@@ -6,17 +6,19 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
-  Shield,
   Swords,
   Trophy,
   Dna,
   Settings,
+  Radio,
+  CircleUserRound,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/players", label: "Players", icon: Users },
-  { href: "/my-league", label: "My League", icon: Shield },
+  { href: "/espn", label: "My ESPN Team", icon: CircleUserRound },
+  { href: "/draft-room", label: "Draft Room", icon: Radio },
   { href: "/mock-draft", label: "Mock Draft", icon: Swords },
   { href: "/ai-arena", label: "AI Arena", icon: Trophy },
   { href: "/training", label: "Training", icon: Dna },

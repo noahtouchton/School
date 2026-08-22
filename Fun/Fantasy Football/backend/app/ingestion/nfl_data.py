@@ -20,6 +20,35 @@ from app.db.models import IngestionCacheManifest, Player, PlayerWeeklyStat
 
 VALID_POSITIONS = {"QB", "RB", "WR", "TE", "K"}
 
+# Usage columns copied verbatim from nflverse weekly data into the stats blob.
+# target_share/air_yards_share/wopr are already normalized against team totals by
+# nflverse, so they stay meaningful regardless of a team's pace or pass rate.
+USAGE_STAT_KEYS = (
+    "carries",
+    "attempts",
+    "completions",
+    "target_share",
+    "air_yards_share",
+    "wopr",
+    "racr",
+    "receiving_air_yards",
+    "passing_air_yards",
+    "rushing_epa",
+    "receiving_epa",
+    "passing_epa",
+)
+
+
+def _num(value) -> float:
+    """nflverse leaves usage columns NaN for players the metric doesn't apply to
+    (target share for a QB, say). JSON can't hold NaN, so those become 0.0."""
+    if value is None or pd.isna(value):
+        return 0.0
+    try:
+        return round(float(value), 4)
+    except (TypeError, ValueError):
+        return 0.0
+
 TEAM_ALIASES = {
     "OAK": "LV",
     "SD": "LAC",
@@ -158,6 +187,11 @@ def ingest_historical_stats(db: Session, season: int, force: bool = False) -> in
                 + int(row.get("rushing_2pt_conversions", 0))
                 + int(row.get("receiving_2pt_conversions", 0))
             ),
+            # Opportunity/usage metrics. These carry no fantasy points themselves but
+            # are far more stable week to week than points are -- a receiver's target
+            # share barely moves while his scoring swings on touchdown variance -- so
+            # they're what lets the model beat a plain rolling average (see ml/train.py).
+            **{key: _num(row.get(key)) for key in USAGE_STAT_KEYS},
         }
 
         pk = {"player_id": player_id, "season": season, "week": int(row["week"])}

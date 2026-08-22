@@ -37,7 +37,22 @@ BASELINE_COLUMN = "rolling_avg_8"
 # directly let a modest feature set land at or below the naive baseline for some positions,
 # while residual-on-baseline reliably matches-or-beats it (worst case the model just learns to
 # predict ~0 residual).
-FEATURE_COLUMNS = [
+# Raw per-game usage stats pulled out of the stats blob (see ingestion/nfl_data.py).
+# Each becomes a leakage-free rolling average over the player's prior games.
+USAGE_STATS = [
+    "targets",
+    "carries",
+    "attempts",
+    "target_share",
+    "air_yards_share",
+    "wopr",
+    "receiving_air_yards",
+]
+
+USAGE_FEATURE_COLUMNS = [f"{stat}_8" for stat in USAGE_STATS] + ["opportunity_8", "usage_trend"]
+
+# Features every position gets.
+CORE_FEATURE_COLUMNS = [
     "rolling_avg_8",
     "trend",
     "last_game_points",
@@ -47,7 +62,69 @@ FEATURE_COLUMNS = [
     "new_team",
 ]
 
+# Opportunity features, assigned per position rather than wholesale.
+#
+# Fantasy points are noisy (touchdowns are close to a coin flip week to week)
+# while volume is not, so knowing a player's role has changed before his points
+# catch up is worth something -- but only where the metric means anything, and
+# only where it's measurably better. These lists are the output of
+# scripts/ablate_usage_features.py (pooled 3-fold walk-forward MAE, 2023-2025):
+#
+#   pos   no usage   all usage   position-aware   shipped
+#   QB      6.2421      6.2672           6.2552   no usage
+#   RB      4.2916      4.2803           4.2786   position-aware
+#   WR      4.1563      4.1381           4.1368   position-aware
+#   TE      3.2433      3.2225           3.2238   position-aware
+#
+# QB gets nothing: target share and air-yards share are structurally zero for a
+# quarterback, and even after trimming to attempts/carries the usage arm still
+# lost to plain rolling-average features. Volume tells you nothing about a QB
+# that his own passing production hasn't already told you. Re-run the ablation
+# before adding to any of these lists.
+USAGE_BY_POSITION = {
+    "QB": [],
+    "RB": [
+        "carries_8",
+        "targets_8",
+        "target_share_8",
+        "opportunity_8",
+        "usage_trend",
+    ],
+    "WR": [
+        "targets_8",
+        "target_share_8",
+        "air_yards_share_8",
+        "wopr_8",
+        "receiving_air_yards_8",
+        "opportunity_8",
+        "usage_trend",
+    ],
+    "TE": [
+        "targets_8",
+        "target_share_8",
+        "air_yards_share_8",
+        "wopr_8",
+        "receiving_air_yards_8",
+        "opportunity_8",
+        "usage_trend",
+    ],
+}
+
 POSITIONS = ["QB", "RB", "WR", "TE"]
+
+
+def features_for(position: str) -> list[str]:
+    """The feature list a given position's model is trained and scored on.
+
+    Position-specific by design -- see USAGE_BY_POSITION. Training and inference
+    must both call this or the model gets columns in a different order/shape.
+    """
+    return CORE_FEATURE_COLUMNS + USAGE_BY_POSITION.get(position, [])
+
+
+# Superset of every column any position needs; used for frame construction and
+# NaN handling, never fed to a model directly.
+FEATURE_COLUMNS = CORE_FEATURE_COLUMNS + USAGE_FEATURE_COLUMNS
 
 
 def _load_base_frame(db: Session, start_season: int, end_season: int) -> pd.DataFrame:
@@ -63,13 +140,17 @@ def _load_base_frame(db: Session, start_season: int, end_season: int) -> pd.Data
         player = players.get(row.player_id)
         if player is None or player.position not in POSITIONS:
             continue
+        stats = row.stats or {}
         records.append(
             {
                 "player_id": row.player_id,
                 "position": player.position,
                 "season": row.season,
                 "week": row.week,
-                "points": calculate_fantasy_points(row.stats),
+                "points": calculate_fantasy_points(stats),
+                # Seasons ingested before usage metrics existed simply have no such
+                # keys; 0.0 keeps those rows usable rather than dropping them.
+                **{stat: float(stats.get(stat, 0.0) or 0.0) for stat in USAGE_STATS},
             }
         )
     return pd.DataFrame.from_records(records)
@@ -115,6 +196,20 @@ def _add_rolling_player_features(df: pd.DataFrame) -> pd.DataFrame:
         group["rolling_avg_8"] = roll8
         group["last_game_points"] = last_game
         group["games_played_prior"] = prior_count
+
+        # Same strictly-prior windows for every usage stat, plus a short window so
+        # a recent role change is visible against the longer baseline.
+        for stat in USAGE_STATS:
+            values = group[stat].to_numpy(dtype=float)
+            long_avg = np.full(n, np.nan)
+            short_avg = np.full(n, np.nan)
+            for i in range(n):
+                prior = values[max(0, i - 8) : i]
+                prior3 = values[max(0, i - 3) : i]
+                long_avg[i] = prior.mean() if len(prior) else np.nan
+                short_avg[i] = prior3.mean() if len(prior3) else np.nan
+            group[f"{stat}_8"] = long_avg
+            group[f"{stat}_3"] = short_avg
         return group
 
     original = df
@@ -130,6 +225,33 @@ def _add_rolling_player_features(df: pd.DataFrame) -> pd.DataFrame:
     # rolling_avg_3 fallback (which is already position-baseline-filled) rather than a second
     # independent fallback.
     df["last_game_points"] = df["last_game_points"].fillna(df["rolling_avg_3"])
+
+    return finalize_usage_columns(df)
+
+
+def finalize_usage_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Fill usage gaps and add the derived usage columns.
+
+    Shared by training (build_training_frame) and inference (ml/predict.py), which
+    compute their rolling windows separately -- training walks each row's history,
+    inference only needs the latest state. Anything derived from those windows has
+    to live here or the two paths silently disagree about what a feature means.
+    """
+    # A debut has no prior usage. Zero is the honest fill here (unlike points,
+    # where a position baseline is the better guess): we have no evidence this
+    # player touches the ball at all, and that's exactly what the model should see.
+    for stat in USAGE_STATS:
+        for window in (8, 3):
+            column = f"{stat}_{window}"
+            if column in df.columns:
+                df[column] = df[column].fillna(0.0)
+
+    # Total touches+targets: one volume number that means the same thing for a
+    # runner and a receiver, which per-position columns can't express.
+    df["opportunity_8"] = df["carries_8"] + df["targets_8"]
+    opportunity_3 = df["carries_3"] + df["targets_3"]
+    # Positive = role is expanding faster than the 8-game average reflects.
+    df["usage_trend"] = opportunity_3 - df["opportunity_8"]
     return df
 
 

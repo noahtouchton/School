@@ -5,7 +5,11 @@ Run this regularly during the season (e.g. weekly) to keep projections current. 
 scripts/generate_projections.py to regenerate projections from the freshly-ingested data.
 
 Usage:
-    ./.venv/bin/python scripts/run_ingestion.py
+    ./.venv/bin/python scripts/run_ingestion.py [--force]
+
+--force re-pulls completed seasons that the cache manifest would otherwise skip.
+Needed after the stats schema changes (e.g. adding usage metrics), since cached
+seasons keep whatever shape they were first written with.
 """
 
 import datetime as dt
@@ -23,9 +27,12 @@ from app.ingestion.season_teams import backfill_historical_season_teams, write_c
 
 
 def main() -> None:
+    force = "--force" in sys.argv
     settings = get_settings()
     db = SessionLocal()
     try:
+        if force:
+            print("--force: ignoring the ingestion cache and re-pulling every season.")
         print(f"Refreshing current-season rosters/team assignments (always-live, never cached)...")
         roster_summary = refresh_current_rosters(db)
         print(f"  -> {roster_summary}")
@@ -34,7 +41,9 @@ def main() -> None:
             f"Ingesting historical seasons {settings.ingestion_start_year}-{settings.ingestion_end_year} "
             "(cache-once for completed seasons, always-live for the current one)..."
         )
-        history_summary = ingest_season_range(db, settings.ingestion_start_year, settings.ingestion_end_year)
+        history_summary = ingest_season_range(
+            db, settings.ingestion_start_year, settings.ingestion_end_year, force=force
+        )
         for season, stats in history_summary.items():
             print(f"  {season}: {stats}")
 
