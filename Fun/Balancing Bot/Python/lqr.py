@@ -25,8 +25,9 @@ Run this on a laptop, not the Arduino. It prints four gains to hardcode.
 """
 
 import numpy as np
-from scipy.linalg import solve_continuous_are
+from scipy.linalg import solve_continuous_are, solve_discrete_are
 from scipy.integrate import solve_ivp
+from scipy.signal import cont2discrete
 
 # ============================================================
 # 1. PHYSICAL CONSTANTS   (SI throughout: m, kg, s, rad, V, A, ohm)
@@ -53,21 +54,30 @@ ke = 0.28           # back-EMF constant                      (V*s/rad)
 n_motors = 2
 N_gear = 1.0        # set to 1.0 if kt/ke are referred to the OUTPUT shaft
 
-V_bat = 7.4         # battery voltage -> control saturation limit (V)
+V_bat = 5.4         # battery voltage -> control saturation limit (V)
 
 # --- masses and inertias ------------------------------------------------
 # >>> THESE THREE ARE THE WEAK LINK. Measure them. <<<
 m = 0.26311             # chassis mass                           (kg)  MEASURE
 M = 0.02532*2             # total wheel mass (both)                (kg)  MEASURE
 
-# Chassis inertia about its OWN center of mass.
-# The inertiaCalc.ino trial measures inertia about the AXLE, so if you have
-# that number instead, use:  I_C = I_axle_measured - m*dx**2
+# --- chassis inertia, from the physical-pendulum swing test ---------------
+# Rod through the axle, wheels locked to the rod (so they neither rotate nor
+# load the pivot). The swinging body is the chassis alone, pivoting about the
+# axle -- which measures J_th DIRECTLY, no parallel-axis subtraction:
 #
-# The stored 0.869964 kg*m^2 is physically impossible for this bot: with
-# dx = 0.064 m and m ~ 0.5 kg you expect ~2e-3. Reaching 0.87 would need the
-# mass 1.3 m from the axle; the whole robot is 0.154 m tall. Re-run the trial.
-I_C = 0.002         # chassis inertia about COM              (kg*m^2)  MEASURE
+#     T = 2*pi*sqrt(J_th / (m*g*dx))   ->   J_th = m*g*dx*(T/2pi)^2
+#
+# This replaces the old inertiaCalc.ino motor-pulse trial, which returned
+# 0.869964 kg*m^2 -- off by a factor of ~1800 (that value implies the mass
+# sits 1.3 m from the axle; the whole robot is 0.154 m tall).
+swing_count = 7         # number of full swings timed
+swing_time = 4.28       # total elapsed for those swings          (s)
+
+T_swing = swing_time / swing_count
+J_th_meas = m * g * dx * (T_swing / (2 * np.pi))**2
+
+I_C = J_th_meas - m * dx**2     # back out COM inertia, for reference only
 
 I_w = 0.5 * M * Rw**2   # wheel pair inertia about axle, solid-disc estimate
 
@@ -76,7 +86,7 @@ I_w = 0.5 * M * Rw**2   # wheel pair inertia about axle, solid-disc estimate
 # 2. DERIVED COEFFICIENTS
 # ============================================================
 
-J_th = I_C + m * dx**2              # chassis inertia about the axle
+J_th = J_th_meas                    # chassis inertia about the axle (measured)
 J_c = m * dx * Rw                   # theta <-> phi coupling
 J_ph = I_w + (m + M) * Rw**2        # effective wheel inertia
 Gam = m * g * dx                    # gravitational (destabilizing) term
@@ -190,21 +200,37 @@ def design(A, B, Q, Rc, label):
     return K
 
 
-def sweep_rho(A, B, Q, label, dt=0.005, rhos=(0.1, 1, 10, 100, 1000, 1e4, 1e5)):
-    """Find rho values that neither saturate the rail nor outrun the loop rate.
+def sweep_rho(A, B, Q, label, dt=0.005, rhos=(0.1, 1, 10, 100, 1000, 1e4, 1e5),
+              A_full=None, B_full=None):
+    """Find rho values that pass every hard limit.
 
-    Two hard limits:
+    Three checks:
       - |V| at the tolerance lean must fit inside V_bat, else the LQR
         optimality guarantee is void and you are running bang-bang.
       - The fastest closed-loop pole must be well below the Nyquist rate of
         the discrete loop. Rule of thumb: under 1/5 of 2*pi/dt.
+      - If designing on the reduced model, the resulting gains must still
+        stabilize the FULL plant. The 2-state model overestimates damping
+        (it applies all of gam*(thd+phid) to thd alone), so it thinks the bot
+        falls ~3x slower than it really does. Gains that look fine against
+        the reduced model can be too weak for the real system -- this is the
+        check that catches it.
+
+    Pass A_full / B_full as the BALANCE subsystem [theta, thd, phid], not the
+    raw 4-state. The phi column of A is identically zero, so the full closed
+    loop always carries an eigenvalue at exactly 0 -- that is wheel position
+    integrating freely (the bot drifts), which no static feedback on theta
+    alone can remove and which is not a balancing instability. Deleting phi
+    is exact, so the 3-state subsystem is the right thing to test.
     """
     pole_cap = 0.2 * 2 * np.pi / dt
     x_test = np.zeros(A.shape[0])
     x_test[0] = tol_theta
+    cross = A_full is not None and B_full is not None
 
     print(f"\n=== rho sweep: {label} ===")
-    print(f"  {'rho':>8}  {'V @ lean':>9}  {'fastest pole':>13}   verdict")
+    hdr = f"  {'rho':>8}  {'V @ lean':>9}  {'fastest pole':>13}"
+    print(hdr + ("   full-plant   verdict" if cross else "   verdict"))
     feasible = []
     for r in rhos:
         Rc_r = np.array([[r / V_bat**2]])
@@ -218,10 +244,23 @@ def sweep_rho(A, B, Q, label, dt=0.005, rhos=(0.1, 1, 10, 100, 1000, 1e4, 1e5)):
             bad.append("saturates")
         if fast > pole_cap:
             bad.append("too fast for loop")
+
+        full_txt = ""
+        if cross:
+            # embed the reduced gains into the full state vector (zeros on
+            # the states this controller cannot measure)
+            K_emb = np.zeros((1, A_full.shape[0]))
+            K_emb[0, :K.shape[1]] = K
+            ok_full = bool(np.all(np.real(np.linalg.eigvals(
+                A_full - B_full @ K_emb)) < 0))
+            full_txt = f"   {'stable' if ok_full else 'UNSTABLE':>9}"
+            if not ok_full:
+                bad.append("unstable on real plant")
+
         verdict = "OK" if not bad else " + ".join(bad)
         if not bad:
             feasible.append((r, K))
-        print(f"  {r:>8.4g}  {v:>8.2f} V  {fast:>10.0f} r/s   {verdict}")
+        print(f"  {r:>8.4g}  {v:>8.2f} V  {fast:>10.0f} r/s{full_txt}   {verdict}")
 
     print(f"  (pole cap {pole_cap:.0f} rad/s at dt = {dt*1000:.0f} ms)")
     return feasible
@@ -246,11 +285,87 @@ def simulate(A, B, K, label, theta0=0.10, t_end=3.0):
           f" {'*** over rail ***' if np.max(np.abs(v)) > V_bat else ''}")
 
 
+def discrete_ok(Ap, Bp, K, dt=0.005):
+    """Honest sampled-data check: ZOH-discretize the plant, close the loop
+    with the same K, and require every discrete pole inside the unit circle.
+
+    This replaces the "fastest pole << 2*pi/dt" rule of thumb, which is too
+    conservative for real, heavily damped modes. This plant has an open-loop
+    pole near -313 rad/s (the back-EMF mode); at dt = 5 ms that maps to
+    z = 0.21, perfectly well behaved, even though the rule of thumb rejects it.
+    """
+    n = Ap.shape[0]
+    Ad, Bd, *_ = cont2discrete((Ap, Bp, np.eye(n), np.zeros((n, 1))), dt)
+    return float(np.max(np.abs(np.linalg.eigvals(Ad - Bd @ K))))
+
+
+# ============================================================
+# 6. OBSERVER  --  estimate phidot from the IMU alone
+# ============================================================
+# The balance subsystem is observable from theta (rank 3/3), so a Luenberger
+# / Kalman observer can in principle reconstruct wheel speed without an
+# encoder, and u = -K*xhat then stabilizes. That is LQG.
+#
+# The catch is that the observer INFERS phidot from the lean dynamics, so it
+# is only as good as beta, gam, and everything unmodeled (gearbox Coulomb
+# friction, wheel slip). Those errors accumulate on the same multi-second
+# timescale as the momentum mode the phidot feedback exists to arrest.
+# The robustness sweep below quantifies how much mismatch it survives.
+
+def build_bal(kt_s=1.0, Jth_s=1.0):
+    """Rebuild the 3-state balance plant [theta, thetadot, phidot] with the
+    motor constant and/or chassis inertia scaled. Used to make a 'true' plant
+    that differs from the one the observer believes in."""
+    kt_, ke_ = kt * kt_s, ke * kt_s
+    J_th_ = J_th * Jth_s
+    beta_ = n_motors * N_gear * kt_ / R
+    gam_ = n_motors * (N_gear**2) * kt_ * ke_ / R
+    Delta_ = J_th_ * J_ph - J_c**2
+    p_ = (J_ph + J_c) / Delta_
+    q_ = (J_th_ + J_c) / Delta_
+    Ab = np.array([
+        [0.0,                 1.0,        0.0     ],
+        [J_ph * Gam / Delta_, -p_ * gam_, -p_ * gam_],
+        [J_c * Gam / Delta_,  -q_ * gam_, -q_ * gam_],
+    ])
+    Bb = np.array([[0.0], [p_ * beta_], [q_ * beta_]])
+    return Ab, Bb
+
+
+def design_observer(Ap, Bp, C, W, V):
+    """Kalman gain from the dual Riccati equation.
+
+    scipy solves   a'X + Xa - Xb r^-1 b'X + q = 0.
+    Feeding a = A', b = C' turns that into the filter ARE
+        AP + PA' - PC'V^-1 CP + W = 0,   L = PC'V^-1
+    """
+    P = solve_continuous_are(Ap.T, C.T, W, V)
+    return P @ C.T @ np.linalg.inv(V)
+
+
+def augmented(A_true, B_true, A_est, B_est, K, L, C):
+    """Closed loop when the observer's model != the real plant.
+
+        xdot    = A_true x - B_true K xhat
+        xhatdot = LC x + (A_est - B_est K - LC) xhat
+
+    With a perfect model this block-triangularizes and the separation
+    principle applies (poles = eig(A-BK) U eig(A-LC)). With mismatch it
+    does not, so the full 6x6 has to be checked directly.
+    """
+    return np.block([
+        [A_true,  -B_true @ K],
+        [L @ C,    A_est - B_est @ K - L @ C],
+    ])
+
+
 if __name__ == "__main__":
     np.set_printoptions(suppress=True)
 
     print("derived coefficients")
     print(f"  dx    = {dx*1000:.1f} mm      (axle -> COM)")
+    print(f"  T_swing = {T_swing:.4f} s  ->  J_th = {J_th_meas:.4e} kg*m^2")
+    print(f"  (implied I_C = {I_C:.3e}; thin-plate estimate ~5e-4)")
     print(f"  J_th  = {J_th:.3e}   J_c = {J_c:.3e}   J_ph = {J_ph:.3e}")
     print(f"  Gam   = {Gam:.4f}    Delta = {Delta:.3e}")
     print(f"  beta  = {beta:.4f} N*m/V   gam = {gam:.4f} N*m*s/rad")
@@ -258,35 +373,210 @@ if __name__ == "__main__":
     print("\nstructural checks")
     check_structure(A)
 
-    # ---- full 4-state (needs encoders) ----
-    K4 = design(A, B, Q, Rc, "4-STATE  [theta, thd, phi, phid]  -- requires encoders")
-    if K4 is not None:
-        simulate(A, B, K4, "4-state")
-        print(f"\n  K = {np.round(K4.ravel(), 4)}")
+    # ------------------------------------------------------------------
+    # The balance subsystem [theta, thetadot, phidot].
+    # phi is deleted exactly (its column in A is zero -- wheel POSITION
+    # drives no dynamics). What remains is what actually has to be
+    # stabilized: lean, lean rate, and wheel speed.
+    # ------------------------------------------------------------------
+    bal = [0, 1, 3]
+    A_bal = A[np.ix_(bal, bal)]
+    B_bal = B[bal]
+    Q_bal = np.diag([1 / tol_theta**2, 1 / tol_thdot**2, 1 / tol_phidot**2])
 
-    # ---- reduced 2-state (IMU only) ----
-    # Dropping phi is exact (zero column). Dropping phidot loses the back-EMF
-    # damping, but J_c is already folded into p and Delta by the 2x2 solve.
-    A2 = A[:2, :2]
-    B2 = B[:2]
-    Q2 = Q[:2, :2]
+    # ==================================================================
+    # CASE 1: IMU only  -- feedback on [theta, thetadot], K_phidot = 0
+    # ==================================================================
+    print("\n" + "=" * 62)
+    print("CASE 1: IMU ONLY  (no encoders)  --  NOT STABILIZABLE")
+    print("=" * 62)
+    print("""
+  The motor torque T is INTERNAL: it acts between chassis and wheels, so
+  it cannot change the system's angular momentum about the contact point.
+  Only gravity can, and gravity's moment goes as theta.
 
-    K2 = design(A2, B2, Q2, Rc, "2-STATE  [theta, thd]  -- IMU only, drifts")
-    if K2 is not None:
-        simulate(A2, B2, K2, "2-state")
-        print(f"\n  K = {np.round(K2.ravel(), 4)}")
+  Concretely, w = q*thetadot - p*phidot has BOTH the input and the back-EMF
+  cancel exactly (q*p*beta - p*q*beta = 0), leaving  wdot = (Gam/Delta)*theta.
+  V has zero direct authority over w.
 
-    # ---- pick a usable rho ----
-    feasible = sweep_rho(A2, B2, Q2, "2-state")
-    if feasible:
-        r, K = feasible[0]
+  Consequence: the constant term of the closed-loop characteristic
+  polynomial is independent of k1 and k2, so one root always sits in the
+  right half plane. Raising the gains only slows the runaway.""")
+
+    print(f"\n  {'k1':>7}{'k2':>7}{'unstable pole':>15}{'runaway tau':>13}"
+          f"{'V @ 1.5deg':>12}")
+    for k1 in [25, 50, 100, 200, 400, 800]:
+        k2 = k1 / 10.0
+        Kt = np.array([[k1, k2, 0.0]])
+        mre = float(np.max(np.real(np.linalg.eigvals(A_bal - B_bal @ Kt))))
+        rail = "  <-- over rail" if k1 * 0.026 > V_bat else ""
+        print(f"  {k1:>7}{k2:>7.1f}{mre:>15.3f}{1/mre:>12.1f}s"
+              f"{k1*0.026:>11.1f}V{rail}")
+    print(f"\n  Within the {V_bat} V rail you can reach a runaway time constant of only")
+    print("  a few seconds. That is exactly how encoder-less balancers behave:")
+    print("  they hold for a moment, then accelerate away. Useful for a first")
+    print("  bring-up and for checking signs, but it is not a working robot.")
+
+    # ==================================================================
+    # CASE 2: add wheel-SPEED feedback -- the real design
+    # ==================================================================
+    print("\n" + "=" * 62)
+    print("CASE 2: + WHEEL SPEED  [theta, thetadot, phidot]  --  STABILIZABLE")
+    print("=" * 62)
+    print("  Note this needs wheel VELOCITY only, not absolute position.")
+
+    rank = np.linalg.matrix_rank(ctrb(A_bal, B_bal))
+    print(f"\n  controllability rank : {rank} / 3")
+
+    print(f"\n  {'rho':>8}{'K_theta':>10}{'K_rate':>9}{'K_wheel':>9}"
+          f"{'slowest pole':>14}{'V@5.7deg':>10}{'max|z|':>9}")
+    best = None
+    for r in [1, 10, 100, 1000, 1e4]:
+        Rc_r = np.array([[r / V_bat**2]])
+        P = solve_continuous_are(A_bal, B_bal, Q_bal, Rc_r)
+        K = np.linalg.inv(Rc_r) @ B_bal.T @ P
+        ev = np.linalg.eigvals(A_bal - B_bal @ K)
         k = K.ravel()
-        print(f"\n=== RECOMMENDED (rho = {r:g}) ===")
-        simulate(A2, B2, K, f"2-state, rho={r:g}")
+        v = abs(k[0] * tol_theta)
+        z = discrete_ok(A_bal, B_bal, K)
+        flag = ""
+        if v <= V_bat and z < 1.0 and best is None:
+            best = (r, K)
+            flag = "  <-- recommended"
+        print(f"  {r:>8.4g}{k[0]:>10.2f}{k[1]:>9.2f}{k[2]:>9.3f}"
+              f"{max(np.real(ev)):>14.2f}{v:>9.2f}V{z:>9.3f}{flag}")
+
+    print(f"\n  (max|z| is the discrete closed-loop spectral radius at "
+          f"{1/0.005:.0f} Hz; must be < 1)")
+
+    if best is not None:
+        r, K = best
+        k = K.ravel()
+        simulate(A_bal, B_bal, K, f"3-state, rho={r:g}")
         print("\n  --- paste into the Arduino sketch ---")
         print(f"  const float K_THETA = {k[0]:.4f}f;   // V per rad")
         print(f"  const float K_RATE  = {k[1]:.4f}f;   // V per rad/s")
-        print("  // V = -(K_THETA*theta + K_RATE*thetaDot);   theta in RADIANS")
-    else:
-        print("\n  !! no rho in the sweep satisfies both limits.")
-        print("     Widen tol_theta, slow the loop, or re-check the constants.")
+        print(f"  const float K_WHEEL = {k[2]:.4f}f;   // V per rad/s of wheel")
+        print("  // V = -(K_THETA*theta + K_RATE*thetaDot + K_WHEEL*phiDot);")
+        print("  // theta in RADIANS, rates in RAD/S")
+
+    # ==================================================================
+    # CASE 3: observer -- estimate phidot from the IMU, no encoder
+    # ==================================================================
+    print("\n" + "=" * 62)
+    print("CASE 3: OBSERVER  (LQG)  --  phidot ESTIMATED, no encoder")
+    print("=" * 62)
+
+    C = np.array([[1.0, 0.0, 0.0],       # theta   (complementary filter)
+                  [0.0, 1.0, 0.0]])      # thetadot (gyro, direct)
+
+    # Measurement noise: the accel-derived theta is the bad one -- it is
+    # corrupted by linear acceleration exactly when the bot is correcting.
+    sig_theta = np.radians(2.0)          # rad
+    sig_rate = np.radians(0.5)           # rad/s
+    Vn = np.diag([sig_theta**2, sig_rate**2])
+
+    # Process noise: put most of it on phidot, since that is where the
+    # unmodeled physics (friction, slip) actually enters.
+    ctrl_pole = float(np.max(np.real(np.linalg.eigvals(A_bal - B_bal @ K))))
+    print(f"\n  {'w_phid':>8}{'slowest obs':>13}{'slowest CL':>12}   note")
+    for w_phid in [0.03, 0.1, 0.3, 1.0, 3.0, 10.0]:
+        W = np.diag([1e-6, 1e-4, w_phid])
+        L = design_observer(A_bal, B_bal, C, W, Vn)
+        obs = float(np.max(np.real(np.linalg.eigvals(A_bal - L @ C))))
+        M = augmented(*build_bal(), A_bal, B_bal, K, L, C)
+        cl = float(np.max(np.real(np.linalg.eigvals(M))))
+        note = "observer limits" if obs > ctrl_pole else "controller limits (good)"
+        print(f"  {w_phid:>8.2f}{obs:>13.2f}{cl:>12.2f}   {note}")
+    print(f"\n  control poles sit at {ctrl_pole:.2f}. Low process noise makes the")
+    print("  observer fast enough that the CONTROLLER sets the closed-loop speed --")
+    print("  i.e. estimating phidot costs nothing nominally. High process noise")
+    print("  slows the weakly-observable mode and the observer becomes the limit.")
+
+    # ---- robustness to model error ----
+    W_PHID = 0.1        # <<< observer tuning dial
+    DT_LOOP = 0.005     # Arduino loop period -- discrete design is tied to it
+    W = np.diag([1e-6, 1e-4, W_PHID])
+    L = design_observer(A_bal, B_bal, C, W, Vn)
+    print(f"\n  using w_phid = {W_PHID}")
+    print(f"  L =\n{np.round(L, 4)}")
+
+    print("\n  --- tolerance to model error (observer keeps the nominal model) ---")
+    print(f"  {'kt error':>10}{'J_th error':>12}{'max Re':>10}   verdict")
+    for kt_s, Jth_s in [(1.0, 1.0), (1.2, 1.0), (0.8, 1.0), (1.5, 1.0),
+                        (0.5, 1.0), (1.0, 1.2), (1.0, 0.8), (1.3, 1.2)]:
+        At, Bt = build_bal(kt_s, Jth_s)
+        M = augmented(At, Bt, A_bal, B_bal, K, L, C)
+        mre = float(np.max(np.real(np.linalg.eigvals(M))))
+        print(f"  {(kt_s-1)*100:>+9.0f}%{(Jth_s-1)*100:>+11.0f}%{mre:>10.2f}"
+              f"   {'stable' if mre < 0 else 'UNSTABLE'}")
+
+    print("\n  Compare against CASE 2: with a real encoder, none of this")
+    print("  matters -- the wheel speed is measured, not inferred.")
+
+    # ==================================================================
+    # CASE 4: DISCRETE design -- what actually ships to the Arduino
+    # ==================================================================
+    print("\n" + "=" * 62)
+    print(f"CASE 4: DISCRETE-TIME DESIGN at dt = {DT_LOOP*1000:.0f} ms")
+    print("=" * 62)
+    print("""
+  The continuous gains above CANNOT be forward-Euler integrated on the
+  Arduino. The plant has a back-EMF pole near -313 rad/s; at 5 ms that
+  gives lambda*dt = -1.57, and the Euler-integrated closed loop comes out
+  at |z| = 2.58 -- violently unstable, despite a perfectly good continuous
+  design. Discretize first, then design. No integration error at all.""")
+
+    Ad, Bd, *_ = cont2discrete(
+        (A_bal, B_bal, np.eye(3), np.zeros((3, 1))), DT_LOOP)
+
+    print(f"\n  {'rho':>6}{'K_theta':>10}{'K_rate':>9}{'K_wheel':>10}"
+          f"{'|z| ctrl':>10}{'V@5.7deg':>10}")
+    for r in [1, 10, 100]:
+        Rd = np.array([[r / V_bat**2]])
+        Pd = solve_discrete_are(Ad, Bd, Q_bal, Rd)
+        Kd = np.linalg.inv(Rd + Bd.T @ Pd @ Bd) @ (Bd.T @ Pd @ Ad)
+        zc = float(np.max(np.abs(np.linalg.eigvals(Ad - Bd @ Kd))))
+        print(f"  {r:>6}{Kd[0,0]:>10.4f}{Kd[0,1]:>9.4f}{Kd[0,2]:>10.4f}"
+              f"{zc:>10.4f}{abs(Kd[0,0]*tol_theta):>9.2f}V")
+
+    RHO_D = 10
+    Rd = np.array([[RHO_D / V_bat**2]])
+    Pd = solve_discrete_are(Ad, Bd, Q_bal, Rd)
+    Kd = np.linalg.inv(Rd + Bd.T @ Pd @ Bd) @ (Bd.T @ Pd @ Ad)
+
+    # discrete Kalman PREDICTOR gain, matching
+    #   xhat[k+1] = Ad xhat + Bd u + L(y - C xhat)
+    Wd = np.diag([1e-6, 1e-4, W_PHID]) * DT_LOOP
+    Sd = solve_discrete_are(Ad.T, C.T, Wd, Vn)
+    Ld = Ad @ Sd @ C.T @ np.linalg.inv(C @ Sd @ C.T + Vn)
+
+    Mfull = np.block([[Ad, -Bd @ Kd], [Ld @ C, Ad - Bd @ Kd - Ld @ C]])
+    print(f"\n  rho = {RHO_D}, w_phid = {W_PHID}")
+    print(f"  observer |z|          : "
+          f"{np.max(np.abs(np.linalg.eigvals(Ad - Ld @ C))):.4f}")
+    print(f"  FULL sampled loop |z| : "
+          f"{np.max(np.abs(np.linalg.eigvals(Mfull))):.4f}   (must be < 1)")
+
+    print("\n  robustness (observer keeps the nominal model):")
+    for s in [1.5, 1.2, 0.8, 0.5]:
+        At, Bt = build_bal(s, 1.0)
+        Adt, Bdt, *_ = cont2discrete(
+            (At, Bt, np.eye(3), np.zeros((3, 1))), DT_LOOP)
+        Mt = np.block([[Adt, -Bdt @ Kd], [Ld @ C, Ad - Bd @ Kd - Ld @ C]])
+        z = float(np.max(np.abs(np.linalg.eigvals(Mt))))
+        print(f"    kt x{s:<4} -> |z| = {z:.4f}  "
+              f"{'stable' if z < 1 else 'UNSTABLE'}")
+
+    print("\n  ---------- paste into Arduino/balance/balance.ino ----------")
+    print(f"  const float DT = {DT_LOOP}f;")
+    print(f"  const float K_THETA = {Kd[0,0]:.4f}f;")
+    print(f"  const float K_RATE  = {Kd[0,1]:.4f}f;")
+    print(f"  const float K_WHEEL = {Kd[0,2]:.4f}f;")
+    for i in range(3):
+        print(f"  const float Ad{i}0 = {Ad[i,0]:.6f}f, "
+              f"Ad{i}1 = {Ad[i,1]:.6f}f, Ad{i}2 = {Ad[i,2]:.6f}f;")
+    print(f"  const float Bd0  = {Bd[0,0]:.6f}f, "
+          f"Bd1  = {Bd[1,0]:.6f}f, Bd2  = {Bd[2,0]:.6f}f;")
+    for i in range(3):
+        print(f"  const float L{i}0 = {Ld[i,0]:.6f}f, L{i}1 = {Ld[i,1]:.6f}f;")
