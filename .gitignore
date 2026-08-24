@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *.so
 *.dylib
+*.cache
 
 # --- Virtual environments ---
 venv/
@@ -14,14 +15,16 @@ soil_classification_env/
 # --- macOS ---
 .DS_Store
 
+# --- Windows ---
+Thumbs.db
+desktop.ini
+
+# --- SolidWorks / Office lock & backup files ---
+~$*
+*.~vrd
+*.swp.*
+
 # Windows-incompatible folders
 Spring 2026/Mechanical Design 3/Final Code/Gantry Code Iterations - Run w: Arduino/
 Spring 2026/Mechanical Design 3/Final Code/Image Processing - Run w: Python (Cursor)/
 Spring 2026/Mechanical Design 3/Final Code/Toolhead Movement - Run w: Arduino/
-
-# Mac junk
-.DS_Store
-
-# Python junk
-__pycache__/
-*.cache
