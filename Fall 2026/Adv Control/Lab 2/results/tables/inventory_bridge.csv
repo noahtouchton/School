@@ -1,0 +1,51 @@
+file,md5,part,shaper,tf_ms,cable_nom_mm,cable_infile_mm,trial,name_flagged_del,n_samples,duration_s,median_dt_s,n_moves,move_dist_mm,first_move_t0,first_move_t1,dup_group,is_duplicate_copy,cable_matches_name,notes,use
+Bride_ZVD_.5_.5_.91_1200_v1.csv,4478b4bd9f15bb6783fe47fabe277ccf,B,ZVD,1500.0,1200.0,1201.0,1.0,False,736,48.71,0.0511,2,371.0,0.97,4.33,,False,True,,True
+Bride_ZVD_.5_.5_.91_1200_v2.csv,84650328e41a0b83d2b31c5a619d4f0e,B,ZVD,1500.0,1200.0,1201.0,2.0,False,516,33.61,0.0511,2,-371.0,3.77,7.09,,False,True,,True
+Bride_ZVD_.5_.5_.91_1200_v3.csv,45edf9c0766f8822afcd2df93b106a58,B,ZVD,1500.0,1200.0,1201.0,3.0,False,517,33.2,0.0511,2,365.0,1.43,4.69,"Bride_ZVD_.5_.5_.91_1200_v3.csv, ZVD 3400 failure.csv",False,True,,True
+Bride_ZVD_.5_.5_.91_600_v1.csv,f17765d73761f68b26e7114aba2e8575,B,ZVD,1500.0,600.0,603.0,1.0,False,232,28.2,0.1022,2,-372.0,1.53,4.79,,False,True,,True
+Bride_ZVD_.5_.5_.91_600_v2.csv,a7be0d0a8ce5df9dc40dd38d8db80ddf,B,ZVD,1500.0,600.0,603.0,2.0,False,218,26.52,0.1022,2,371.0,7.09,10.45,,False,True,,True
+Bride_ZVD_.5_.5_.91_600_v3.csv,f56a0f8c863831543556db38305ee093,B,ZVD,1500.0,600.0,603.0,3.0,False,258,31.16,0.1022,2,371.0,0.71,4.08,,False,True,,True
+Bride_ZVD_.5_.5_.91_900_v1.csv,96f95be3cdaf465ed581955b1104b6d5,B,ZVD,1500.0,900.0,901.0,1.0,False,288,24.18,0.1019,2,372.0,1.94,5.31,,False,True,,True
+Bride_ZVD_.5_.5_.91_900_v2.csv,af4ee24704d211c2e462679f98828210,B,ZVD,1500.0,900.0,901.0,2.0,False,435,36.72,0.1018,2,371.0,2.39,5.76,,False,True,,True
+Bride_ZVD_.5_.5_.91_900_v3.csv,d5e31c1df675d625b7f771a96639fee6,B,ZVD,1500.0,900.0,901.0,3.0,False,421,35.86,0.1021,2,371.0,0.71,4.08,,False,True,,True
+Bride_ZV_.5_.5_.91_1200_v1.csv,00af29c4643bb90285ac0399af7f855c,B,ZV,1500.0,1200.0,1200.0,1.0,False,288,18.87,0.0511,2,296.0,0.71,3.06,,False,True,,True
+Bride_ZV_.5_.5_.91_1200_v2.csv,7c2df5359fba39681891e8c23a5b13a0,B,ZV,1500.0,1200.0,1200.0,2.0,False,328,21.58,0.0511,2,295.0,1.73,4.08,,False,True,,True
+Bride_ZV_.5_.5_.91_1200_v3.csv,e43eb7394854a3945e9d5c6ba7c9a7b2,B,ZV,1500.0,1200.0,1200.0,3.0,False,424,28.1,0.0511,2,296.0,1.37,3.77,,False,True,,True
+Bride_ZV_.5_.5_.91_600_v1.csv,75ce3d82d2d447c49f14c7d584714b5f,B,ZV,1500.0,600.0,603.0,1.0,False,178,21.73,0.1023,2,289.0,1.22,3.47,,False,True,,True
+Bride_ZV_.5_.5_.91_600_v2.csv,21e970ca2cba662783dc223fbca7b948,B,ZV,1500.0,600.0,603.0,2.0,False,192,23.52,0.1022,2,297.0,0.97,3.37,,False,True,,True
+Bride_ZV_.5_.5_.91_600_v3.csv,ed0dc2874bc2f6f6ceafa9213261d539,B,ZV,1500.0,600.0,603.0,3.0,False,265,32.13,0.1022,2,-297.0,3.47,5.76,,False,True,,True
+Bride_ZV_.5_.5_.91_900_v1.csv,7c852d8e286aa65cb7c6a7f332ac8ad5,B,ZV,1500.0,900.0,900.0,1.0,False,272,22.9,0.1019,2,297.0,5.76,8.16,,False,True,,True
+Bride_ZV_.5_.5_.91_900_v2.csv,5501ecd7cfc38505315b52b8749d7d23,B,ZV,1500.0,900.0,900.0,2.0,False,280,23.66,0.1018,2,297.0,1.17,3.57,,False,True,,True
+Bride_ZV_.5_.5_.91_900_v3.csv,4d74d9fb83ed115e657502beb742dd41,B,ZV,1500.0,900.0,900.0,3.0,False,280,24.08,0.102,2,296.0,2.09,4.49,,False,True,,True
+Bridge_100_-100_1100_v1.csv,a8c0b7785136f5d448db8f80e456e77b,A,Unshaped,1100.0,800.0,799.0,1.0,False,1537,129.36,0.1019,5,-755.0,1.43,2.6,,False,True,"5 moves in one log - session file, segmented per move",True
+Bridge_100_-100_1100_v2.csv,2c0d8b4c09a5ef12e85f80bb45f455e2,A,Unshaped,1100.0,800.0,799.0,2.0,False,209,16.98,0.1019,2,206.0,0.61,1.78,,False,True,,True
+Bridge_100_-100_1100_v3.csv,df0c4315b78b976ce8694fc2b9dbc12e,A,Unshaped,1100.0,800.0,799.0,3.0,False,201,16.98,0.1018,2,-207.0,1.38,2.45,"Bridge_100_-100_1100_v3.csv, Bridge_100_-100_1600_v1_del.csv",False,True,,True
+Bridge_100_-100_1600_v1_del.csv,df0c4315b78b976ce8694fc2b9dbc12e,A,Unshaped,1600.0,800.0,799.0,1.0,True,201,16.98,0.1018,2,-207.0,1.38,2.45,"Bridge_100_-100_1100_v3.csv, Bridge_100_-100_1600_v1_del.csv",True,True,byte-identical to Bridge_100_-100_1100_v3.csv; '_del' in name: flagged during the session,False
+Bridge_100_-100_1600_v2.csv,28f9e39989ee8c4bd82b58952236e1f8,A,Unshaped,1600.0,800.0,799.0,2.0,False,170,14.53,0.102,2,-303.0,1.22,2.8,,False,True,,True
+Bridge_100_-100_1600_v3.csv,140af36f100caed1830e56863354ae1d,A,Unshaped,1600.0,800.0,799.0,3.0,False,233,20.2,0.102,2,309.0,1.58,3.26,"Bridge_100_-100_1600_v3.csv, Bridge_100_-100_1600_v4_del.csv",False,True,,True
+Bridge_100_-100_1600_v4_del.csv,140af36f100caed1830e56863354ae1d,A,Unshaped,1600.0,800.0,799.0,4.0,True,233,20.2,0.102,2,309.0,1.58,3.26,"Bridge_100_-100_1600_v3.csv, Bridge_100_-100_1600_v4_del.csv",True,True,byte-identical to Bridge_100_-100_1600_v3.csv; '_del' in name: flagged during the session,False
+Bridge_100_-100_2000_v1.csv,3df8c51e31017392e63149e62fd826a5,A,Unshaped,2000.0,800.0,799.0,1.0,False,385,32.85,0.102,2,387.0,12.7,14.74,,False,True,,True
+Bridge_100_-100_2000_v2.csv,63600ec38f498bffc10b84e107d34191,A,Unshaped,2000.0,800.0,799.0,2.0,False,384,32.85,0.102,2,-390.0,0.92,2.96,"Bridge_100_-100_2000_v2.csv, Bridge_100_-100_2000_v3_del.csv",False,True,,True
+Bridge_100_-100_2000_v3_del.csv,63600ec38f498bffc10b84e107d34191,A,Unshaped,2000.0,800.0,799.0,3.0,True,384,32.85,0.102,2,-390.0,0.92,2.96,"Bridge_100_-100_2000_v2.csv, Bridge_100_-100_2000_v3_del.csv",True,True,byte-identical to Bridge_100_-100_2000_v2.csv; '_del' in name: flagged during the session,False
+Bridge_100_-100_2000_v4.csv,808172fbfac1a74209b01d3ee251af74,A,Unshaped,2000.0,800.0,799.0,4.0,False,211,18.26,0.102,2,-384.0,0.76,2.75,,False,True,,True
+Bridge_ZV_.5_.5_.9_1100_v1.csv,4c80ee8dd2388151a2997cf61ca7f1e5,A,ZV,1100.0,800.0,799.0,1.0,False,311,26.47,0.102,2,-216.0,1.48,3.37,"Bridge_ZV_.5_.5_.9_1100_v1.csv, Bridge_ZV_.5_.5_.9_1100_v2_del.csv",False,True,,True
+Bridge_ZV_.5_.5_.9_1100_v2_del.csv,4c80ee8dd2388151a2997cf61ca7f1e5,A,ZV,1100.0,800.0,799.0,2.0,True,311,26.47,0.102,2,-216.0,1.48,3.37,"Bridge_ZV_.5_.5_.9_1100_v1.csv, Bridge_ZV_.5_.5_.9_1100_v2_del.csv",True,True,byte-identical to Bridge_ZV_.5_.5_.9_1100_v1.csv; '_del' in name: flagged during the session,False
+Bridge_ZV_.5_.5_.9_1100_v3.csv,74feb45f6a6979c61706edece6ec2d14,A,ZV,1100.0,800.0,799.0,3.0,False,280,23.26,0.1018,2,211.0,1.73,3.67,"Bridge_ZV_.5_.5_.9_1100_v3.csv, Bridge_ZV_.5_.5_.9_1600_v1.csv",False,True,,True
+Bridge_ZV_.5_.5_.9_1600_v1.csv,74feb45f6a6979c61706edece6ec2d14,A,ZV,1600.0,800.0,799.0,1.0,False,280,23.26,0.1018,2,211.0,1.73,3.67,"Bridge_ZV_.5_.5_.9_1100_v3.csv, Bridge_ZV_.5_.5_.9_1600_v1.csv",True,True,byte-identical to Bridge_ZV_.5_.5_.9_1100_v3.csv,False
+Bridge_ZV_.5_.5_.9_1600_v2.csv,2a245ac91a8a54fc0a366e6ba8ff01ed,A,ZV,1600.0,800.0,799.0,2.0,False,1504,127.26,0.1019,2,316.0,105.12,107.62,,False,True,,True
+Bridge_ZV_.5_.5_.9_1600_v3.csv,ecd9fb2737ffe834ebad58fab5dd90b5,A,ZV,1600.0,800.0,799.0,3.0,False,478,40.65,0.102,2,-315.0,4.08,6.48,,False,True,,True
+Bridge_ZV_.5_.5_.9_1600_v4.csv,220dde2045072e3f8b92372e69b3deaf,A,ZV,1600.0,800.0,799.0,4.0,False,476,40.65,0.102,3,316.0,3.77,6.27,,False,True,"3 moves in one log - session file, segmented per move",True
+Bridge_ZV_.5_.5_.9_1800_v1.csv,c146358c8d6973557259dd470653d9a8,A,ZV,1800.0,800.0,799.0,1.0,False,291,24.89,0.1019,2,-353.0,3.88,6.48,,False,True,,True
+Bridge_ZV_.5_.5_.9_1800_v2.csv,57966dbb774f559cc09c8c8e28ec7c3c,A,ZV,1800.0,800.0,799.0,2.0,False,311,26.47,0.1021,2,352.0,1.63,4.28,,False,True,,True
+Bridge_ZV_.5_.5_.9_2000_v1.csv,e685f9f4548b64fe17564d384f164aea,A,ZV,2000.0,800.0,799.0,1.0,False,317,26.98,0.102,2,392.0,1.88,4.74,,False,True,,True
+Bridge_ZV_.5_.5_.9_2000_v2.csv,d8f8441f2b16419ab9dcb351c3fd3c9a,A,ZV,2000.0,800.0,799.0,2.0,False,462,38.76,0.1019,2,-393.0,2.6,5.41,,False,True,,True
+Bridge_ZV_.5_.5_.9_2000_v3.csv,6b1c48592b548127e4c347766480f723,A,ZV,2000.0,800.0,799.0,3.0,False,261,21.83,0.1019,2,394.0,1.02,3.87,,False,True,,True
+Bridge_b_1200_100_1500_v1.csv,cf6ed4b723eb67944c56141e2a209d20,B,Unshaped,1500.0,1200.0,1200.0,1.0,False,355,23.15,0.0511,2,287.0,1.48,3.01,,False,True,,True
+Bridge_b_1200_100_1500_v2.csv,d79a0117591c6c9719ac5b80397c8a20,B,Unshaped,1500.0,1200.0,1200.0,2.0,False,671,44.89,0.0511,2,289.0,4.39,5.97,,False,True,,True
+Bridge_b_1200_100_1500_v3.csv,6b118a0d1f6924d0179b387d362e47c4,B,Unshaped,1500.0,1200.0,1200.0,3.0,False,671,44.89,0.0511,2,-288.0,1.48,3.06,,False,True,,True
+Bridge_b_600_100_1500_v1.csv,87124bc363833eaab7265ad7d397c9c2,B,Unshaped,1500.0,600.0,799.0,1.0,False,234,21.83,0.1021,2,-390.0,4.79,6.02,,False,False,cable tag in file is 799 mm but the name implies 600 mm - MISLABELLED,False
+Bridge_b_600_100_1500_v2.csv,a0703bbabae675c510d3870aefb536f4,B,Unshaped,1500.0,600.0,601.0,2.0,False,633,76.81,0.1022,2,287.0,5.87,7.45,"Bridge_b_600_100_1500_v2.csv, Bridge_b_900_100_1500_v2.csv",False,True,,True
+Bridge_b_900_100_1500_v1.csv,b4cc049a478eb0b4933c4c9f8252167c,B,Unshaped,1500.0,900.0,901.0,1.0,False,626,52.33,0.1018,2,288.0,2.3,3.88,,False,True,,True
+Bridge_b_900_100_1500_v2.csv,a0703bbabae675c510d3870aefb536f4,B,Unshaped,1500.0,900.0,601.0,2.0,False,633,76.81,0.1022,2,287.0,5.87,7.45,"Bridge_b_600_100_1500_v2.csv, Bridge_b_900_100_1500_v2.csv",True,False,cable tag in file is 601 mm but the name implies 900 mm - MISLABELLED; byte-identical to Bridge_b_600_100_1500_v2.csv,False
+Bridge_b_900_100_1500_v3.csv,c72854dc6ae7335343cfada0a45aa942,B,Unshaped,1500.0,900.0,901.0,3.0,False,276,21.22,0.0512,2,281.0,1.37,2.85,,False,True,,True
+ZVD 3400 failure.csv,45edf9c0766f8822afcd2df93b106a58,,,,,1201.0,,False,517,33.2,0.0511,2,365.0,1.43,4.69,"Bride_ZVD_.5_.5_.91_1200_v3.csv, ZVD 3400 failure.csv",True,False,file name does not match any known lab condition; cable tag in file is 1201 mm but the name implies nan mm - MISLABELLED; byte-identical to Bride_ZVD_.5_.5_.91_1200_v3.csv,False

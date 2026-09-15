@@ -1,0 +1,31 @@
+rig,part,shaper,tf_s,cable_m,w_rad_s,tf_over_T,V_rel_vs_unshaped,freqs,w1_rad_s,w2_rad_s,V_rel_mode1,V_rel_mode2
+Bridge,A,Unshaped,1.1,0.8,3.5012,0.613,1.0,,,,,
+Bridge,A,ZV,1.1,0.8,3.5012,0.613,0.0047,,,,,
+Bridge,A,Unshaped,1.6,0.8,3.5012,0.8916,1.0,,,,,
+Bridge,A,ZV,1.6,0.8,3.5012,0.8916,0.0047,,,,,
+Bridge,A,Unshaped,1.8,0.8,3.5012,1.003,1.0,,,,,
+Bridge,A,ZV,1.8,0.8,3.5012,1.003,0.0047,,,,,
+Bridge,A,Unshaped,2.0,0.8,3.5012,1.1145,1.0,,,,,
+Bridge,A,ZV,2.0,0.8,3.5012,1.1145,0.0047,,,,,
+Bridge,B,Unshaped,1.5,0.6,4.0428,0.9652,1.0,,,,,
+Bridge,B,ZV,1.5,0.6,4.0428,0.9652,0.2655,,,,,
+Bridge,B,ZVD (as run),1.5,0.6,4.0428,0.9652,0.1929,,,,,
+Bridge,B,ZVD (textbook),1.5,0.6,4.0428,0.9652,0.0705,,,,,
+Bridge,B,Unshaped,1.5,0.9,3.301,0.788,1.0,,,,,
+Bridge,B,ZV,1.5,0.9,3.301,0.788,0.0688,,,,,
+Bridge,B,ZVD (as run),1.5,0.9,3.301,0.788,0.2453,,,,,
+Bridge,B,ZVD (textbook),1.5,0.9,3.301,0.788,0.0047,,,,,
+Bridge,B,Unshaped,1.5,1.2,2.8587,0.6825,1.0,,,,,
+Bridge,B,ZV,1.5,1.2,2.8587,0.6825,0.2668,,,,,
+Bridge,B,ZVD (as run),1.5,1.2,2.8587,0.6825,0.1925,,,,,
+Bridge,B,ZVD (textbook),1.5,1.2,2.8587,0.6825,0.0712,,,,,
+Tower,2,Unshaped,4.0,,,,,model,3.6661,11.9778,1.0,1.0
+Tower,2,Unshaped,4.0,,,,,measured,3.3112,10.0531,1.0,1.0
+Tower,2,ZV,4.0,,,,,model,3.6661,11.9778,0.031,0.313
+Tower,2,ZV,4.0,,,,,measured,3.3112,10.0531,0.1791,0.4707
+Tower,2,ZVD (as run),4.0,,,,,model,3.6661,11.9778,0.2521,0.2724
+Tower,2,ZVD (as run),4.0,,,,,measured,3.3112,10.0531,0.2209,0.1099
+Tower,2,ZVD (textbook),4.0,,,,,model,3.6661,11.9778,0.0275,0.1742
+Tower,2,ZVD (textbook),4.0,,,,,measured,3.3112,10.0531,0.034,0.1737
+Tower,2,Two-mode ZV,4.0,,,,,model,3.6661,11.9778,0.0273,0.0145
+Tower,2,Two-mode ZV,4.0,,,,,measured,3.3112,10.0531,0.1615,0.0998

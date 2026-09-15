@@ -1,0 +1,9 @@
+rig,config,model,L1_m,L2_m,w_rad_s,f_hz,T_s,half_T_s,R,beta
+Bridge,cable 600 mm,single pendulum,0.6,,4.0428,0.6434,1.5542,0.7771,,
+Bridge,cable 800 mm,single pendulum,0.8,,3.5012,0.5572,1.7946,0.8973,,
+Bridge,cable 900 mm,single pendulum,0.9,,3.301,0.5254,1.9034,0.9517,,
+Bridge,cable 1200 mm,single pendulum,1.2,,2.8587,0.455,2.1979,1.099,,
+Tower,"hoist 598 mm (as run), mode 1",double pendulum,0.598,0.2,3.6661,0.5835,1.7139,0.8569,1.398,13.2592
+Tower,"hoist 598 mm (as run), mode 2",double pendulum,0.598,0.2,11.9778,1.9063,0.5246,0.2623,1.398,13.2592
+Tower,"hoist 1000 mm (Table 1), mode 1",double pendulum,1.0,0.2,2.9512,0.4697,2.129,1.0645,1.398,12.6119
+Tower,"hoist 1000 mm (Table 1), mode 2",double pendulum,1.0,0.2,11.5061,1.8313,0.5461,0.273,1.398,12.6119

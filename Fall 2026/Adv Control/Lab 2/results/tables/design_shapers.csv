@@ -1,0 +1,17 @@
+rig,part,shaper,amps,delays_s,amp_sum,duration_s,implied_design_w_rad_s,implied_design_T_s,implied_design_L_m,tf_s,note
+Bridge,A,Unshaped,[1.0],[0.0],1.0,0.0,,,,1.1/1.6/2.0,"trapezoidal velocity, 100 % speed"
+Bridge,A,ZV (as run),"[0.5, 0.5]","[0.0, 0.9]",1.0,0.9,3.4907,1.8,0.8048,1.1/1.6/1.8/2.0,dt = 0.9 s = T/2 for the 0.8 m cable actually used (T/2 = 0.897 s)
+Bridge,B,Unshaped,[1.0],[0.0],1.0,0.0,,,,1.5,baseline at each cable length
+Bridge,B,ZV (as run),"[0.5, 0.5]","[0.0, 0.91]",1.0,0.91,3.4523,1.82,0.8228,1.5,"dt = 0.91 s = pi / mean(w at 0.6 m, w at 1.2 m) = pi/3.451 = 0.910 s - centred on the MEAN of the two extreme frequencies, not on the mid cable length, which is the standard way to centre a shaper over a known frequency range"
+Bridge,B,"ZVD (as run, 0.25/0.5/0.5)","[0.25, 0.5, 0.5]","[0.0, 0.91, 1.82]",1.25,1.82,3.4523,1.82,0.8228,1.5,"READ BACK FROM THE MEASURED VELOCITY of all nine trials: the third impulse was entered as 0.50 instead of 0.25, so the amplitudes sum to 1.25.  Consequences: the move is 27 % longer (371 mm vs 291 mm) and, critically, the residual at the design frequency is 0.25/1.25 = 20 % instead of 0 - which is why these trials do not beat the plain ZV.  The same mis-entry appears in the tower ZVD trials."
+Bridge,B,"ZVD (textbook, for comparison)","[0.25, 0.5, 0.25]","[0.0, 0.91, 1.82]",1.0,1.82,3.4523,1.82,0.8228,1.5,what the same delays would have delivered with correct amplitudes - the design the report should describe as intended
+Bridge,B-ref,ZV tuned to 600 mm,"[0.5, 0.5]","[0.0, 0.7771]",1.0,0.7771,4.0428,1.5542,0.6,1.5,reference: a ZV designed for this one cable length only
+Bridge,B-ref,ZV tuned to 900 mm,"[0.5, 0.5]","[0.0, 0.9517]",1.0,0.9517,3.301,1.9034,0.9,1.5,reference: a ZV designed for this one cable length only
+Bridge,B-ref,ZV tuned to 1200 mm,"[0.5, 0.5]","[0.0, 1.099]",1.0,1.099,2.8587,2.1979,1.2,1.5,reference: a ZV designed for this one cable length only
+Bridge,B-ref,EI (5 %) at the mean frequency,"[0.2625, 0.475, 0.2625]","[0.0, 0.9104, 1.8208]",1.0,1.8208,3.4508,1.8208,0.8235,1.5,"reference: an extra-insensitive shaper, same duration as ZVD"
+Tower,2,Unshaped,[1.0],[0.0],1.0,0.0,,,,4.0,"100 % slew, tf = 4000 ms"
+Tower,2,ZV (as run),"[0.5, 0.5]","[0.0, 0.84]",1.0,0.84,3.74,1.68,0.7011,4.0,dt = 0.84 s ~ T1/2 = 0.857 s: single-mode ZV on mode 1
+Tower,2,"ZVD (as run, 0.25/0.5/0.5)","[0.25, 0.5, 0.5]","[0.0, 0.84, 1.71]",1.25,1.71,3.74,1.68,0.7011,4.0,"READ BACK FROM THE DATA: the third impulse was entered as 0.50 instead of 0.25, so the amplitudes sum to 1.25 and the mid-move command asked for 125 % of the slew rate limit and saturated"
+Tower,2,"ZVD (textbook, for comparison)","[0.25, 0.5, 0.25]","[0.0, 0.84, 1.71]",1.0,1.71,3.74,1.68,0.7011,4.0,what the same delays would have done with correct amplitudes
+Tower,2,Two-mode ZV (as run),"[0.25, 0.25, 0.25, 0.25]","[0.0, 0.27, 0.84, 1.11]",1.0,1.11,11.6355,0.54,0.0724,4.0,convolution of a ZV on mode 1 (T1/2 = 0.857 s) with a ZV on mode 2 (T2/2 = 0.262 s); read back from the data
+Tower,2,Two-mode ZV (exact theory),"[0.25, 0.25, 0.25, 0.25]","[0.0, 0.2623, 0.8569, 1.1192]",1.0,1.1192,11.9778,0.5246,0.0684,4.0,the same design evaluated at the exact model frequencies
