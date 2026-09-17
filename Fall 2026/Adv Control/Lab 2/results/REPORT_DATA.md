@@ -178,5 +178,6 @@ The trade-off to state explicitly: a single-mode ZV is short but leaves the seco
 | `fig10_tower_mode_split.png` | Tower | residual split by mode - the two-mode argument |
 | `fig11_tower_spectra.png` | Tower | swing spectra with both predicted modes marked |
 | `fig12_tower_sensitivity.png` | Tower | tower shaper sensitivity curves with both modes marked |
+| `fig13_shaper_target_frequencies.png` | Both | shaper sensitivity vs frequency for both cranes with each shaper's target frequency marked - minimal labelling, written to be captioned |
 
 The handout limits you to 3 pages of text and asks for non-redundant plots. A minimal set that covers every required discussion point: **02** (Part A trend), **03** or **04** (Part B comparison), **05** (Part B design justification), **07** (tower execution), **10** (tower two-mode argument). Figures 01, 06, 08, 09, 11 and 12 are supporting material.

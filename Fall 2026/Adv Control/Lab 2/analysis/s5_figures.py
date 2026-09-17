@@ -21,6 +21,8 @@ it is obvious which figure supports which paragraph of the report.
   fig10  Tower residual split by mode - the two-mode argument
   fig11  Tower swing spectra with both predicted modes marked
   fig12  Tower shaper sensitivity curves with both modes marked
+  fig13  Both cranes, shaper sensitivity vs frequency with each shaper's
+         target frequency marked - minimal labelling, for a captioned figure
 """
 
 import os
@@ -435,6 +437,74 @@ def fig12(sc, tt):
     return save(fig, "fig12_tower_sensitivity.png")
 
 
+def fig13(tt):
+    """Shaper sensitivity vs frequency for both rigs, deliberately sparse.
+
+    This is the SHAPER-ONLY curve - the textbook V(omega) normalised by the
+    impulse sum - not the pulse-convolved command of figs 05 and 12.  That is
+    the right choice here because the notches then land on each shaper's design
+    frequency, which is what the figure is about.  Axis labels, panel titles
+    and legend entries are kept minimal so the caption can carry the detail.
+
+    Target frequencies are declared per design rather than inferred from the
+    impulse times: a shaper's target is set by the SPACING between impulses
+    (pi/dt), so reading pi/t_i off the later impulses of a three- or
+    four-impulse sequence invents frequencies the shaper was never aimed at.
+    """
+    w = np.linspace(1.0, 17.0, 4000)
+
+    # (name, amplitudes, delays, colour, linestyle, target frequencies rad/s)
+    bridge = [
+        ("ZV", [0.5, 0.5], [0.0, 0.91], C["ZV"], "-", [np.pi / 0.91]),
+        ("ZVD (as run)", [0.25, 0.5, 0.5], [0.0, 0.91, 1.82], C["ZVD"], "-",
+         [np.pi / 0.91]),
+        ("ZVD (textbook)", [0.25, 0.5, 0.25], [0.0, 0.91, 1.82],
+         C["ZVD (textbook)"], "--", []),
+    ]
+    tower = [
+        ("ZV", [0.5, 0.5], [0.0, 0.84], C["ZV"], "-", [np.pi / 0.84]),
+        ("ZVD (as run)", [0.25, 0.5, 0.5], [0.0, 0.84, 1.71], C["ZVD"], "-",
+         [np.pi / 0.855]),
+        ("Two-mode ZV", [0.25, 0.25, 0.25, 0.25], [0.0, 0.27, 0.84, 1.11],
+         C["Two-mode ZV"], "-", [np.pi / 0.84, np.pi / 0.27]),
+    ]
+    bridge_sys = [(L.pendulum_freq(c / 1000.0)[0], f"{c/1000:.1f} m")
+                  for c in (600, 800, 900, 1200)]
+    tower_sys = [(tt.w1_theory.mean(), "$\\omega_1$"),
+                 (tt.w2_theory.mean(), "$\\omega_2$")]
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.2), sharey=True)
+    for ax, designs, sysf, title, xlim in (
+            (axes[0], bridge, bridge_sys, "Bridge crane", (2.2, 5.0)),
+            (axes[1], tower, tower_sys, "Tower crane", (1.8, 14.5))):
+        for name, A, T, c, ls, _ in designs:
+            ax.plot(w, 100 * L.residual_vibration(A, T, w), color=c, ls=ls,
+                    label=name, lw=1.4)
+        # Headroom above 100 % holds the system-frequency labels, so they can
+        # never collide with the curves, the legend or the panel title.
+        ax.set_xlim(*xlim)
+        ax.set_ylim(0, 122)
+        ax.set_yticks([0, 20, 40, 60, 80, 100])
+        for k, (wf, lab) in enumerate(sorted(sysf)):
+            ax.axvline(wf, color="0.6", lw=0.7, ls=":", zorder=0)
+            ax.text(wf, 104 if k % 2 == 0 else 113, lab, fontsize=8,
+                    color="0.35", ha="center", va="bottom")
+        # One tick per distinct target frequency.  Several shapers share a
+        # target here, so colouring per shaper would just stack markers on top
+        # of one another; which shaper owns which notch is read off the curves.
+        for wt in sorted({round(t, 1) for _, _, _, _, _, ts in designs for t in ts}):
+            if xlim[0] < wt < xlim[1]:
+                ax.plot([wt], [0], marker="^", ms=9, color="0.15",
+                        clip_on=False, zorder=6)
+        ax.set_title(title, pad=6)
+        ax.set_xlabel("Frequency (rad/s)")
+        ax.legend(loc="upper left", bbox_to_anchor=(0.012, 100 / 122),
+                  framealpha=0.92)
+    axes[0].set_ylabel("Residual vibration (%)")
+    fig.tight_layout()
+    return save(fig, "fig13_shaper_target_frequencies.png")
+
+
 def main():
     tr = pd.read_csv(os.path.join(L.TABLES, "bridge_trials.csv"))
     tt = pd.read_csv(os.path.join(L.TABLES, "tower_trials.csv"))
@@ -443,6 +513,7 @@ def main():
     print("figures:")
     fig01(tr); fig02(tr, pred); fig03(tr); fig04(tr, pred); fig05(sc, tr); fig06(tr)
     fig07(tt); fig08(tt); fig09(tt); fig10(tt); fig11(tt); fig12(sc, tt)
+    fig13(tt)
 
 
 if __name__ == "__main__":

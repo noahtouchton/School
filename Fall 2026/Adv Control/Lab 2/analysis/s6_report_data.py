@@ -324,6 +324,7 @@ def main():
         ("fig10_tower_mode_split.png", "Tower", "residual split by mode - the two-mode argument"),
         ("fig11_tower_spectra.png", "Tower", "swing spectra with both predicted modes marked"),
         ("fig12_tower_sensitivity.png", "Tower", "tower shaper sensitivity curves with both modes marked"),
+        ("fig13_shaper_target_frequencies.png", "Both", "shaper sensitivity vs frequency for both cranes with each shaper's target frequency marked - minimal labelling, written to be captioned"),
     ]
     w("| figure | section | message |")
     w("|---|---|---|")

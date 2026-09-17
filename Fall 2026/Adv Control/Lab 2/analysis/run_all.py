@@ -49,7 +49,7 @@ def main():
     print("\nStart here:")
     print("  results/REPORT_DATA.md   numbers and argument, organised for the write-up")
     print("  results/DATA_QUALITY.md  what was thrown out and why - read before citing")
-    print("  results/figures/         12 report-ready figures")
+    print("  results/figures/         13 report-ready figures")
     print("  results/tables/          every number as CSV")
 
 
