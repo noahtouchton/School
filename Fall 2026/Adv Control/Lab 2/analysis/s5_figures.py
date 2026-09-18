@@ -375,29 +375,30 @@ def fig09(tt):
 
 
 def fig10(tt):
-    shapers = ["Unshaped", "ZV", "ZVD", "Two-mode ZV"]
-    fig, axes = plt.subplots(1, 2, figsize=(8.8, 3.9))
+    """Residual swing split by pendulum mode, tangential and radial.
+
+    Plotted in degrees to match the report's caption and the other tower
+    figures.  Amplitudes are peak-to-peak, averaged over the three trolley
+    radii, with error bars showing the spread across those three trials.
+    """
+    shapers = TOWER_ORDER
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.0), sharey=True)
     x = np.arange(len(shapers))
-    wd = 0.38
-    for ax, tag, name in ((axes[0], "tan", "tangential"), (axes[1], "rad", "radial")):
-        for k, (mode, hatch) in enumerate(((1, ""), (2, "///"))):
-            vals = [tt[tt.shaper == s][f"{tag}_m{mode}_amp_pp_rad"].mean() for s in shapers]
-            errs = [tt[tt.shaper == s][f"{tag}_m{mode}_amp_pp_rad"].std() for s in shapers]
+    wd = 0.36
+    for ax, tag, name in ((axes[0], "tan", "Tangential"), (axes[1], "rad", "Radial")):
+        for k, mode in enumerate((1, 2)):
+            col = f"{tag}_m{mode}_amp_pp_deg"
+            vals = [tt[tt.shaper == s][col].mean() for s in shapers]
+            errs = [tt[tt.shaper == s][col].std() for s in shapers]
             ax.bar(x + (k - 0.5) * wd, vals, wd, yerr=errs, capsize=3,
-                   hatch=hatch, edgecolor="k", linewidth=0.6,
-                   color=["#b0c4de", "#8fbc8f"][k],
-                   label=f"mode {mode}")
+                   color=["#8ab4d8", "#8fbc8f"][k], edgecolor="k",
+                   linewidth=0.6, label=f"Mode {mode}")
         ax.set_xticks(x)
-        ax.set_xticklabels(shapers, rotation=18, ha="right")
-        ax.set_ylabel(f"{name} swing, p-p (rad)")
-        ax.set_title(f"{name}")
-    f1 = tt.f1_theory_hz.mean()
-    f2 = tt.f2_theory_hz.mean()
-    axes[0].legend(title=f"mode 1 ~ {f1:.2f} Hz\nmode 2 ~ {f2:.2f} Hz", fontsize=7.5,
-                   title_fontsize=7.5)
-    fig.suptitle("Tower, residual split by mode: the single-mode ZV leaves mode 2 untouched "
-                 "(slightly worse),\nwhile the two-mode ZV is the only shaper that suppresses "
-                 "mode 2", y=1.0)
+        ax.set_xticklabels(shapers, rotation=15, ha="right")
+        ax.set_title(name, loc="left")
+    axes[0].set_ylabel("swing (deg)")
+    axes[0].legend()
+    fig.suptitle("Residual Swing by Mode", y=0.97)
     fig.tight_layout()
     return save(fig, "fig10_tower_mode_split.png")
 
