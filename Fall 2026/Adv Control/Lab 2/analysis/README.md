@@ -13,7 +13,7 @@ Reads everything under `data/`, writes everything under `results/`. Never modifi
 |---|---|
 | `results/REPORT_DATA.md` | the numbers and the argument, in the order the handout asks for the write-up. **Start here.** |
 | `results/DATA_QUALITY.md` | which files were set aside and why. Read before citing any trial by name. |
-| `results/figures/` | 13 report-ready figures, each with one message |
+| `results/figures/` | 17 report-ready figures, each with one message |
 | `results/tables/` | every number as CSV |
 
 ## Pipeline

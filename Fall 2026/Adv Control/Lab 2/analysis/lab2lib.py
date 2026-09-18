@@ -18,18 +18,24 @@ BRIDGE CRANE  (data/Bridge Crane Data/*.csv)
       * Files are padded to 2000 rows with all-zero rows.
 
 TOWER CRANE   (data/Tower Crane Data/*.xlsx)
-    One "Data" sheet, but each workbook is TWO concatenated acquisition
-    blocks separated by a jump in "Time [s]":
+    One "Data" sheet.  In 7 of the 12 workbooks it holds TWO acquisition
+    streams stacked vertically and separated by a jump in "Time [s]"; in the
+    other 5 a single block carries everything.  Where there are two:
       * block 1 (dt = 30 ms): motion-control stream.  Slew/trolley/hoist
         positions and the shaped command velocity are live; the vision
         columns (Cable Length, Tangential/Radial Swing) are blank.
       * block 2 (dt = 20 ms): vision stream.  Tangential/Radial swing and
         cable length are live; the motion columns are frozen at their final
         value.
-    So the commanded shaper is recovered from block 1 and the payload swing
-    is measured from block 2.  Block 2 begins roughly 15 s AFTER the move
-    ends, which is an unavoidable caveat on the tower amplitudes (see
-    results/DATA_QUALITY.md).
+
+    The two blocks are PARALLEL RECORDINGS OF THE SAME WINDOW on different
+    clocks, not consecutive segments.  Block 2's clock is offset by about
+    21.2 s, but the two spans have matching durations and the swing onset in
+    block 2 lines up with the move start in block 1 to within the detection
+    threshold.  So the vision stream DOES capture the move, and the blocks
+    must be aligned by subtracting each one's own start time before the
+    residual window can be placed after the end of the move.  `load_tower`
+    returns `t_vision_aligned` for exactly that.
 """
 
 from __future__ import annotations
@@ -117,39 +123,50 @@ def find_motion_segments(t, v, thresh, merge_gap=0.8, min_dur=0.3):
 
 
 def local_extrema(y):
-    """Indices of interior local maxima and minima (strict, with plateau
-    tolerance).  Returns a single array of extrema indices in time order."""
-    idx = []
-    n = y.size
-    i = 1
-    while i < n - 1:
-        if (y[i] >= y[i - 1] and y[i] > y[i + 1]) or (y[i] <= y[i - 1] and y[i] < y[i + 1]):
-            idx.append(i)
-        i += 1
+    """Indices of interior local maxima and minima (strict).
+
+    Kept for inspection only.  Amplitude scoring uses
+    `alternating_extrema`, which is robust to quantisation chatter.
+    """
+    y = np.asarray(y, float)
+    idx = [i for i in range(1, y.size - 1)
+           if (y[i] >= y[i - 1] and y[i] > y[i + 1])
+           or (y[i] <= y[i - 1] and y[i] < y[i + 1])]
     return np.asarray(idx, dtype=int)
 
 
-def prune_extrema(y, idx, min_swing):
-    """Keep only extrema that alternate max/min and whose swing exceeds
-    `min_swing`, which suppresses sensor-quantisation chatter."""
-    if idx.size == 0:
-        return idx
-    kept = [idx[0]]
-    for j in idx[1:]:
-        prev = kept[-1]
-        same_side = (y[j] - y[prev]) * (1 if y[prev] < 0 else -1) <= 0
-        # classify by comparing to neighbours instead: simply require the
-        # sign of the step to alternate and be large enough
-        if abs(y[j] - y[prev]) < min_swing:
-            # replace previous if this one is more extreme in the same direction
-            if (y[j] > y[prev]) == (y[prev] > 0):
-                kept[-1] = j
-            continue
-        if kept and len(kept) >= 2 and (y[j] - y[prev]) * (y[prev] - y[kept[-2]]) > 0:
-            kept[-1] = j
-            continue
-        kept.append(j)
-    return np.asarray(kept, dtype=int)
+def alternating_extrema(y, thresh=0.0):
+    """Peak/valley indices that strictly alternate, with a hysteresis band.
+
+    Walks the signal tracking a running extreme and commits it only once the
+    signal has reversed by more than `thresh`.  That rejects sensor
+    quantisation chatter (the bridge logs deflection to 1 mm) and, unlike a
+    neighbour-comparison peak search, it cannot return two maxima in a row -
+    so consecutive differences of the returned values are always true
+    peak-to-peak swings.  On a two-mode signal it follows whichever mode
+    dominates locally rather than collapsing, which is why it replaced the
+    earlier prune-by-alternation approach.
+    """
+    y = np.asarray(y, float)
+    if y.size < 3:
+        return np.array([], dtype=int)
+    out = []
+    i_max = i_min = 0
+    looking = 0              # +1 = a max is next to commit, -1 = a min
+    for i in range(1, y.size):
+        if y[i] > y[i_max]:
+            i_max = i
+        if y[i] < y[i_min]:
+            i_min = i
+        if looking >= 0 and y[i] < y[i_max] - thresh:
+            out.append(i_max)
+            looking = -1
+            i_min = i
+        elif looking <= 0 and y[i] > y[i_min] + thresh:
+            out.append(i_min)
+            looking = 1
+            i_max = i
+    return np.asarray(out, dtype=int)
 
 
 def zero_cross_period(t, y):
@@ -264,9 +281,7 @@ def residual_metrics(t, y, t0, t1, min_swing=0.0, n_cycles_cap=None, detrend="me
     if len(pk) > 1:
         r.freq_fft2_hz = pk[1][0]
 
-    idx = local_extrema(yc)
-    if min_swing > 0:
-        idx = prune_extrema(yc, idx, min_swing)
+    idx = alternating_extrema(yc, min_swing)
     r.n_extrema = int(idx.size)
     if idx.size >= 2:
         swings = np.abs(np.diff(yc[idx]))
@@ -466,24 +481,50 @@ TOWER_VISION = ["Time [s]", "Tangential Swing [rad]", "Radial Swing [rad]",
 
 
 def load_tower(path):
-    """Split a tower workbook into its motion block and its vision block."""
+    """Split a tower workbook into its motion stream and its vision stream,
+    and put the vision stream on the motion stream's clock.
+
+    The two streams are stacked vertically in one sheet and are told apart by
+    whether the vision columns are populated - NOT by looking for a jump in
+    "Time [s]".  A time-gap split silently fails on 5 of the 12 workbooks,
+    where the vision stream's clock carries straight on from the motion
+    stream's with no gap, so the whole sheet looks like a single block and the
+    swing data then appears to sit at times when the crane was still moving.
+
+    The streams are simultaneous recordings of one event on different clocks:
+    the motion stream always starts near t = 0 at 30 ms, the vision stream
+    always starts at t ~ 21.2 s at 20 ms.  Aligning their start times aligns
+    the event - verified by the swing onset landing on the move start to within
+    the detection threshold in all 12 trials.  `t_vision_aligned` is the vision
+    time base expressed on the motion clock.
+    """
     df = pd.read_excel(path, sheet_name="Data")
-    t = df["Time [s]"].to_numpy(float)
-    blocks = split_blocks(t, gap=1.0)
-    motion = vision = None
-    for a, b in blocks:
-        blk = df.iloc[a:b]
-        has_vision = blk["Tangential Swing [rad]"].notna().sum() > 10
-        has_cmd = np.ptp(blk["Position Slew [deg]"].to_numpy(float)) > 1.0
-        if has_vision and (vision is None or len(blk) > len(vision)):
-            vision = blk.reset_index(drop=True)
-        if has_cmd and (motion is None or len(blk) > len(motion)):
-            motion = blk.reset_index(drop=True)
-    if motion is None and blocks:
-        a, b = blocks[0]
-        motion = df.iloc[a:b].reset_index(drop=True)
+    vok = df["Tangential Swing [rad]"].notna().to_numpy()
+
+    motion = df[~vok].reset_index(drop=True) if (~vok).any() else None
+    vision = df[vok].reset_index(drop=True) if vok.any() else None
+    if motion is not None and len(motion) < 20:
+        motion = None
+    if vision is not None and len(vision) < 20:
+        vision = None
+    if motion is None:                      # degenerate: use the whole sheet
+        motion = df.reset_index(drop=True)
+
+    offset = 0.0
+    t_vision_aligned = None
+    if vision is not None:
+        tv = vision["Time [s]"].to_numpy(float)
+        tm = motion["Time [s]"].to_numpy(float)
+        offset = float(tv.min() - tm.min())
+        t_vision_aligned = tv - offset
     return dict(path=path, name=os.path.basename(path), raw=df,
-                motion=motion, vision=vision, n_blocks=len(blocks))
+                motion=motion, vision=vision,
+                n_blocks=len(split_blocks(df["Time [s]"].to_numpy(float))),
+                vision_clock_offset_s=offset,
+                t_vision_aligned=t_vision_aligned,
+                motion_dur_s=float(np.ptp(motion["Time [s]"].to_numpy(float))),
+                vision_dur_s=float(np.ptp(vision["Time [s]"].to_numpy(float)))
+                if vision is not None else np.nan)
 
 
 def command_profile(motion):
@@ -747,9 +788,7 @@ def mode_amplitudes(t, y, mode_freqs_hz, bw_frac=0.30, min_swing=0.0,
             sel = tt <= t_score_hi
             if sel.sum() >= 16:
                 tt, yy = tt[sel], yy[sel]
-        idx = local_extrema(yy)
-        if min_swing > 0:
-            idx = prune_extrema(yy, idx, min_swing)
+        idx = alternating_extrema(yy, min_swing)
         swings = np.abs(np.diff(yy[idx])) if idx.size >= 2 else np.array([np.nan])
         d.update(amp_pp=float(np.nanmax(swings)) if swings.size else np.nan,
                  amp_pp_mean=float(np.nanmean(swings)) if swings.size else np.nan,

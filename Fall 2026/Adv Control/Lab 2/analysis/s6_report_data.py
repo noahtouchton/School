@@ -167,7 +167,12 @@ def main():
     # -------------------------------------------------------------- tower ---
     w("---\n\n## Mobile tower crane\n")
     w("L1 (hoist) = 0.6 m, L2 = 0.2 m, tf = 4000 ms, 100 % slew, trolley at "
-      "500 / 700 / 900 mm. Figures 07-12.\n")
+      "500 / 700 / 900 mm. Figures 07-12 and 14-17.\n")
+    w("Residual swing is scored over three mode-1 periods starting 0.2 s after the "
+      "slew stops, on the vision stream aligned onto the motion clock. A separate "
+      "`*_peak_pp_deg` column reports the largest swing DURING the move plus a 3 s "
+      "tail - the transient the operator sees - because a shaper can win on one and "
+      "lose on the other.\n")
     w("### Double-pendulum frequencies\n")
     ftow = fq[fq.rig == "Tower"]
     w(md_table(ftow, ["config", "w_rad_s", "f_hz", "T_s", "half_T_s"]))
@@ -272,11 +277,14 @@ def main():
 
     # ------------------------------------------------------------ caveats ---
     w("---\n\n## Caveats to carry into the text\n")
-    w("1. **Tower amplitudes are post-decay.** Each workbook holds a motion block "
-      "and a vision block on different clocks, and the vision block starts ~15 s "
-      "after the move ends. Shaper-to-shaper and radius-to-radius comparisons are "
-      "fair (same protocol, same delay); absolute amplitudes are smaller than at the "
-      "end of the move, and tower and bridge amplitudes are not comparable.")
+    w("1. **The two tower streams are simultaneous, not consecutive.** The motion "
+      "stream and the vision stream record the same window on clocks offset by "
+      "~21.2 s, and they are told apart by which columns are populated rather than "
+      "by a time gap (a gap-based split fails on 5 of the 12 workbooks). Aligning "
+      "them is what lets the residual be scored after the move; an earlier version "
+      "of this analysis mis-read the offset as a 15 s delay and reported peak "
+      "swing DURING the move as though it were residual. Tower and bridge amplitudes "
+      "are still not comparable to each other.")
     w("2. **The ZVD trials on both rigs used [0.25, 0.50, 0.50].** Report them as "
       "the three-impulse shaper that was actually run, not as ZVD.")
     w("3. **Move distance is not constant across shapers.** On the bridge, ZVD moved "

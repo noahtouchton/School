@@ -197,18 +197,24 @@ def write_quality_report(b, t):
         A(f"| {r.timestamp} | {r.shaper} | {r.impulse_amps} | {r.impulse_delays_s} | "
           f"{r.trolley_mm:.0f} | {r.slew_travel_deg:.0f} | {r.notes or '-'} |")
     A("")
-    A("### The important tower caveat\n")
-    A("Each workbook holds **two acquisition blocks** on different clocks:\n")
+    A("### How the two tower data streams fit together\n")
+    A("Each workbook stacks **two acquisition streams** in one sheet:\n")
     A("1. a 30 ms motion-control stream (slew/trolley/hoist state and the shaped "
       "command) in which the vision columns are blank, and")
     A("2. a 20 ms vision stream (tangential/radial swing, cable length) in which the "
       "motion columns are frozen at their final value.\n")
-    A("The vision block **starts roughly 15 s after the move ends**, so tower swing "
-      "amplitudes are measured well into the decay, not at the instant the move "
-      "finishes. Every trial shares the same protocol and the same delay, so "
-      "shaper-to-shaper and radius-to-radius comparisons are fair; the absolute "
-      "amplitudes are simply smaller than they were at the end of the move. Do not "
-      "compare tower amplitudes to bridge amplitudes.\n")
+    A("They are **parallel recordings of the same window on different clocks**, not "
+      "consecutive segments. The motion stream always starts near t = 0; the vision "
+      "stream always starts at t ~ 21.2 s. Their durations match, and once the start "
+      "times are aligned the swing onset lands on the move start to within the "
+      "detection threshold in all 12 trials. So the vision stream **does** capture "
+      "the move, and residual amplitudes are scored strictly after the slew stops "
+      "(3 mode-1 periods, the most every trial can supply).\n")
+    A("The streams are told apart by **whether the vision columns are populated**, "
+      "not by looking for a jump in `Time [s]`. A time-gap split fails silently on 5 "
+      "of the 12 workbooks, where the vision clock carries straight on from the "
+      "motion clock with no gap: the sheet then looks like one block and the swing "
+      "data appears to sit at times when the crane was still moving.\n")
     A("### As-run ZVD amplitudes\n")
     zvd = t[t.shaper == "ZVD"]
     if len(zvd) and abs(zvd.impulse_amp_sum.mean() - 1.0) > 0.05:

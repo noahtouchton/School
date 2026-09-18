@@ -23,6 +23,14 @@ it is obvious which figure supports which paragraph of the report.
   fig12  Tower shaper sensitivity curves with both modes marked
   fig13  Both cranes, shaper sensitivity vs frequency with each shaper's
          target frequency marked - minimal labelling, for a captioned figure
+
+  Figures in the draft report's Figure 1 / Figure 2 house style, replacing the
+  default-palette MATLAB plots:
+  fig14  Tower residual swing, 3 radii x tangential/radial, all four shapers
+  fig15  Residual swing spectrum at one radius
+  fig16  Mean residual RMS by shaper       -> the report's first "FIGURE __"
+  fig17  Mode content, and residual vs peak transient, by shaper
+                                           -> the report's second "Figure __"
 """
 
 import os
@@ -75,6 +83,32 @@ def bridge_trace(row, pad_before=1.0, pad_after=None):
     hi = t1 + (pad_after if pad_after else max(row.resid_window_s, 6.0))
     m = (d["t"] >= t0 - pad_before) & (d["t"] <= hi)
     return d["t"][m] - t0, d["defl"][m], d["vel"][m], d["pos"][m]
+
+
+TOWER_ORDER = ["Unshaped", "ZV", "ZVD", "Two-mode ZV"]
+RADII = [500, 700, 900]
+
+
+def _tower_trace(row, chan, despike=True):
+    """Swing trace on the motion clock, zeroed on its own pre-move baseline.
+
+    The vision signal carries occasional single-sample dropouts that show up as
+    hairline spikes (they are visible in the original MATLAB plots too).  A
+    3-sample median filter removes them without touching the oscillation: at
+    50 Hz it spans 60 ms against a 1.9 s mode-1 period and a 0.6 s mode-2
+    period.  Amplitudes in the tables are computed from the UNFILTERED signal -
+    this is for legibility of the plotted curves only.
+    """
+    d = L.load_tower(os.path.join(L.TOWER_DIR, row.file))
+    vi, ta = d["vision"], d["t_vision_aligned"]
+    y = vi[chan].to_numpy(float)
+    ok = np.isfinite(y)
+    t, y = ta[ok], y[ok]
+    if despike and y.size > 5:
+        y = pd.Series(y).rolling(3, center=True, min_periods=1).median().to_numpy()
+    base = y[t < row.move_t0]
+    y = y - (base.mean() if base.size > 5 else y.mean())
+    return t - row.move_t0, np.degrees(y)
 
 
 # ---------------------------------------------------------------- Part A ----
@@ -297,27 +331,22 @@ def fig08(tt, radius=700):
         if sub.empty:
             continue
         r = sub.iloc[0]
-        d = L.load_tower(os.path.join(L.TOWER_DIR, r.file))
-        vi = d["vision"]
-        t = vi["Time [s]"].to_numpy(float) - r.vision_t0
         for ax, chan, tag in ((axes[0], "Tangential Swing [rad]", "tan"),
                               (axes[1], "Radial Swing [rad]", "rad")):
-            y = vi[chan].to_numpy(float)
-            ok = np.isfinite(y)
-            yy = y[ok] - np.polyval(np.polyfit(t[ok], y[ok], 1), t[ok])
-            ax.plot(t[ok], yy, color=C[sh],
+            t, y = _tower_trace(r, chan)
+            ax.plot(t, np.radians(y), color=C[sh],
                     label=f"{sh} ({getattr(r, tag + '_amp_pp_rad'):.3f} rad p-p)")
     axes[0].set_ylabel("tangential swing (rad)")
     axes[1].set_ylabel("radial swing (rad)")
-    axes[1].set_xlabel("time from start of the vision record (s)")
+    axes[1].set_xlabel("time from start of move (s)")
     for ax in axes:
         ax.legend(ncol=2, fontsize=7.5)
         ax.axhline(0, color="0.4", lw=0.6)
     axes[0].set_title("along the direction of travel - what the shaper targets")
     axes[1].set_title("along the jib - excited by the rotation, not by the shaper's target mode")
     fig.suptitle(f"Tower residual hook swing, trolley at {radius} mm\n"
-                 "the vision record starts ~15 s after the move ends, so these are "
-                 "post-decay amplitudes", y=1.0)
+                 "vision stream aligned onto the motion clock; t = 0 is the start "
+                 "of the slew", y=1.0)
     fig.tight_layout()
     return save(fig, "fig08_tower_swing_time_histories.png")
 
@@ -380,12 +409,9 @@ def fig11(tt, radius=900):
         if sub.empty:
             continue
         r = sub.iloc[0]
-        d = L.load_tower(os.path.join(L.TOWER_DIR, r.file))
-        vi = d["vision"]
-        t = vi["Time [s]"].to_numpy(float)
-        y = vi["Tangential Swing [rad]"].to_numpy(float)
-        ok = np.isfinite(y)
-        tt_, yy = t[ok], y[ok]
+        t, ydeg = _tower_trace(r, "Tangential Swing [rad]")
+        m = t >= (r.move_t1 - r.move_t0)          # residual only
+        tt_, yy = t[m], np.radians(ydeg[m])
         yy = yy - np.polyval(np.polyfit(tt_, yy, 1), tt_)
         dt = float(np.median(np.diff(tt_)))
         tu = np.arange(tt_[0], tt_[-1], dt)
@@ -505,6 +531,146 @@ def fig13(tt):
     return save(fig, "fig13_shaper_target_frequencies.png")
 
 
+# ---------------------------------------------------------------------------
+# Figures matching the Figure 1 / Figure 2 house style of the draft report.
+#
+# Style rules taken from those two figures and applied verbatim here:
+#   * one suptitle naming the quantity, left-aligned minimal panel titles
+#   * axis labels only ("swing (deg)", "time from start of move (s)"), with the
+#     x label on the bottom row only
+#   * a single horizontal legend in the first panel, shaper names only - no
+#     amplitudes, annotations or callouts, because the caption carries those
+#   * red = Unshaped, blue = ZV, green = ZVD, purple = Two-mode ZV
+#   * dotted grey vertical at t = 0, grey zero line, shared axis limits
+#   * every trace trimmed to a common duration so no curve ends mid-panel
+#     (the reviewer comment on Figure 1 asks for this explicitly)
+# ---------------------------------------------------------------------------
+def fig14(tt):
+    """Tower residual swing time histories: 3 radii x tangential/radial."""
+    # trim every panel to the shortest post-move record in the set
+    avail = []
+    for r in tt.itertuples():
+        t, _ = _tower_trace(r, "Tangential Swing [rad]")
+        avail.append(t.max())
+    t_end = float(np.floor(min(avail)))
+
+    fig, axes = plt.subplots(3, 2, figsize=(9.6, 8.0), sharex=True)
+    for i, radius in enumerate(RADII):
+        for j, (chan, lab) in enumerate((("Tangential Swing [rad]", "Tangential"),
+                                         ("Radial Swing [rad]", "Radial"))):
+            ax = axes[i, j]
+            for sh in TOWER_ORDER:
+                sub = tt[(tt.shaper == sh) & (tt.trolley_nom_mm == radius)]
+                if sub.empty:
+                    continue
+                t, y = _tower_trace(sub.iloc[0], chan)
+                m = t <= t_end
+                ax.plot(t[m], y[m], color=C[sh], label=sh, lw=1.2)
+            ax.axvline(0, color="0.6", lw=0.8, ls=":")
+            ax.axhline(0, color="0.5", lw=0.7)
+            ax.set_xlim(-1.5, t_end)
+            ax.set_ylim(-16, 16)
+            ax.set_title(f"{lab}, trolley = {radius} mm", loc="left")
+            if j == 0:
+                ax.set_ylabel("swing (deg)")
+    axes[0, 0].legend(ncol=4, loc="upper right", fontsize=7.5,
+                      columnspacing=1.0, handlelength=1.4)
+    for ax in axes[-1, :]:
+        ax.set_xlabel("time from start of move (s)")
+    fig.suptitle("Tower Crane - Residual Swing", y=0.995)
+    fig.tight_layout()
+    return save(fig, "fig14_tower_residual_swing.png")
+
+
+def fig15(tt, radius=700):
+    """Residual swing spectrum at one radius, tangential + radial combined."""
+    fig, ax = plt.subplots(figsize=(7.4, 4.0))
+    for sh in TOWER_ORDER:
+        sub = tt[(tt.shaper == sh) & (tt.trolley_nom_mm == radius)]
+        if sub.empty:
+            continue
+        r = sub.iloc[0]
+        spec_sum, freq = None, None
+        for chan in ("Tangential Swing [rad]", "Radial Swing [rad]"):
+            t, y = _tower_trace(r, chan)
+            m = t >= (r.move_t1 - r.move_t0)      # residual only
+            tt_, yy = t[m], y[m]
+            yy = yy - np.polyval(np.polyfit(tt_, yy, 1), tt_)
+            dt = float(np.median(np.diff(tt_)))
+            tu = np.arange(tt_[0], tt_[-1], dt)
+            yu = np.interp(tu, tt_, yy) * np.hanning(tu.size)
+            n = 1 << int(np.ceil(np.log2(tu.size * 8)))
+            sp = np.abs(np.fft.rfft(yu, n)) * 2 / tu.size
+            freq = np.fft.rfftfreq(n, dt)
+            spec_sum = sp if spec_sum is None else spec_sum + sp
+        m = (freq > 0.15) & (freq < 2.5)
+        ax.plot(freq[m], spec_sum[m], color=C[sh], label=sh, lw=1.3)
+    for fc in (tt.f1_theory_hz.mean(), tt.f2_theory_hz.mean()):
+        ax.axvline(fc, color="0.6", lw=0.8, ls="--")
+    ax.set_xlabel("frequency (Hz)")
+    ax.set_ylabel("swing amplitude (deg)")
+    ax.legend(ncol=4, fontsize=8, columnspacing=1.0, handlelength=1.4)
+    fig.suptitle(f"Residual Swing Spectrum - trolley = {radius} mm", y=0.98)
+    fig.tight_layout()
+    return save(fig, "fig15_tower_residual_spectrum.png")
+
+
+def fig16(tt):
+    """Mean residual RMS by shaper - the figure the RMS claim needs."""
+    x = np.arange(len(TOWER_ORDER))
+    wd = 0.36
+    fig, ax = plt.subplots(figsize=(6.6, 4.0))
+    for k, (col, lab) in enumerate((("tan_rms_rad", "Tangential"),
+                                    ("rad_rms_rad", "Radial"))):
+        vals = [np.degrees(tt[tt.shaper == s][col].mean()) for s in TOWER_ORDER]
+        errs = [np.degrees(tt[tt.shaper == s][col].std()) for s in TOWER_ORDER]
+        ax.bar(x + (k - 0.5) * wd, vals, wd, yerr=errs, capsize=3,
+               color=["#8ab4d8", "#c9a227"][k], edgecolor="k", linewidth=0.6,
+               label=lab)
+    ax.set_xticks(x)
+    ax.set_xticklabels(TOWER_ORDER)
+    ax.set_ylabel("residual RMS swing (deg)")
+    ax.legend()
+    fig.suptitle("Mean Residual RMS Swing by Shaper", y=0.97)
+    fig.tight_layout()
+    return save(fig, "fig16_tower_residual_rms.png")
+
+
+def fig17(tt):
+    """Mode split and residual-vs-transient - the two-mode trade-off figure."""
+    x = np.arange(len(TOWER_ORDER))
+    wd = 0.36
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.0))
+
+    ax = axes[0]
+    for k, (col, lab) in enumerate((("tan_m1_amp_pp_deg", "Mode 1"),
+                                    ("tan_m2_amp_pp_deg", "Mode 2"))):
+        vals = [tt[tt.shaper == s][col].mean() for s in TOWER_ORDER]
+        errs = [tt[tt.shaper == s][col].std() for s in TOWER_ORDER]
+        ax.bar(x + (k - 0.5) * wd, vals, wd, yerr=errs, capsize=3,
+               color=["#8ab4d8", "#8fbc8f"][k], edgecolor="k", linewidth=0.6,
+               label=lab)
+    ax.set_ylabel("residual swing (deg)")
+
+    ax = axes[1]
+    for k, (col, lab) in enumerate((("tan_amp_pp_deg", "Residual"),
+                                    ("tan_peak_pp_deg", "Peak transient"))):
+        vals = [tt[tt.shaper == s][col].mean() for s in TOWER_ORDER]
+        errs = [tt[tt.shaper == s][col].std() for s in TOWER_ORDER]
+        ax.bar(x + (k - 0.5) * wd, vals, wd, yerr=errs, capsize=3,
+               color=["#8ab4d8", "#d98a8a"][k], edgecolor="k", linewidth=0.6,
+               label=lab)
+    ax.set_ylabel("tangential swing (deg)")
+
+    for ax in axes:
+        ax.set_xticks(x)
+        ax.set_xticklabels(TOWER_ORDER, rotation=15, ha="right")
+        ax.legend()
+    fig.suptitle("Mode Content and Transient vs Residual Swing", y=0.97)
+    fig.tight_layout()
+    return save(fig, "fig17_tower_modes_and_transient.png")
+
+
 def main():
     tr = pd.read_csv(os.path.join(L.TABLES, "bridge_trials.csv"))
     tt = pd.read_csv(os.path.join(L.TABLES, "tower_trials.csv"))
@@ -514,6 +680,7 @@ def main():
     fig01(tr); fig02(tr, pred); fig03(tr); fig04(tr, pred); fig05(sc, tr); fig06(tr)
     fig07(tt); fig08(tt); fig09(tt); fig10(tt); fig11(tt); fig12(sc, tt)
     fig13(tt)
+    fig14(tt); fig15(tt); fig16(tt); fig17(tt)
 
 
 if __name__ == "__main__":

@@ -35,8 +35,19 @@ different from the bridge:
     bridge, where tf/T ~ 0.6-1.1, the same prediction is well conditioned and
     is used quantitatively.)
 
-The vision stream comes online ~15 s after the move ends, so all tower
-amplitudes are post-decay; see results/DATA_QUALITY.md.
+The vision stream is a PARALLEL recording of the same window as the motion
+stream on a clock offset by ~21 s (and in 5 of the 12 workbooks a single block
+carries both).  `lab2lib.load_tower` aligns them, so the residual window can be
+placed strictly AFTER the end of the move.  Two amplitudes are therefore
+reported and they answer different questions:
+  * `*_amp_pp_rad`  - the RESIDUAL, scored over 3 mode-1 periods starting when
+    the slew stops.  This is what the handout asks for and what the shaper is
+    judged on.  3 periods is the most every trial can supply (the shortest has
+    3.5 available).
+  * `*_peak_pp_rad` - the largest swing DURING the move plus a 3 s tail, i.e.
+    the transient the operator actually sees.  A shaper can win on one and lose
+    on the other, which is the two-mode-vs-robust trade-off the report
+    discusses.
 
 Outputs
   results/tables/tower_trials.csv    one row per trial, everything
@@ -59,7 +70,10 @@ MIN_SWING = 2 * SWING_QUANT
 # Score a fixed span of MODE-1 periods.  A zero-crossing-based cycle cap is
 # useless on a double pendulum: the crossings count both modes, so the apparent
 # "period" is a fraction of a second and the window collapses to a sliver.
-N_MODE1_PERIODS = 5
+# 3 periods is the largest span every trial can supply after its move ends.
+N_MODE1_PERIODS = 3
+RESID_MARGIN_S = 0.2     # let the drive settle before the residual window
+TRANSIENT_TAIL_S = 3.0   # how long after the move the "peak" window runs
 FULL_SLEW_CMD = 32.4     # deg/s at 100 % speed
 TF_MS = 4000             # commanded pulse length for every tower trial
 CHANNELS = (("Tangential Swing [rad]", "tan"), ("Radial Swing [rad]", "rad"))
@@ -144,34 +158,50 @@ def analyse(path):
 
     # --- residual swing, overall and per mode -------------------------------
     if vi is not None:
-        tv = vi["Time [s]"].to_numpy(float)
+        # vision on the motion clock, so "after the move" means what it says
+        tv = d["t_vision_aligned"]
         T1 = 2 * np.pi / w1
+        t_lo = t1 + RESID_MARGIN_S
+        t_hi = min(float(np.nanmax(tv)), t_lo + N_MODE1_PERIODS * T1)
+        row["resid_t0"] = round(t_lo, 2)
+        row["resid_t1"] = round(t_hi, 2)
+        row["resid_window_s"] = round(t_hi - t_lo, 2)
+        row["resid_cycles_available"] = round(
+            (float(np.nanmax(tv)) - t_lo) / T1, 2)
+        row["vision_clock_offset_s"] = round(d["vision_clock_offset_s"], 2)
+        row["motion_dur_s"] = round(d["motion_dur_s"], 2)
+        row["vision_dur_s"] = round(d["vision_dur_s"], 2)
+
         for chan, tag in CHANNELS:
             y = vi[chan].to_numpy(float)
             ok = np.isfinite(y)
             tvv, yy = tv[ok], y[ok]
-            t_hi = min(tvv[-1], tvv[0] + N_MODE1_PERIODS * T1)
-            r = L.residual_metrics(tvv, yy, tvv[0], t_hi, min_swing=MIN_SWING,
+
+            # residual, strictly after the move
+            r = L.residual_metrics(tvv, yy, t_lo, t_hi, min_swing=MIN_SWING,
                                    detrend="linear")
             row[f"{tag}_amp_pp_rad"] = round(r.amp_pp_max, 5)
             row[f"{tag}_rms_rad"] = round(r.rms, 5)
             row[f"{tag}_amp_pp_mm"] = round(r.amp_pp_max * cable_mm, 1)
+            row[f"{tag}_amp_pp_deg"] = round(np.degrees(r.amp_pp_max), 2)
+
+            # peak transient during the move plus a short tail
+            p = L.residual_metrics(tvv, yy, t0 - 0.5, t1 + TRANSIENT_TAIL_S,
+                                   min_swing=MIN_SWING, detrend="linear")
+            row[f"{tag}_peak_pp_rad"] = round(p.amp_pp_max, 5)
+            row[f"{tag}_peak_pp_deg"] = round(np.degrees(p.amp_pp_max), 2)
 
             modes = L.mode_amplitudes(tvv, yy, [f1, f2], min_swing=MIN_SWING,
                                       t_score_hi=t_hi)
             for m in modes:
                 i = m["mode"]
                 row[f"{tag}_m{i}_amp_pp_rad"] = round(m["amp_pp"], 5)
-                row[f"{tag}_m{i}_amp_pp_mm"] = round(m["amp_pp"] * cable_mm, 1)
+                row[f"{tag}_m{i}_amp_pp_deg"] = round(np.degrees(m["amp_pp"]), 2)
                 row[f"{tag}_m{i}_rms_rad"] = round(m["rms"], 5)
                 row[f"{tag}_m{i}_f_meas_hz"] = round(m["f_peak_hz"], 4)
                 row[f"{tag}_m{i}_f_err_pct"] = round(
                     100 * (m["f_peak_hz"] - m["f_center_hz"]) / m["f_center_hz"], 1)
                 row[f"{tag}_m{i}_f_unreliable"] = bool(m["f_at_band_edge"])
-        row["scoring_window_s"] = round(float(t_hi - tv[0]), 2)
-        row["vision_t0"] = round(float(tv[0]), 2)
-        row["vision_t1"] = round(float(tv[-1]), 2)
-        row["vision_delay_after_move_s"] = round(float(tv[0]) - t1, 2)
         row["total_amp_pp_rad"] = round(
             float(np.hypot(row["tan_amp_pp_rad"], row["rad_amp_pp_rad"])), 5)
 
@@ -274,9 +304,15 @@ def main():
         actual_travel_deg=("actual_travel_deg", "mean"),
         tan_amp_pp_rad=("tan_amp_pp_rad", "mean"),
         tan_amp_pp_sd=("tan_amp_pp_rad", "std"),
+        tan_amp_pp_deg=("tan_amp_pp_deg", "mean"),
+        tan_peak_pp_deg=("tan_peak_pp_deg", "mean"),
+        rad_peak_pp_deg=("rad_peak_pp_deg", "mean"),
+        tan_rms_rad=("tan_rms_rad", "mean"),
+        rad_rms_rad=("rad_rms_rad", "mean"),
         tan_m1_rad=("tan_m1_amp_pp_rad", "mean"),
         tan_m2_rad=("tan_m2_amp_pp_rad", "mean"),
         rad_amp_pp_rad=("rad_amp_pp_rad", "mean"),
+        rad_amp_pp_deg=("rad_amp_pp_deg", "mean"),
         rad_m1_rad=("rad_m1_amp_pp_rad", "mean"),
         rad_m2_rad=("rad_m2_amp_pp_rad", "mean"),
         pct_tan=("pct_tan", "mean"),
@@ -308,8 +344,8 @@ def main():
 
     pd.set_option("display.width", 260)
     print("=" * 120)
-    print("TOWER - residual hook swing (vision block, ~%.0f s after the move ends)"
-          % tr.vision_delay_after_move_s.mean())
+    print("TOWER - residual hook swing, scored over %d mode-1 periods starting "
+          "%.1f s after the slew stops" % (N_MODE1_PERIODS, RESID_MARGIN_S))
     print("cable L1 = %.0f mm, L2 = %.0f mm  ->  f1 = %.3f Hz (T1 = %.2f s), f2 = %.3f Hz"
           % (tr.cable_mm.mean(), L.L2_RIG * 1000, tr.f1_theory_hz.mean(),
              tr.T1_theory_s.mean(), tr.f2_theory_hz.mean()))
