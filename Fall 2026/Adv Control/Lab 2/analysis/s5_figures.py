@@ -418,7 +418,7 @@ def fig11(tt, radius=900):
         tu = np.arange(tt_[0], tt_[-1], dt)
         yu = np.interp(tu, tt_, yy) * np.hanning(tu.size)
         n = 1 << int(np.ceil(np.log2(tu.size * 8)))
-        spec = np.abs(np.fft.rfft(yu, n)) * 2 / tu.size
+        spec = np.abs(np.fft.rfft(yu, n)) * 4 / tu.size   # 4/N: Hann coherent gain 0.5
         f = np.fft.rfftfreq(n, dt)
         m = (f > 0.15) & (f < 3.0)
         ax.semilogy(f[m], spec[m], color=C[sh], label=sh)
@@ -584,7 +584,18 @@ def fig14(tt):
 
 
 def fig15(tt, radius=700):
-    """Residual swing spectrum at one radius, tangential + radial combined."""
+    """Residual swing spectrum at one radius, tangential + radial combined.
+
+    Frequencies are FFT bin centres, f_k = k / (n*dt) with dt = 20 ms.  The
+    transform is zero-padded to 8x the record length, which INTERPOLATES the
+    spectrum so peaks are easy to read off; it does not add real resolution,
+    which stays at 1/T set by the record length.
+
+    Amplitude scaling: a Hann window has a coherent gain of 0.5, so a
+    single-sided amplitude spectrum needs 4/N, not the 2/N that is correct for
+    an unwindowed transform.  Using 2/N here reported every amplitude at half
+    its true value.
+    """
     fig, ax = plt.subplots(figsize=(7.4, 4.0))
     for sh in TOWER_ORDER:
         sub = tt[(tt.shaper == sh) & (tt.trolley_nom_mm == radius)]
@@ -601,7 +612,7 @@ def fig15(tt, radius=700):
             tu = np.arange(tt_[0], tt_[-1], dt)
             yu = np.interp(tu, tt_, yy) * np.hanning(tu.size)
             n = 1 << int(np.ceil(np.log2(tu.size * 8)))
-            sp = np.abs(np.fft.rfft(yu, n)) * 2 / tu.size
+            sp = np.abs(np.fft.rfft(yu, n)) * 4 / tu.size   # 4/N: Hann coherent gain 0.5
             freq = np.fft.rfftfreq(n, dt)
             spec_sum = sp if spec_sum is None else spec_sum + sp
         m = (freq > 0.15) & (freq < 2.5)
