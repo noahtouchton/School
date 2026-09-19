@@ -64,23 +64,53 @@ def save(fig, name):
     return p
 
 
+def clean_end(row):
+    """How long after the start of the move this trial stays clean.
+
+    The record is only usable up to the moment the operator released the
+    button and the trolley ran back, because the return move re-excites the
+    payload.  `resid_window_s` already stops short of that, so the outbound
+    move plus that window is the whole trustworthy span.
+    """
+    return (row.move_t1 - row.move_t0) + row.resid_window_s
+
+
 def pick(tr, **kw):
-    """Best trial matching the given conditions: prefers a long residual
-    window so the plotted trace actually shows 4-5 oscillations."""
+    """Best trial matching the given conditions: the one that stays clean
+    longest, so the plotted curve reaches as far right as possible."""
     m = pd.Series(True, index=tr.index)
     for k, v in kw.items():
         m &= tr[k] == v
     sub = tr[m]
     if sub.empty:
         return None
-    return sub.sort_values(["cycles_available", "resid_window_s"],
-                           ascending=False).iloc[0]
+    return sub.assign(_end=sub.apply(clean_end, axis=1)) \
+              .sort_values("_end", ascending=False).iloc[0]
+
+
+def common_end(rows):
+    """Right-hand x limit that every supplied trial can fill.
+
+    Curves that stop part-way across a panel read as missing data, so each
+    bridge figure is cut to the shortest clean span among the trials it shows
+    (here the tf = 1100 ms unshaped trial, whose operator released the button
+    earliest).  Every curve then spans the full axis.
+    """
+    ends = [clean_end(r) for r in rows if r is not None]
+    return float(min(ends)) if ends else np.nan
 
 
 def bridge_trace(row, pad_before=1.0, pad_after=None):
+    """Deflection/velocity/position from `pad_before` before the move starts.
+
+    The trace ENDS at `clean_end(row)` unless `pad_after` is given explicitly.
+    The previous version used max(resid_window_s, 6.0), which on trials whose
+    clean window is shorter than 6 s ran past the release of the button and
+    plotted the return move as though it were residual oscillation.
+    """
     d = L.load_bridge(os.path.join(L.BRIDGE_DIR, row.file))
     t0, t1 = row.move_t0, row.move_t1
-    hi = t1 + (pad_after if pad_after else max(row.resid_window_s, 6.0))
+    hi = t1 + (pad_after if pad_after is not None else row.resid_window_s)
     m = (d["t"] >= t0 - pad_before) & (d["t"] <= hi)
     return d["t"][m] - t0, d["defl"][m], d["vel"][m], d["pos"][m]
 
@@ -113,25 +143,40 @@ def _tower_trace(row, chan, despike=True):
 
 # ---------------------------------------------------------------- Part A ----
 def fig01(tr):
+    """Part A payload deflection, styled to match the report's Figure 1.
+
+    Every curve is cut to `common_end`, the shortest clean span among the
+    trials shown, so no curve stops part-way across the axis.  Panels share
+    both axes: a shared y scale is what makes the move-distance trend legible,
+    since the whole point is that the tf = 1100 ms residual dwarfs the others.
+    """
     tfs = [1100, 1600, 2000]
-    fig, axes = plt.subplots(len(tfs), 1, figsize=(7.2, 7.0), sharex=True)
+    rows = {(tf, sh): pick(tr, part="A", shaper=sh, tf_ms=float(tf))
+            for tf in tfs for sh in ("Unshaped", "ZV")}
+    t_end = common_end(list(rows.values()))
+
+    fig, axes = plt.subplots(len(tfs), 1, figsize=(7.2, 7.0),
+                             sharex=True, sharey=True)
+    ymax = 0.0
     for ax, tf in zip(axes, tfs):
         for sh in ("Unshaped", "ZV"):
-            r = pick(tr, part="A", shaper=sh, tf_ms=float(tf))
+            r = rows[(tf, sh)]
             if r is None:
                 continue
-            t, y, v, _ = bridge_trace(r)
-            ax.plot(t, y - np.mean(y[t > r.move_t1 - r.move_t0]),
-                    color=C[sh], label=f"{sh}  ({r.amp_pp_mm:.0f} mm p-p)")
-            ax.axvspan(0, r.move_t1 - r.move_t0, color="0.85", zorder=0)
-        ax.set_ylabel("payload deflection (mm)")
-        ax.set_title(f"$t_f$ = {tf} ms   (move distance "
-                     f"{tr[(tr.part=='A')&(tr.tf_ms==tf)].move_dist_mm.mean():.0f} mm)")
-        ax.legend(loc="upper right")
-        ax.axhline(0, color="0.4", lw=0.6)
-    axes[-1].set_xlabel("time from start of move (s)  -  grey band = trolley moving")
-    fig.suptitle("Part A: ZV input shaping removes the residual payload swing at every "
-                 "move distance\n0.8 m cable, 100 % speed, trolley axis", y=1.0)
+            t, y, _, _ = bridge_trace(r)
+            keep = t <= t_end
+            y = y - np.mean(y[t > r.move_t1 - r.move_t0])
+            ax.plot(t[keep], y[keep], color=C[sh], label=sh)
+            ymax = max(ymax, float(np.max(np.abs(y[keep]))))
+        ax.axvline(0, color="0.6", lw=0.8, ls=":")
+        ax.axhline(0, color="0.5", lw=0.7)
+        ax.set_ylabel("deflection (mm)")
+        ax.set_title(f"$t_f$ = {tf} ms", loc="left")
+    axes[0].legend(ncol=2, loc="upper right")
+    axes[-1].set_xlim(-1.0, t_end)
+    axes[-1].set_ylim(-1.12 * ymax, 1.12 * ymax)
+    axes[-1].set_xlabel("time from start of move (s)")
+    fig.suptitle("Part A - Payload Deflection")
     fig.tight_layout()
     return save(fig, "fig01_partA_time_histories.png")
 
@@ -175,25 +220,34 @@ def fig02(tr, pred):
 
 # ---------------------------------------------------------------- Part B ----
 def fig03(tr):
+    """Part B payload deflection, styled to match the report's Figure 2."""
     cables = [600, 900, 1200]
-    fig, axes = plt.subplots(len(cables), 1, figsize=(7.2, 7.4), sharex=True)
+    rows = {(cb, sh): pick(tr, part="B", shaper=sh, cable_nom_mm=float(cb))
+            for cb in cables for sh in ("Unshaped", "ZV", "ZVD")}
+    t_end = common_end(list(rows.values()))
+
+    fig, axes = plt.subplots(len(cables), 1, figsize=(7.2, 7.4),
+                             sharex=True, sharey=True)
+    ymax = 0.0
     for ax, cb in zip(axes, cables):
         for sh in ("Unshaped", "ZV", "ZVD"):
-            r = pick(tr, part="B", shaper=sh, cable_nom_mm=float(cb))
+            r = rows[(cb, sh)]
             if r is None:
                 continue
-            t, y, v, _ = bridge_trace(r)
-            ax.plot(t, y - np.mean(y[t > r.move_t1 - r.move_t0]), color=C[sh],
-                    label=f"{sh}  ({r.amp_pp_mm:.0f} mm p-p)")
-        w, Tn = L.pendulum_freq(cb / 1000.0)
-        ax.set_ylabel("payload deflection (mm)")
-        ax.set_title(f"cable = {cb} mm   (T = {Tn:.2f} s, "
-                     f"$\\omega$ = {w:.2f} rad/s)")
-        ax.legend(loc="upper right", ncol=3)
-        ax.axhline(0, color="0.4", lw=0.6)
+            t, y, _, _ = bridge_trace(r)
+            keep = t <= t_end
+            y = y - np.mean(y[t > r.move_t1 - r.move_t0])
+            ax.plot(t[keep], y[keep], color=C[sh], label=sh)
+            ymax = max(ymax, float(np.max(np.abs(y[keep]))))
+        ax.axvline(0, color="0.6", lw=0.8, ls=":")
+        ax.axhline(0, color="0.5", lw=0.7)
+        ax.set_ylabel("deflection (mm)")
+        ax.set_title(f"cable = {cb/1000:.1f} m", loc="left")
+    axes[0].legend(ncol=3, loc="upper right")
+    axes[-1].set_xlim(-1.0, t_end)
+    axes[-1].set_ylim(-1.12 * ymax, 1.12 * ymax)
     axes[-1].set_xlabel("time from start of move (s)")
-    fig.suptitle("Part B: one ZV and one robust shaper across a 2:1 cable-length range\n"
-                 "$t_f$ = 1500 ms, 100 % speed", y=1.0)
+    fig.suptitle("Part B - Payload Deflection")
     fig.tight_layout()
     return save(fig, "fig03_partB_time_histories.png")
 
