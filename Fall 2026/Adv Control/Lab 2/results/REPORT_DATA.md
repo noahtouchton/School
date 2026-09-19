@@ -101,33 +101,33 @@ Measured from the swing spectra: f1 = 0.522 Hz and f2 = 1.600 Hz, i.e. -11 % and
 
 | shaper | trolley_nom_mm | actual_travel_deg | tan_amp_pp_rad | pct_tan | tan_m1_amp_pp_rad | pct_tan_m1 | tan_m2_amp_pp_rad | pct_tan_m2 | rad_amp_pp_rad | pct_rad |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Unshaped | 500 | 128.8 | 0.2782 | 100 | 0.2759 | 100 | 0.04221 | 100 | 0.1412 | 100 |
-| Unshaped | 700 | 128.8 | 0.3791 | 100 | 0.387 | 100 | 0.05614 | 100 | 0.1895 | 100 |
-| Unshaped | 900 | 129.2 | 0.456 | 100 | 0.464 | 100 | 0.06987 | 100 | 0.2297 | 100 |
-| ZV | 500 | 157.1 | 0.1809 | 65 | 0.1521 | 55.1 | 0.04819 | 114.2 | 0.08666 | 61.4 |
-| ZV | 700 | 157.1 | 0.2173 | 57.3 | 0.1972 | 51 | 0.06435 | 114.6 | 0.1194 | 63 |
-| ZV | 900 | 157.2 | 0.2562 | 56.2 | 0.2358 | 50.8 | 0.07776 | 111.3 | 0.1527 | 66.5 |
-| ZVD | 500 | 143.7 | 0.03277 | 11.8 | 0.02565 | 9.3 | 0.03217 | 76.2 | 0.03785 | 26.8 |
-| ZVD | 700 | 143.8 | 0.05161 | 13.6 | 0.04011 | 10.4 | 0.04369 | 77.8 | 0.03546 | 18.7 |
-| ZVD | 900 | 144 | 0.04819 | 10.6 | 0.05891 | 12.7 | 0.0515 | 73.7 | 0.04935 | 21.5 |
-| Two-mode ZV | 500 | 129 | 0.05647 | 20.3 | 0.07009 | 25.4 | 0.01368 | 32.4 | 0.04309 | 30.5 |
-| Two-mode ZV | 700 | 83.9 | 0.07573 | 20 | 0.09259 | 23.9 | 0.02032 | 36.2 | 0.06627 | 35 |
-| Two-mode ZV | 900 | 128.8 | 0.1123 | 24.6 | 0.1408 | 30.4 | 0.01946 | 27.9 | 0.0772 | 33.6 |
+| Unshaped | 500 | 128.8 | 0.2976 | 100 | 0.2759 | 100 | 0.03209 | 100 | 0.1452 | 100 |
+| Unshaped | 700 | 128.8 | 0.4288 | 100 | 0.387 | 100 | 0.03861 | 100 | 0.1956 | 100 |
+| Unshaped | 900 | 129.2 | 0.5229 | 100 | 0.464 | 100 | 0.04168 | 100 | 0.245 | 100 |
+| ZV | 500 | 157.1 | 0.1907 | 64.1 | 0.1521 | 55.1 | 0.04819 | 150.2 | 0.09525 | 65.6 |
+| ZV | 700 | 157.1 | 0.2422 | 56.5 | 0.1972 | 51 | 0.06362 | 164.8 | 0.1271 | 65 |
+| ZV | 900 | 157.2 | 0.2802 | 53.6 | 0.2358 | 50.8 | 0.07776 | 186.6 | 0.1656 | 67.6 |
+| ZVD | 500 | 143.7 | 0.03771 | 12.7 | 0.02565 | 9.3 | 0.02355 | 73.4 | 0.04162 | 28.7 |
+| ZVD | 700 | 143.8 | 0.05736 | 13.4 | 0.03614 | 9.3 | 0.03466 | 89.8 | 0.0506 | 25.9 |
+| ZVD | 900 | 144 | 0.05703 | 10.9 | 0.05185 | 11.2 | 0.03341 | 80.2 | 0.05356 | 21.9 |
+| Two-mode ZV | 500 | 129 | 0.07205 | 24.2 | 0.07009 | 25.4 | 0.00608 | 18.9 | 0.0535 | 36.8 |
+| Two-mode ZV | 700 | 83.9 | 0.08519 | 19.9 | 0.09259 | 23.9 | 0.00939 | 24.3 | 0.0723 | 37 |
+| Two-mode ZV | 900 | 128.8 | 0.1163 | 22.2 | 0.1408 | 30.4 | 0.01238 | 29.7 | 0.08447 | 34.5 |
 
 ### Averaged over the three radii
 
 | shaper | n | shaper_dur_s | actual_travel_deg | tan_amp_pp_rad | pct_tan | tan_m1_rad | pct_tan_m1 | tan_m2_rad | pct_tan_m2 | rad_amp_pp_rad | pct_rad |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Unshaped | 3 | 0 | 128.9 | 0.3711 | 100 | 0.3756 | 100 | 0.0561 | 100 | 0.1868 | 100 |
-| ZV | 3 | 0.8427 | 157.1 | 0.2181 | 59.5 | 0.195 | 52.3 | 0.0634 | 113.4 | 0.1196 | 63.63 |
-| ZVD | 3 | 1.711 | 143.8 | 0.0442 | 12 | 0.0416 | 10.8 | 0.0425 | 75.9 | 0.0409 | 22.33 |
-| Two-mode ZV | 3 | 1.697 | 113.9 | 0.0815 | 21.63 | 0.1012 | 26.57 | 0.0178 | 32.17 | 0.0622 | 33.03 |
+| Unshaped | 3 | 0 | 128.9 | 0.4165 | 100 | 0.3756 | 100 | 0.0375 | 100 | 0.1953 | 100 |
+| ZV | 3 | 0.8427 | 157.1 | 0.2377 | 58.07 | 0.195 | 52.3 | 0.0632 | 167.2 | 0.1293 | 66.07 |
+| ZVD | 3 | 1.711 | 143.8 | 0.0507 | 12.33 | 0.0379 | 9.933 | 0.0305 | 81.13 | 0.0486 | 25.5 |
+| Two-mode ZV | 3 | 1.697 | 113.9 | 0.0912 | 22.1 | 0.1012 | 26.57 | 0.0093 | 24.3 | 0.0701 | 36.1 |
 
 ### Answers to the four questions the handout asks
 
-**How does the slewing motion affect residual oscillations?** It puts swing in a direction a translational shaper is not designed to touch. Unshaped radial swing is 0.187 rad p-p against 0.371 rad tangential - the same order of magnitude. A straight-line move would leave essentially nothing in the cross-axis; here the centripetal and Coriolis terms of the rotating frame drive the payload outward along the jib during the slew and it rings radially afterwards. Note in the table that the single-mode ZV cuts tangential swing to 60 % but leaves radial swing at 64 % - essentially untouched. The shapers that help radially (ZVD, two-mode ZV, both around 10-30 %) do so because they smooth the velocity profile far more, not because they target the radial direction.
+**How does the slewing motion affect residual oscillations?** It puts swing in a direction a translational shaper is not designed to touch. Unshaped radial swing is 0.195 rad p-p against 0.416 rad tangential - the same order of magnitude. A straight-line move would leave essentially nothing in the cross-axis; here the centripetal and Coriolis terms of the rotating frame drive the payload outward along the jib during the slew and it rings radially afterwards. Note in the table that the single-mode ZV cuts tangential swing to 58 % but leaves radial swing at 66 % - essentially untouched. The shapers that help radially (ZVD, two-mode ZV, both around 10-30 %) do so because they smooth the velocity profile far more, not because they target the radial direction.
 
-**Does the radial distance of the trolley on the jib matter?** Yes, strongly and monotonically. Unshaped tangential swing grows from 0.278 rad at 500 mm to 0.456 rad at 900 mm - a factor of 1.6 for a 1.8x change in radius (Figure 09). The same slew rate at a larger radius means a larger tangential velocity and a larger centripetal acceleration at the payload, so there is more to excite. What does *not* change is the frequency: f1 and f2 are identical across radii to within the measurement, because the pendulum frequencies depend on L1, L2 and the mass ratio, not on where the trolley sits. That is why one shaper design works at all three radii, and the percentage reductions in the table are roughly radius-independent while the absolute amplitudes are not.
+**Does the radial distance of the trolley on the jib matter?** Yes, strongly and monotonically. Unshaped tangential swing grows from 0.298 rad at 500 mm to 0.523 rad at 900 mm - a factor of 1.8 for a 1.8x change in radius (Figure 09). The same slew rate at a larger radius means a larger tangential velocity and a larger centripetal acceleration at the payload, so there is more to excite. What does *not* change is the frequency: f1 and f2 are identical across radii to within the measurement, because the pendulum frequencies depend on L1, L2 and the mass ratio, not on where the trolley sits. That is why one shaper design works at all three radii, and the percentage reductions in the table are roughly radius-independent while the absolute amplitudes are not.
 
 **How did slewing (rather than translation) affect the shaper design?** It did not change the delays, because the mode frequencies are set by the suspension geometry and are radius-independent - the same impulse times work everywhere on the jib. What it changed is what a single-mode design can achieve: the excitation now has a cross-axis component the shaper cannot cancel, so the useful figure of merit becomes total swing rather than swing along the direction of travel, and a shaper that broadly smooths the command beats one that puts a deep notch at exactly one frequency.
 
@@ -136,15 +136,15 @@ Measured from the swing spectra: f1 = 0.522 Hz and f2 = 1.600 Hz, i.e. -11 % and
 | shaper | shaper_dur_s | pct_tan | pct_tan_m1 | pct_tan_m2 | pct_rad |
 |---|---|---|---|---|---|
 | Unshaped | 0 | 100 | 100 | 100 | 100 |
-| ZV | 0.8427 | 59.5 | 52.3 | 113.4 | 63.63 |
-| ZVD | 1.711 | 12 | 10.8 | 75.9 | 22.33 |
-| Two-mode ZV | 1.697 | 21.63 | 26.57 | 32.17 | 33.03 |
+| ZV | 0.8427 | 58.07 | 52.3 | 167.2 | 66.07 |
+| ZVD | 1.711 | 12.33 | 9.933 | 81.13 | 25.5 |
+| Two-mode ZV | 1.697 | 22.1 | 26.57 | 24.3 | 36.1 |
 
 Read that table with Figures 07, 10 and 12 together:
 
-- **ZV** is the cheapest (0.84 s added) but the weakest: mode 1 only to 52 %, and mode 2 to 113 % - i.e. slightly *worse* than unshaped, exactly as a single-mode design predicts (Figure 12 shows it has no notch at w2). **These three trials also need a caveat you should check against your lab notes.** In all three, the logged *actual* slew velocity sits at ~32.3 deg/s throughout, including during both intervals where the logged command asks for 16.2 deg/s, and the crane travelled 157 deg against a commanded 130 deg (Figure 07, top right). Either the half-amplitude steps were not applied to the drive, or this group's motion log is mis-scaled - note it is also the group carrying the x100 command-scale glitch. The vision block, and therefore the swing amplitudes, is a separate stream and is unaffected; it is the ZV trials' *geometry* (travel, tf, tracking) that is not trustworthy. Say what was measured and flag the ambiguity rather than asserting the shaping failed.
-- **ZVD as run** gives the lowest tangential number in the table (12 %), but it is the least trustworthy result: the amplitudes were mis-entered as [0.25, 0.50, 0.50] (same error as the bridge), the command therefore asked for 40.5 deg/s against a ~34 deg/s rate limit and **saturated**, and the crane travelled 144 deg against a commanded 163 deg. It also leaves mode 2 at 76 %.
-- **Two-mode ZV** is the one to argue for. It is the only shaper executed exactly as designed - Figure 07 shows the actual velocity tracking all four 0.25 steps cleanly, with no saturation and no command/velocity disagreement - the only one that moves the same 129 deg as the unshaped baseline (so its comparison is clean), and the only one that suppresses **both** modes: mode 1 to 27 % and mode 2 to 32 %, with radial swing at 33 %. Its cost is duration: 1.11 s of added move time, about the same as the three-impulse shaper and 0.27 s more than the ZV.
+- **ZV** is the cheapest (0.84 s added) but the weakest: mode 1 only to 52 %, and mode 2 to 167 % - i.e. slightly *worse* than unshaped, exactly as a single-mode design predicts (Figure 12 shows it has no notch at w2). **These three trials also need a caveat you should check against your lab notes.** In all three, the logged *actual* slew velocity sits at ~32.3 deg/s throughout, including during both intervals where the logged command asks for 16.2 deg/s, and the crane travelled 157 deg against a commanded 130 deg (Figure 07, top right). Either the half-amplitude steps were not applied to the drive, or this group's motion log is mis-scaled - note it is also the group carrying the x100 command-scale glitch. The vision block, and therefore the swing amplitudes, is a separate stream and is unaffected; it is the ZV trials' *geometry* (travel, tf, tracking) that is not trustworthy. Say what was measured and flag the ambiguity rather than asserting the shaping failed.
+- **ZVD as run** gives the lowest tangential number in the table (12 %), but it is the least trustworthy result: the amplitudes were mis-entered as [0.25, 0.50, 0.50] (same error as the bridge), the command therefore asked for 40.5 deg/s against a ~34 deg/s rate limit and **saturated**, and the crane travelled 144 deg against a commanded 163 deg. It also leaves mode 2 at 81 %.
+- **Two-mode ZV** is the one to argue for. It is the only shaper executed exactly as designed - Figure 07 shows the actual velocity tracking all four 0.25 steps cleanly, with no saturation and no command/velocity disagreement - the only one that moves the same 129 deg as the unshaped baseline (so its comparison is clean), and the only one that suppresses **both** modes: mode 1 to 27 % and mode 2 to 24 %, with radial swing at 36 %. Its cost is duration: 1.11 s of added move time, about the same as the three-impulse shaper and 0.27 s more than the ZV.
 
 The trade-off to state explicitly: a single-mode ZV is short but leaves the second mode entirely, and on a double pendulum that second mode is what you see and hear. Buying two-mode coverage costs roughly the duration of one extra half-period of the fast mode - cheap, because T2/2 is only 0.26 s.
 

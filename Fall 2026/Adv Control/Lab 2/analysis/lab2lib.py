@@ -281,13 +281,20 @@ def residual_metrics(t, y, t0, t1, min_swing=0.0, n_cycles_cap=None, detrend="me
     if len(pk) > 1:
         r.freq_fft2_hz = pk[1][0]
 
+    # Peak-to-peak is the full excursion of the detrended window.  Taking the
+    # largest ALTERNATING-EXTREMA swing instead under-reports a multi-mode
+    # signal: ripple from the faster mode makes the hysteresis detector commit
+    # a reversal part-way up a slow-mode swing, splitting it into pieces.  That
+    # let a single mode band read larger than the full-band signal it belongs
+    # to, which is impossible.  max - min cannot do that.
+    r.amp_pp_max = float(np.ptp(yc))
+
     idx = alternating_extrema(yc, min_swing)
     r.n_extrema = int(idx.size)
     if idx.size >= 2:
         swings = np.abs(np.diff(yc[idx]))
         r.amp_pp_mean = float(np.mean(swings))
         r.amp_pp_first = float(swings[0])
-        r.amp_pp_max = float(np.max(swings))
         r.amp_single_mean = r.amp_pp_mean / 2.0
         r.n_cycles = idx.size / 2.0
         # log-decrement damping from the |extrema| envelope
@@ -747,7 +754,7 @@ def bandpass_fft(t, y, f_lo, f_hi):
 
 
 def mode_amplitudes(t, y, mode_freqs_hz, bw_frac=0.30, min_swing=0.0,
-                    t_score_hi=None):
+                    t_score_lo=None, t_score_hi=None):
     """Split a multi-mode signal into one band per mode and score each band.
 
     A two-mode payload cannot be characterised by zero crossings - they count
@@ -758,9 +765,14 @@ def mode_amplitudes(t, y, mode_freqs_hz, bw_frac=0.30, min_swing=0.0,
 
     Filtering always uses the WHOLE record, because the frequency resolution of
     a short window is too coarse to locate a mode.  Amplitudes are then scored
-    only up to `t_score_hi`, so every trial is scored over the same span even
-    though the records have different lengths.  Frequencies therefore come from
-    the full record and amplitudes from a fixed window.
+    only on [`t_score_lo`, `t_score_hi`], so every trial is scored over the same
+    span even though the records have different lengths.  Frequencies therefore
+    come from the full record and amplitudes from a fixed window.
+
+    Both bounds matter.  With only an upper bound the scoring window silently
+    started at the beginning of the record, which on the tower meant it
+    included the move itself - so a per-mode amplitude could come out LARGER
+    than the full-band residual it is supposed to be a component of.
 
     `f_at_band_edge` is set when the in-band spectral peak lands on a band
     limit, which means there is no real mode there - only leakage from outside.
@@ -784,13 +796,16 @@ def mode_amplitudes(t, y, mode_freqs_hz, bw_frac=0.30, min_swing=0.0,
         edge = bool(np.isfinite(fpk) and (fpk < lo * 1.03 or fpk > hi * 0.97))
 
         # amplitude over the common scoring window only
+        sel = np.ones(tt.size, dtype=bool)
+        if t_score_lo is not None:
+            sel &= tt >= t_score_lo
         if t_score_hi is not None:
-            sel = tt <= t_score_hi
-            if sel.sum() >= 16:
-                tt, yy = tt[sel], yy[sel]
+            sel &= tt <= t_score_hi
+        if sel.sum() >= 16:
+            tt, yy = tt[sel], yy[sel]
         idx = alternating_extrema(yy, min_swing)
         swings = np.abs(np.diff(yy[idx])) if idx.size >= 2 else np.array([np.nan])
-        d.update(amp_pp=float(np.nanmax(swings)) if swings.size else np.nan,
+        d.update(amp_pp=float(np.ptp(yy)),
                  amp_pp_mean=float(np.nanmean(swings)) if swings.size else np.nan,
                  rms=float(np.sqrt(np.mean(yy ** 2))),
                  f_peak_hz=fpk, f_at_band_edge=edge,

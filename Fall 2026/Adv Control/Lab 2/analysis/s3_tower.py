@@ -192,7 +192,7 @@ def analyse(path):
             row[f"{tag}_peak_pp_deg"] = round(np.degrees(p.amp_pp_max), 2)
 
             modes = L.mode_amplitudes(tvv, yy, [f1, f2], min_swing=MIN_SWING,
-                                      t_score_hi=t_hi)
+                                      t_score_lo=t_lo, t_score_hi=t_hi)
             for m in modes:
                 i = m["mode"]
                 row[f"{tag}_m{i}_amp_pp_rad"] = round(m["amp_pp"], 5)
