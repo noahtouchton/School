@@ -31,3 +31,6 @@ desktop.ini
 Spring 2026/Mechanical Design 3/Final Code/Gantry Code Iterations - Run w: Arduino/
 Spring 2026/Mechanical Design 3/Final Code/Image Processing - Run w: Python (Cursor)/
 Spring 2026/Mechanical Design 3/Final Code/Toolhead Movement - Run w: Arduino/
+
+# --- Crane optimal-control backup (rewritten by every find_min_time run) ---
+crane_solution_backup.mat
