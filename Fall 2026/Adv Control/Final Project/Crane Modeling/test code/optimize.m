@@ -5,7 +5,7 @@
 
 
 
-N = 40;
+N = 90;
 tf_guess = 5.0; 
 tf_min = 0.5;
 tf_max = 30.0;
@@ -51,8 +51,8 @@ R_pay = 0.08;  % payload radius (clearance margin)
 
 % Obstacle 1: wall/block, 0.4m wide, 0.04m thick, 1.0m tall
 obs(1).type   = 'box';
-obs(1).center = [0.45; 0.05; 0.50];
-obs(1).half   = [0.20; 0.02; 0.50];
+obs(1).center = [0.45; 0.05; 0.750];
+obs(1).half   = [0.20; 0.02; 0.750];
 
 % Obstacle 2: pillar at X=0.60, Y=0.10, radius 0.05m, height 0 to 1.2m
 obs(2).type = 'cylinder';

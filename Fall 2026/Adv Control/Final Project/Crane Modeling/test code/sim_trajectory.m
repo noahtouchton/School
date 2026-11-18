@@ -100,7 +100,9 @@ if animate
     XA = interp1(t, X.', tA).';
     QA = payload_xyz(XA);  PA = [XA(1, :).*cos(XA(3, :)); XA(1, :).*sin(XA(3, :)); zeros(size(tA))];
     lift = [0; 0; H];
-    fa = figure('Name', 'Crane animation', 'Color', 'w');  ax = axes(fa);  hold(ax, 'on');  grid(ax, 'on');
+    fa = figure('Name', 'Crane animation', 'Color', 'w', 'WindowStyle', 'normal', ...
+                'Position', [1230 60 700 750]);                % own window, not docked in the editor
+    ax = axes(fa);  hold(ax, 'on');  grid(ax, 'on');
     axis(ax, 'equal');  view(ax, 40, 25);
     R = 1.2*max(S.x_ub(1), 0.5);
     xlim(ax, [-R R]);  ylim(ax, [-R R]);  zlim(ax, [0 H + 0.1]);  xlabel(ax, 'X (m)');  ylabel(ax, 'Y (m)');  zlabel(ax, 'Z (m)');
