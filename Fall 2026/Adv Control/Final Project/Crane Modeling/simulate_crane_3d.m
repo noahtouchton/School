@@ -24,7 +24,7 @@ r_p = 0.03;  % Pin radius (m)
 c_clr = 0.02; % Clearance: payload size + safety margin (m)
 z_top = -0.60; % Pin top relative to jib height (m)
 
-W_obs = 10; % Obstacle wall strength
+W_obs = 5; % Obstacle wall strength
 k_x = 1; % Trolley-limit wall strength
 W_t = 0; % Time price
 
@@ -40,9 +40,9 @@ x0 = 0.70; l0 = 1.00;
 
 X0 = [x0; l0; 0; 0; 0; 0; 0; 0; 0; 0];
 kdir = 1; % +1 is one counter clockwise loop around the pin. -1 for clockwise
-t_f = 8;   % warm-up horizon. Longer is NOT easier: 25 s and 40 s failed for 2 loops (costates get stiff)
+t_f = 30;   % warm-up horizon. Longer is NOT easier: 25 s and 40 s failed for 2 loops (costates get stiff)
 
-R_p_start = 0.8;
+R_p_start = 0.7;
 R_p_final = 0.9;
 
 make_params = @(R_p, k_x, W_t) [g; r1; r2; r3; xmax; lmax; dxmax; dlmax; dthmax; ...
