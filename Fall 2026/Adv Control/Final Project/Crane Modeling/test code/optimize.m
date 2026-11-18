@@ -1,7 +1,9 @@
-clc; clear;
+    clc; clear;
 
 % x = [x; l; th; phi; psi; dx; dl; dth; dphi; dpsi]
 % u = [ddx; ddl; ddth]
+
+
 
 N = 40;
 tf_guess = 5.0; 
@@ -24,15 +26,15 @@ ddl_min = -30.0e-3; ddl_max = -ddl_min;
 %% Starting and Ending states
 
 % Trolley
-x_start = 0.5; x_end = 0.4;
+x_start = 0.5; x_end = 0.5;
 dx_start = 0.0; dx_end = 0.0;
 
 % Hoist
-l_start = 1.0; l_end = 0.6;
+l_start = 1.0; l_end = 1.0;
 dl_start = 0.0; dl_end = 0.0;
 
 % Slew
-th_start = deg2rad(0.0); th_end = deg2rad(100.0);
+th_start = deg2rad(-10.0); th_end = deg2rad(100.0);
 dth_start = 0.0; dth_end = 0.0;
 
 % Phi and Psi
@@ -42,6 +44,21 @@ dphi_start = 0.0; dphi_end = 0.0;
 dpsi_start = 0.0; dpsi_end = 0.0;
 
 
+
+%% Obstacles (ground frame, Z up from the floor)
+H_jib = 2.0;   % height of the jib above the floor
+R_pay = 0.08;  % payload radius (clearance margin)
+
+% Obstacle 1: wall/block, 0.4m wide, 0.04m thick, 1.0m tall
+obs(1).type   = 'box';
+obs(1).center = [0.45; 0.05; 0.50];
+obs(1).half   = [0.20; 0.02; 0.50];
+
+% Obstacle 2: pillar at X=0.60, Y=0.10, radius 0.05m, height 0 to 1.2m
+obs(2).type = 'cylinder';
+obs(2).xy   = [0.60; 0.10];
+obs(2).R    = 0.05;
+obs(2).z    = [0.0; 1.2];
 
 % Initial state and control guesses
 xInitial = [x_start; l_start; th_start; phi_start; psi_start; ...
@@ -103,7 +120,7 @@ options = optimoptions('fmincon', 'Algorithm', 'sqp', ...
 
 Z_opt = fmincon(@(Z) cost_fun(Z, idx_u, idx_tf, N, u_ub, w_t), Z0, ...
     [], [], [], [], lb, ub, ...
-    @(Z) nonlcon_fun(Z, idx_x, idx_u, idx_tf, N, nx), options);
+    @(Z) nonlcon_fun(Z, idx_x, idx_u, idx_tf, N, nx, obs, H_jib, R_pay), options);
 
 % Unpack optimal trajectories into clean matrices
 tf_opt = Z_opt(idx_tf);
@@ -120,6 +137,9 @@ traj.w_t     = w_t;           % time weight in the cost (shown on the sim plot)
 traj.N       = N;
 traj.x_lb    = x_lb;   traj.x_ub = x_ub;      % limits, so the sim can check them
 traj.u_lb    = u_lb;   traj.u_ub = u_ub;
+traj.obs     = obs;           % obstacle struct array (see Obstacles section)
+traj.H_jib   = H_jib;         % jib height used for the obstacle constraints
+traj.R_pay   = R_pay;         % payload radius used for the obstacle constraints
 traj.created = char(datetime('now'));
 out_file = fullfile(fileparts(mfilename('fullpath')), 'trajectory.mat');
 save(out_file, '-struct', 'traj');
@@ -139,7 +159,7 @@ function J = cost_fun(Z, idx_u, idx_tf, N, u_ub, w_t)
     J = sum(0.5 * dt * (effort(1:end-1) + effort(2:end))) + w_t * tf;
 end
 
-function [c, ceq] = nonlcon_fun(Z, idx_x, idx_u, idx_tf, N, nx)
+function [c, ceq] = nonlcon_fun(Z, idx_x, idx_u, idx_tf, N, nx, obs, H_jib, R_pay)
     x = Z(idx_x);
     u = Z(idx_u);
     tf = Z(idx_tf);
@@ -155,5 +175,28 @@ function [c, ceq] = nonlcon_fun(Z, idx_x, idx_u, idx_tf, N, nx)
         ceq((k-1)*nx + (1:nx)) = defect;
     end
 
-    c = [];
+    num_obs = numel(obs);
+    c = zeros(num_obs * (N+1), 1);
+    row = 1;
+
+    for k = 1:(N+1)
+        % Map states into Payload Position [Xp; Yp; Zp]
+        xk = x(1, k); lk = x(2, k); thk = x(3, k);
+        phik = x(4,k); psik = x(5,k);
+
+        r_loc = xk + lk *sin(phik)*cos(psik);
+        t_loc = lk*sin(psik);
+        z_loc = H_jib - lk*cos(phik)*cos(psik);
+
+        Xp = r_loc *cos(thk) - t_loc*sin(thk);
+        Yp = r_loc *sin(thk) + t_loc*cos(thk);
+        Zp = z_loc;
+        p_pay = [Xp; Yp; Zp];
+
+        % Enforce SDF >= 0  ->  -SDF <= 0
+        for j = 1:num_obs
+            c(row + j - 1) = -obstacle_sdf(p_pay, obs(j), R_pay);
+        end
+        row = row + num_obs;
+    end
 end
